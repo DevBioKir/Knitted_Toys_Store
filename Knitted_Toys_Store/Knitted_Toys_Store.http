@@ -1,0 +1,6 @@
+@Knitted_Toys_Store_HostAddress = http://localhost:5237
+
+GET {{Knitted_Toys_Store_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
