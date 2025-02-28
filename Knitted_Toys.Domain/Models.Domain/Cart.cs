@@ -1,17 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using System.Runtime.InteropServices;
 
-namespace Knitted_Toys.Domain.Models.Domain
+namespace Knitted_Toys_Store.Domain.Models.Domain
 {
     public class Cart
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
-        public int SessionId { get; set; } //идентификатор сессии пользователя, если не сработает то вернуть int
-        public DateTime CreateAt { get; set; } = DateTime.UtcNow;  //Дата создания корзины
-        public DateTime LastUpdate { get; set; } = DateTime.UtcNow;//Дата последнего обновления корзины
-        public List<CartItems> CartItems { get; set; } = []; //у корзины может быть много Toy
+        public Guid Id { get; private set; } 
+        public Guid SessionId { get; private set; } //идентификатор сессии пользователя, если не сработает то вернуть int
+        public DateTime CreateAt { get; private set; } //Дата создания корзины
+        public DateTime LastUpdate { get; private set; } //Дата последнего обновления корзины
+        public decimal TotalAmount { get; private set; } = 0;
+
+        public List<CartItems> CartItems { get; private set; } = []; //у корзины может быть много Toy
+
+        public static Cart Create(Guid sessionId) //фабричный метод
+        {
+            return new Cart()
+            {
+                Id = Guid.NewGuid(),
+                SessionId = sessionId,
+                CreateAt = DateTime.UtcNow,
+                LastUpdate = DateTime.UtcNow
+            };
+        }
+        public void CartLastUpdate() //обновление времени последнего изменения
+        {
+            LastUpdate = DateTime.UtcNow;
+        }
+        public void TotalAmountUpdate()
+        {
+            if (CartItems.Any(item => item.Toy == null))
+                throw new InvalidOperationException("The toys are not loaded!");
+
+            TotalAmount = CartItems.Sum(item => item.Quantity * item.Toy.Price);
+        }
     }
 }

@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35818.85 d17.13
+VisualStudioVersion = 17.13.35818.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knitted_Toys_Store", "Knitted_Toys_Store\Knitted_Toys_Store.csproj", "{31B6375E-452E-446C-A787-145162A65626}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knitted_Toys.Domain", "Knitted_Toys.Domain\Knitted_Toys.Domain.csproj", "{C29D9E8F-712C-4C09-87E3-0A80EC14E445}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knitted_Toys_Store.Domain", "Knitted_Toys.Domain\Knitted_Toys_Store.Domain.csproj", "{C29D9E8F-712C-4C09-87E3-0A80EC14E445}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knitted_Toys_Store.DataAccess", "Knitted_Toys_Store.DataAccess\Knitted_Toys_Store.DataAccess.csproj", "{EA140A00-BCC4-4A86-8382-14457ED115A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{C29D9E8F-712C-4C09-87E3-0A80EC14E445}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C29D9E8F-712C-4C09-87E3-0A80EC14E445}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C29D9E8F-712C-4C09-87E3-0A80EC14E445}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA140A00-BCC4-4A86-8382-14457ED115A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA140A00-BCC4-4A86-8382-14457ED115A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA140A00-BCC4-4A86-8382-14457ED115A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA140A00-BCC4-4A86-8382-14457ED115A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

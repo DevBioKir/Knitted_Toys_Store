@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Knitted_Toys.Domain.Models.Domain
+﻿
+namespace Knitted_Toys_Store.Domain.Models.Domain
 {
     public class Toy
     {
@@ -21,15 +16,15 @@ namespace Knitted_Toys.Domain.Models.Domain
             Price = price;
             ImageUrl = imageUrl;
         }
-        public Guid Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public string Size { get; set; } = string.Empty;
-        public decimal Price { get; set; }
-        public string ImageUrl { get; set; } = string.Empty;//путь к изображению
+        public Guid Id { get; }
+        public string Name { get; } = string.Empty;
+        public string Description { get; } = string.Empty;
+        public string Size { get; } = string.Empty;
+        public decimal Price { get; }
+        public string ImageUrl { get; } = string.Empty;//путь к изображению
 
-        public List<OrderItems> OrderItems { get; set; } = []; //у одной игрушки может быть много позиций в заказе
-        public List<CartItems> CartItems { get; set; } = []; //у одной игрушки может быть много позиций в корзине
+        public List<OrderItems> OrderItems { get; } = []; //у одной игрушки может быть много позиций в заказе
+        public List<CartItems> CartItems { get; } = []; //у одной игрушки может быть много позиций в корзине
 
         public (Toy Toy, string Error) CreateToy(string name, string description, string size, decimal price, string imageUrl)
         {

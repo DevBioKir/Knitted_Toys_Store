@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Knitted_Toys.Domain.Models.Domain
+﻿
+namespace Knitted_Toys_Store.Domain.Models.Domain
 {
     
     public enum OrderStatus
@@ -18,21 +13,10 @@ namespace Knitted_Toys.Domain.Models.Domain
 
     public class Order
     {
-        public Order(decimal totalAmount, string surname, string name, string phone, string email, string deliveryAddress, string deliveryNotes)
-        {
-            TotalAmount = totalAmount;
-            SurnameCustomer = surname;
-            NameCustomer = name;
-            PhoneNumber = phone;
-            Email = email;
-            DeliveryAddress = deliveryAddress;
-            DeliveryNotes = deliveryNotes;
-        }
-
-        public Guid Id { get; private set; } = Guid.NewGuid();
-        public DateTime OrderDate { get; private set; } = DateTime.UtcNow;//дата создания заказа
+        public Guid Id { get; private set; }
+        public DateTime OrderDate { get; private set; } //дата создания заказа
         public decimal TotalAmount { get; private set; } //общая сумма заказа
-        public OrderStatus Status { get; private set; } = OrderStatus.Pending; //статус заказа
+        public OrderStatus Status { get; private set; } //статус заказа
 
         public string? SurnameCustomer { get; private set; } = string.Empty; //Фамилия заказчика
         public string? NameCustomer { get; private set; } = string.Empty; //Имя заказчика
@@ -41,6 +25,46 @@ namespace Knitted_Toys.Domain.Models.Domain
         public string? DeliveryAddress { get; private set; } = string.Empty; //адрес доставки
         public string? DeliveryNotes { get; private set; } = string.Empty;
 
-        public List<OrderItems> OrderItems { get; set; } = []; //у одного заказа может быть много товаров
+        public List<OrderItems> OrderItems { get; private set; } = []; //у одного заказа может быть много товаров
+
+        public static Order Create(
+            string surname, string name, string phone, string email, string deliveryAddress,
+            string deliveryNotes, List<OrderItems> orderItems, decimal totalAmount)
+        {
+            if (string.IsNullOrWhiteSpace(surname) || string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Customer name and surname cannot be empty");
+
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(deliveryAddress))
+                throw new ArgumentException("The mail and the delivery address cannot be empty");
+
+            if (orderItems == null || orderItems.Count == 0)
+                throw new ArgumentException("Order must contain at least one item");
+
+            if (totalAmount < 0)
+                throw new ArgumentException("Total amount must be greater than zero");
+
+            var order = new Order
+            {
+                Id = Guid.NewGuid(),
+                OrderDate = DateTime.UtcNow,
+                Status = OrderStatus.Pending,
+                SurnameCustomer = surname,
+                NameCustomer = name,
+                PhoneNumber = phone,
+                Email = email,
+                DeliveryAddress = deliveryAddress,
+                OrderItems = orderItems
+            };
+            order.UpdateTotalAmount();
+            return order;
+        }
+        public void UpdateTotalAmount()
+        {
+            TotalAmount = OrderItems.Sum(item => item.Quantity * item.PriceAtTime);
+        }
+        public void UpdateStatus(OrderStatus newStatus)
+        {
+            Status = newStatus;
+        }
     }
 }
