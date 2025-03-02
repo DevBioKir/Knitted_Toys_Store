@@ -3,7 +3,7 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
 {
     public class CartItems
     {
-        public Guid Id { get; private set; } = Guid.NewGuid();
+        public Guid Id { get; private set; }
         public Guid CartId { get; private set; } //внешний ключ на Cart
         public Guid ToyId { get; private set; } //внешний ключ на Toy
         public int Quantity { get; private set; } //количество товара
@@ -23,6 +23,12 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
                 Quantity = quantity,
                 AddedAt = DateTime.UtcNow
             };
+        }
+        public void UpdateQuantity(int newQuantity)
+        {
+            if (newQuantity <= 0) throw new ArgumentException("The number must be greater than 0");
+
+            Quantity = newQuantity;
         }
     }
 }

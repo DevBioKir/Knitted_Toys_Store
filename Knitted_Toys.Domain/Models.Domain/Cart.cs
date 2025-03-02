@@ -34,5 +34,15 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
 
             TotalAmount = CartItems.Sum(item => item.Quantity * item.Toy.Price);
         }
+
+        public void UpdateItemQuantity(Guid toyId, int newQuantity)
+        {
+            var item = CartItems.FirstOrDefault(ci => ci.Toy.Id == toyId);
+
+            if (item == null) throw new InvalidOperationException("The toy was not found in the cart");
+
+            item.UpdateQuantity(newQuantity);
+            TotalAmountUpdate();
+        }
     }
 }

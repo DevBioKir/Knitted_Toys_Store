@@ -7,57 +7,48 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
         const int MAX_LENGTH_DESCRIPTION = 3000;
         const int MAX_LENGTH_SIZE = 20;
 
-        private Toy(string name, string description, string size, decimal price, string imageUrl)
-        {
-            Id = Guid.NewGuid(); // Генерируем новый Id внутри конструктора
-            Name = name;
-            Description = description;
-            Size = size;
-            Price = price;
-            ImageUrl = imageUrl;
-        }
-        public Guid Id { get; }
-        public string Name { get; } = string.Empty;
-        public string Description { get; } = string.Empty;
-        public string Size { get; } = string.Empty;
-        public decimal Price { get; }
-        public string ImageUrl { get; } = string.Empty;//путь к изображению
+        public Guid Id { get; private set; }
+        public string Name { get; private set; } = string.Empty;
+        public string Description { get; private set; } = string.Empty;
+        public string Size { get; private set; } = string.Empty;
+        public decimal Price { get; private set; }
+        public string ImageUrl { get; private set; } = string.Empty;//путь к изображению
 
         public List<OrderItems> OrderItems { get; } = []; //у одной игрушки может быть много позиций в заказе
         public List<CartItems> CartItems { get; } = []; //у одной игрушки может быть много позиций в корзине
 
-        public (Toy Toy, string Error) CreateToy(string name, string description, string size, decimal price, string imageUrl)
+        public static Toy Create(
+            string name, string description, string size, decimal price, string imageUrl)
         {
-            var error = string.Empty;
-
             if (string.IsNullOrWhiteSpace(name) || name.Length > MAX_LENGTH_NAME)
             {
-                error = "Name toy must not be empty and should not exceed 200 characters.";
-                return (null, error);
+                throw new ArgumentException("Name toy must not be empty and should not exceed 200 characters.");
             }
             if (description.Length > MAX_LENGTH_DESCRIPTION)
             {
-                error = "Description should not exceed 3000 characters.";
-                return (null, error);
+                throw new ArgumentException("Description should not exceed 3000 characters.");
             }
             if (string.IsNullOrWhiteSpace(size) || size.Length > MAX_LENGTH_SIZE)
             {
-                error = "Size must not be empty and should not exceed 50 characters.";
-                return (null, error);
+                throw new ArgumentException("Size must not be empty and should not exceed 20 characters.");
             }
             if (price <= 0)
             {
-                error = "Price must be a positive value.";
-                return (null, error);
+                throw new ArgumentException("Price must be greater than zero.");
             }
             if (string.IsNullOrWhiteSpace(imageUrl))
             {
-                error = "Image URL must not be empty.";
+                throw new ArgumentException("Image URL must not be empty.");
             }
-
-            var toy = new Toy(name, description, size, price, imageUrl);
-
-            return (toy, error);
+            return new Toy
+            {
+                Id = Guid.NewGuid(),
+                Name = name,
+                Description = description,
+                Size = size,
+                Price = price,
+                ImageUrl = imageUrl
+            };
         }
     }
 }
