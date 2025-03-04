@@ -3,13 +3,36 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
 {
     public class OrderItems
     {
-        public Guid Id { get; } = Guid.NewGuid();//уникальный идентификатор позиции
-        public Guid OrderId { get; } //внешний ключ на Orders
-        public Guid ToyId { get; } //внешний ключ на Toy
-        public int Quantity { get; } //количество товара
-        public decimal PriceAtTime { get; } //цена на момент заказа
+        public Guid Id { get; private set; }//уникальный идентификатор позиции
+        public Guid OrderId { get; private set; } //внешний ключ на Orders
+        public Guid ToyId { get; private set; } //внешний ключ на Toy
+        public int Quantity { get; private set; } //количество товара
+        public decimal PriceAtTime { get; private set; } //цена на момент заказа
 
-        public required Order Order { get; set; } //ссылка на Orders
-        public required Toy Toy { get; set; } //ссылка на Toy
+        public Order Order { get; private set; } //ссылка на Orders
+        public Toy Toy { get; private set; } //ссылка на Toy
+
+        private OrderItems() { } // пустой конструктор для EF Core
+
+        private OrderItems(Guid orderId, Guid toyId, int quantity, decimal priceAtTime)
+        {
+            Id = Guid.NewGuid();
+            OrderId = orderId;
+            ToyId = toyId;
+            Quantity = quantity;
+            PriceAtTime = priceAtTime;
+        }
+
+        public static OrderItems Create(Guid orderId, Guid toyId, int quantity, decimal priceAtTime)
+        {
+            if (quantity <= 0)
+                throw new ArgumentException("Quantity must be greater than zero.");
+
+            if (priceAtTime < 0)
+                throw new ArgumentException("Price must be non-negative.");
+
+            return new OrderItems(orderId, toyId, quantity, priceAtTime);
+        }
     }
 }
+

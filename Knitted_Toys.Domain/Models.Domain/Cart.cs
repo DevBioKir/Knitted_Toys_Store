@@ -5,8 +5,7 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
 {
     public class Cart
     {
-        public Guid Id { get; private set; } 
-        public Guid SessionId { get; private set; } //идентификатор сессии пользователя, если не сработает то вернуть int
+        public Guid Id { get; private set; } //сохранять его в cookies
         public DateTime CreateAt { get; private set; } //Дата создания корзины
         public DateTime LastUpdate { get; private set; } //Дата последнего обновления корзины
         public decimal TotalAmount { get; private set; } = 0;
@@ -18,7 +17,6 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
             return new Cart()
             {
                 Id = Guid.NewGuid(),
-                SessionId = sessionId,
                 CreateAt = DateTime.UtcNow,
                 LastUpdate = DateTime.UtcNow
             };

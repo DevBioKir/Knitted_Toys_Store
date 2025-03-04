@@ -29,7 +29,7 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
 
         public static Order Create(
             string surname, string name, string phone, string email, string deliveryAddress,
-            string deliveryNotes, List<OrderItems> orderItems, decimal totalAmount)
+            string deliveryNotes, List<OrderItems> orderItems)
         {
             if (string.IsNullOrWhiteSpace(surname) || string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Customer name and surname cannot be empty");
@@ -40,13 +40,14 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
             if (orderItems == null || orderItems.Count == 0)
                 throw new ArgumentException("Order must contain at least one item");
 
-            if (totalAmount < 0)
-                throw new ArgumentException("Total amount must be greater than zero");
+            //вычисляем сумму
+            decimal totalAmount = orderItems.Sum(item => item.Quantity * item.PriceAtTime);
 
-            var order = new Order
+            return new Order
             {
                 Id = Guid.NewGuid(),
                 OrderDate = DateTime.UtcNow,
+                TotalAmount = totalAmount, //при создании передаем вычисленную сумму
                 Status = OrderStatus.Pending,
                 SurnameCustomer = surname,
                 NameCustomer = name,
@@ -55,12 +56,6 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
                 DeliveryAddress = deliveryAddress,
                 OrderItems = orderItems
             };
-            order.UpdateTotalAmount();
-            return order;
-        }
-        public void UpdateTotalAmount()
-        {
-            TotalAmount = OrderItems.Sum(item => item.Quantity * item.PriceAtTime);
         }
         public void UpdateStatus(OrderStatus newStatus)
         {

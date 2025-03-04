@@ -13,7 +13,7 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
 
         public static CartItems Create(Guid cartId, Guid toyId, int quantity)
         {
-            if (quantity < 0) throw new ArgumentException("Quantity must be greater than zero");
+            if (quantity <= 0) throw new ArgumentException("Quantity must be greater than zero");
 
             return new CartItems
             {

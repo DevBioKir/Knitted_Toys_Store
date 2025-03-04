@@ -17,6 +17,7 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
         public List<OrderItems> OrderItems { get; } = []; //у одной игрушки может быть много позиций в заказе
         public List<CartItems> CartItems { get; } = []; //у одной игрушки может быть много позиций в корзине
 
+        private Toy() { }
         public static Toy Create(
             string name, string description, string size, decimal price, string imageUrl)
         {
@@ -24,7 +25,7 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
             {
                 throw new ArgumentException("Name toy must not be empty and should not exceed 200 characters.");
             }
-            if (description.Length > MAX_LENGTH_DESCRIPTION)
+            if (string.IsNullOrWhiteSpace(name) || description.Length > MAX_LENGTH_DESCRIPTION)
             {
                 throw new ArgumentException("Description should not exceed 3000 characters.");
             }

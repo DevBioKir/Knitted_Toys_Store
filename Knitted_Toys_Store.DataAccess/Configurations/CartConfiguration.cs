@@ -10,8 +10,7 @@ namespace Knitted_Toys_Store.DataAccess.Configurations
         {
             builder.HasKey(c => c.Id);
 
-            builder.Property(c => c.SessionId)
-                .IsRequired();
+
             builder.Property(c => c.CreateAt)
                 .IsRequired();
             builder.Property(c => c.LastUpdate)

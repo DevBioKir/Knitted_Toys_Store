@@ -16,7 +16,7 @@ namespace Knitted_Toys_Store.DataAccess.Configurations
                 .IsRequired()
                 .HasMaxLength(20);
 
-            builder.Property(o => o.TotalAmount).HasPrecision(18, 5);
+            builder.Property(o => o.TotalAmount).HasPrecision(18, 2);
             builder.Property(o => o.OrderDate).IsRequired();
             
             
