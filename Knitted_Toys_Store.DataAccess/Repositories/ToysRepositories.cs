@@ -14,7 +14,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             _context = context;
         }
 
-        public async Task<List<Toy>> GetAllToys() //Получение всех игрушек //Возвращает Toy из типа Domain
+        public async Task<List<Toy>> GetAllToysAsync() //Получение всех игрушек //Возвращает Toy из типа Domain
         {
             var entitiesToy = await _context.Toys //получение Entties Toy
                 .AsNoTracking() //не отслеживать изменения
@@ -27,7 +27,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             return toys;
         }
 
-        public async Task<Guid> CreateToy(Toy toy) //Создать игрушку
+        public async Task<Guid> CreateToyAsync(Toy toy) //Создать игрушку
         {
             var entitiesToy = new ToyEntity //создание экземпляра игрушки
             {
@@ -43,7 +43,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             return entitiesToy.Id; //получаем id игрушки, чтобы удостоверится что была создана игрушка в БД
         }
 
-        public async Task<Guid> Update(Guid id, string name, string description, string size, decimal price, string imageUrl)
+        public async Task<Guid> UpdateAsync(Guid id, string name, string description, string size, decimal price, string imageUrl)
         {
             var toys = await _context.Toys.FirstOrDefaultAsync(t => t.Id == id); //поиск игрушки по Id
             if (toys == null) throw new KeyNotFoundException($"Toy with ID {id} not found"); //если такой игрушки нет, выкинуть исключение
@@ -60,7 +60,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             return id; //выведем как результат успеха операции
         }
 
-        public async Task<Guid> Delete(Guid id)
+        public async Task<Guid> DeleteAsync(Guid id)
         {
             await _context.Toys
                 .Where(t => t.Id == id)

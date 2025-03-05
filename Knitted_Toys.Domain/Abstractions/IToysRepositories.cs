@@ -5,9 +5,9 @@ namespace Knitted_Toys_Store.Domain.Abstractions
 {
     public interface IToysRepositories
     {
-        Task<Guid> CreateToy(Toy toy);
-        Task<Guid> Delete(Guid id);
-        Task<List<Toy>> GetAllToys();
-        Task<Guid> Update(Guid id, string name, string description, string size, decimal price, string imageUrl);
+        Task<Guid> CreateToyAsync(Toy toy);
+        Task<Guid> DeleteAsync(Guid id);
+        Task<List<Toy>> GetAllToysAsync();
+        Task<Guid> UpdateAsync(Guid id, string name, string description, string size, decimal price, string imageUrl);
     }
 }

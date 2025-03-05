@@ -12,7 +12,7 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
 
         public List<CartItems> CartItems { get; private set; } = []; //у корзины может быть много Toy
 
-        public static Cart Create(Guid sessionId) //фабричный метод
+        public static Cart Create() //фабричный метод
         {
             return new Cart()
             {
@@ -35,11 +35,22 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
 
         public void UpdateItemQuantity(Guid toyId, int newQuantity)
         {
-            var item = CartItems.FirstOrDefault(ci => ci.Toy.Id == toyId);
+            var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId);
 
             if (item == null) throw new InvalidOperationException("The toy was not found in the cart");
 
             item.UpdateQuantity(newQuantity);
+            CartLastUpdate();
+            TotalAmountUpdate();
+        }
+        public void RemoveItem(Guid toyId)
+        {
+            var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId);
+
+            if(item == null) throw new InvalidOperationException("The toy was not found in the cart");
+
+            CartItems.Remove(item);
+            CartLastUpdate();
             TotalAmountUpdate();
         }
     }
