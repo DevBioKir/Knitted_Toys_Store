@@ -3,9 +3,9 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
 {
     public class Toy
     {
-        const int MAX_LENGTH_NAME = 200;
-        const int MAX_LENGTH_DESCRIPTION = 3000;
-        const int MAX_LENGTH_SIZE = 20;
+        public const int MAX_LENGTH_NAME = 200;
+        public const int MAX_LENGTH_DESCRIPTION = 3000;
+        public const int MAX_LENGTH_SIZE = 20;
 
         public Guid Id { get; private set; }
         public string Name { get; private set; } = string.Empty;

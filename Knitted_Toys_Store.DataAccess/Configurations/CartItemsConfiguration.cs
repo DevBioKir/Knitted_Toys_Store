@@ -12,6 +12,16 @@ namespace Knitted_Toys_Store.DataAccess.Configurations
             builder.HasKey(ci => ci.Id);
 
             builder.Property(ci => ci.Quantity).IsRequired();
+
+            builder.HasOne(ci => ci.Cart)
+                .WithMany(c => c.CartItems)
+                .HasForeignKey(ci => ci.CartId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(ci => ci.Toy)
+                .WithMany(t => t.CartItems)
+                .HasForeignKey(ci => ci.ToyId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

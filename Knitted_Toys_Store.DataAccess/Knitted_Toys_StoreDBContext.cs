@@ -1,4 +1,5 @@
-﻿using Knitted_Toys_Store.Domain.Models.Domain;
+﻿using Knitted_Toys_Store.DataAccess.Entities;
+using Knitted_Toys_Store.Domain.Models.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Knitted_Toys_Store.DataAccess
@@ -10,11 +11,10 @@ namespace Knitted_Toys_Store.DataAccess
         {
             
         }
-        public DbSet<Toy> Toys { get; set; } //DbSet для взаимодействия с коллекциями
-        public DbSet<Cart> Carts { get; set; }
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<CartItems> CartItems { get; set; }
-        public DbSet<OrderItems> OrderItems { get; set; }
-
+        public DbSet<ToyEntity> Toys { get; set; } //DbSet для взаимодействия с коллекциями
+        public DbSet<CartEntity> Carts { get; set; }
+        public DbSet<OrderEntity> Orders { get; set; }
+        public DbSet<CartItemsEntity> CartItems { get; set; }
+        public DbSet<OrderItemsEntity> OrderItems { get; set; }
     }
 }
