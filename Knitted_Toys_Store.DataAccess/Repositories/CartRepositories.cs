@@ -1,4 +1,5 @@
-﻿using Knitted_Toys_Store.DataAccess.Entities;
+﻿using AutoMapper;
+using Knitted_Toys_Store.DataAccess.Entities;
 using Knitted_Toys_Store.DataAccess.Mapping;
 using Knitted_Toys_Store.Domain.Abstractions;
 using Knitted_Toys_Store.Domain.Models.Domain;
@@ -9,10 +10,13 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
     public class CartRepositories
     {
         private readonly Knitted_Toys_StoreDBContext _context;
+        private readonly IMapper _mapper;
 
-        public CartRepositories(Knitted_Toys_StoreDBContext context)
+        public CartRepositories(Knitted_Toys_StoreDBContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
+
         }
 
         public async Task<Cart?> GetCartAsync(Guid cartId)//////////////////////////////////////
@@ -22,7 +26,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             .ThenInclude(ci => ci.Toy)
             .FirstOrDefaultAsync(c => c.Id == cartId);
 
-            return entitiesCart?.ToDomain();
+            return entitiesCart == null ? null : _mapper.Map<Cart>(entitiesCart);
         }
 
         public async Task<Guid> CreateCartAsync(Cart cart)
