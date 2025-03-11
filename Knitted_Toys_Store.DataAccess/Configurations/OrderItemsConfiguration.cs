@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Knitted_Toys_Store.DataAccess.Configurations
 {
-    class OrderItemsConfigurations : IEntityTypeConfiguration<OrderItemsEntity>
+    class OrderItemsConfiguration : IEntityTypeConfiguration<OrderItemsEntity>
     {
         public void Configure(EntityTypeBuilder<OrderItemsEntity> builder)
         {

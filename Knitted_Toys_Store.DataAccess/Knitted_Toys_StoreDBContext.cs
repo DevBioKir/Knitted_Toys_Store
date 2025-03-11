@@ -1,4 +1,5 @@
-﻿using Knitted_Toys_Store.DataAccess.Entities;
+﻿using Knitted_Toys_Store.DataAccess.Configurations;
+using Knitted_Toys_Store.DataAccess.Entities;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,5 +17,16 @@ namespace Knitted_Toys_Store.DataAccess
         public DbSet<OrderEntity> Orders { get; set; }
         public DbSet<CartItemsEntity> CartItems { get; set; }
         public DbSet<OrderItemsEntity> OrderItems { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfiguration(new CartConfiguration());
+            modelBuilder.ApplyConfiguration(new CartItemsConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderItemsConfiguration());
+            modelBuilder.ApplyConfiguration(new ToyConfiguration());
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }
