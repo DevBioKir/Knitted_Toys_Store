@@ -2,6 +2,7 @@
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Knitted_Toys_Store.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
+using Knitted_Toys_Store.Domain.Abstractions;
 
 namespace Knitted_Toys_Store.DataAccess.Repositories
 {
