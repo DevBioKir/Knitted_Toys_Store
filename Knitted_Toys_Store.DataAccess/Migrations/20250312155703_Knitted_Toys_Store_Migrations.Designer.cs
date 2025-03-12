@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Knitted_Toys_Store.DataAccess.Migrations
 {
     [DbContext(typeof(Knitted_Toys_StoreDBContext))]
-    [Migration("20250311173413_Knitted_Toys_Store_Migration")]
-    partial class Knitted_Toys_Store_Migration
+    [Migration("20250312155703_Knitted_Toys_Store_Migrations")]
+    partial class Knitted_Toys_Store_Migrations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,6 +36,9 @@ namespace Knitted_Toys_Store.DataAccess.Migrations
 
                     b.Property<DateTime>("LastUpdate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("numeric(18,2)");
 
                     b.HasKey("Id");
 

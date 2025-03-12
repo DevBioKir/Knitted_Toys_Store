@@ -34,6 +34,9 @@ namespace Knitted_Toys_Store.DataAccess.Migrations
                     b.Property<DateTime>("LastUpdate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("numeric(18,2)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Carts");

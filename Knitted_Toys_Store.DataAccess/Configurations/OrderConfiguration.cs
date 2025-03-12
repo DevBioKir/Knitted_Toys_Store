@@ -1,7 +1,6 @@
 ﻿using Knitted_Toys_Store.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Knitted_Toys_Store.DataAccess.Configurations
 {

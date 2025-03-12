@@ -6,6 +6,7 @@ namespace Knitted_Toys_Store.DataAccess.Entities
         public Guid Id { get; set; }
         public DateTime CreateAt { get; set; } //Дата создания корзины
         public DateTime LastUpdate { get; set; } //Дата последнего обновления корзины
+        public decimal TotalAmount { get; set; } 
         public List<CartItemsEntity> CartItems { get; set; } = []; //у корзины может быть много Toy
     }
 }

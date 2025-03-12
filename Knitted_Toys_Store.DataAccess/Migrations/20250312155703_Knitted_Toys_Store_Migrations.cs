@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Knitted_Toys_Store.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class Knitted_Toys_Store_Migration : Migration
+    public partial class Knitted_Toys_Store_Migrations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +17,8 @@ namespace Knitted_Toys_Store.DataAccess.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastUpdate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    LastUpdate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "numeric(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {

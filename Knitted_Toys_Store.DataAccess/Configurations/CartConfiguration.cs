@@ -15,6 +15,9 @@ namespace Knitted_Toys_Store.DataAccess.Configurations
                 .IsRequired();
             builder.Property(c => c.LastUpdate)
                 .IsRequired();
+            builder.Property(c => c.TotalAmount)
+                .HasColumnType("numeric(18,2)")
+                .IsRequired();
 
             //builder.HasIndex(c => c.SessionId); //индекс на SessionId для быстрого поиска
 

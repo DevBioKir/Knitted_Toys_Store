@@ -1,5 +1,4 @@
-﻿using Knitted_Toys_Store.Domain.Models.Domain;
-using Knitted_Toys_Store.DataAccess.Entities;
+﻿using Knitted_Toys_Store.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
