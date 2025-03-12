@@ -84,7 +84,7 @@ namespace Knitted_Toys_Store.DataAccess.Migrations
                         column: x => x.ToyId,
                         principalTable: "Toys",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -111,7 +111,7 @@ namespace Knitted_Toys_Store.DataAccess.Migrations
                         column: x => x.ToyId,
                         principalTable: "Toys",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

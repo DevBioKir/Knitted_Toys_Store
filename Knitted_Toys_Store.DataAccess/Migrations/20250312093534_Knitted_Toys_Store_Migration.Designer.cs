@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Knitted_Toys_Store.DataAccess.Migrations
 {
     [DbContext(typeof(Knitted_Toys_StoreDBContext))]
-    [Migration("20250311173413_Knitted_Toys_Store_Migration")]
+    [Migration("20250312093534_Knitted_Toys_Store_Migration")]
     partial class Knitted_Toys_Store_Migration
     {
         /// <inheritdoc />
@@ -183,7 +183,7 @@ namespace Knitted_Toys_Store.DataAccess.Migrations
                     b.HasOne("Knitted_Toys_Store.DataAccess.Entities.ToyEntity", "Toy")
                         .WithMany("CartItems")
                         .HasForeignKey("ToyId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Cart");
@@ -202,7 +202,7 @@ namespace Knitted_Toys_Store.DataAccess.Migrations
                     b.HasOne("Knitted_Toys_Store.DataAccess.Entities.ToyEntity", "Toy")
                         .WithMany("OrderItems")
                         .HasForeignKey("ToyId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Order");
