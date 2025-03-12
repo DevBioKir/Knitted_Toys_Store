@@ -183,7 +183,7 @@ namespace Knitted_Toys_Store.DataAccess.Migrations
                     b.HasOne("Knitted_Toys_Store.DataAccess.Entities.ToyEntity", "Toy")
                         .WithMany("CartItems")
                         .HasForeignKey("ToyId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Cart");

@@ -27,11 +27,13 @@ namespace Knitted_Toys_Store.DataAccess.Configurations
 
             builder.HasMany(t => t.OrderItems)
                 .WithOne(oi => oi.Toy)
-                .HasForeignKey(oi => oi.ToyId); //Добавить вид удаления каскадный например
+                .HasForeignKey(oi => oi.ToyId)
+                .OnDelete(DeleteBehavior.Restrict); // Если Toy удалена, то OrderItems не удалятся
 
             builder.HasMany(t => t.CartItems)
                 .WithOne(ci => ci.Toy)
-                .HasForeignKey(ci => ci.ToyId); //Добавить вид удаления каскадный например
+                .HasForeignKey(ci => ci.ToyId)
+                .OnDelete(DeleteBehavior.Cascade); // Если Toy удалена, то CartItems тоже будут удалены
         }
     }
 }
