@@ -1,5 +1,7 @@
+using Knitted_Toys_Store.App.Services;
 using Knitted_Toys_Store.DataAccess;
 using Knitted_Toys_Store.DataAccess.Mapping;
+using Knitted_Toys_Store.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +17,17 @@ builder.Services.AddDbContext<Knitted_Toys_StoreDBContext>(
         options.UseNpgsql(configuration.GetConnectionString(nameof(Knitted_Toys_StoreDBContext)));
     });
 
+//Регистрация сервисов
+builder.Services.AddScoped<IToyService, ToyService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICartService, CartService>();
+
+//Регистрация репозиториев
+builder.Services.AddScoped<IToysRepositories, ToysRepositories>();
+builder.Services.AddScoped<IOrderRepositories, OrderRepositories>();
+builder.Services.AddScoped<ICartRepositories, CartRepositories>();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -26,6 +39,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+//app.Swagger();
 
 app.MapControllers();
 

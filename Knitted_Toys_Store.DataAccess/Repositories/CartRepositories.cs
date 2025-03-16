@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Knitted_Toys_Store.DataAccess.Entities;
-using Knitted_Toys_Store.Domain.Abstractions;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +16,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             _mapper = mapper;
         }
 
-        public async Task<Cart?> GetCarByIdtAsync(Guid cartId)
+        public async Task<Cart?> GetCarByIdAsync(Guid cartId)
         {
             var entitiesCart = await _context.Carts
             .Include(c => c.CartItems)
@@ -38,15 +37,16 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             return cart;
         }
 
-        public async Task UpdateAsync(Cart cart)
+        public async Task<Guid> UpdateAsync(Cart cart)
         {
             cart.TotalAmountUpdate();
             var entityCart = _mapper.Map<CartEntity>(cart);
             _context.Set<CartEntity>().Update(entityCart);
             await _context.SaveChangesAsync();
+            return entityCart.Id;
         }
 
-        public async Task DeleteAsync(Guid cartId)
+        public async Task<Guid> DeleteAsync(Guid cartId)
         {
             var entityCart = await _context.Set<CartEntity>().FindAsync(cartId);
             if (entityCart != null)
@@ -54,11 +54,12 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
                 _context.Set<CartEntity>().Remove(entityCart);
                 await _context.SaveChangesAsync();
             }
+            return cartId;
         }
 
         public async Task AddToCartAsync(Guid cartId, Guid toyId, int quantity)
         {
-            var cart = await GetCarByIdtAsync(cartId);
+            var cart = await GetCarByIdAsync(cartId);
             if (cart == null) throw new InvalidOperationException("Cart not found");
 
             var entityToy = await _context.Set<ToyEntity>().FindAsync(toyId);
@@ -73,7 +74,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
         public async Task UpdateItemQuantityAsync(Guid cartId, Guid toyId, int newQuantity)
         {
-            var cart = await GetCarByIdtAsync(cartId);
+            var cart = await GetCarByIdAsync(cartId);
             if (cart == null) throw new InvalidOperationException("Cart not found");
 
             cart.UpdateItemQuantity(toyId, newQuantity);
@@ -81,7 +82,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
         }
         public async Task RemoveItemFromCartAsync(Guid cartId, Guid toyId)
         {
-            var cart = await GetCarByIdtAsync(cartId);
+            var cart = await GetCarByIdAsync(cartId);
             if (cart == null) throw new InvalidOperationException("Cart not found");
 
             cart.RemoveItem(toyId);

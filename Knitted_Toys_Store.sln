@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knitted_Toys_Store.Domain",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knitted_Toys_Store.DataAccess", "Knitted_Toys_Store.DataAccess\Knitted_Toys_Store.DataAccess.csproj", "{EA140A00-BCC4-4A86-8382-14457ED115A2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knitted_Toys_Store.App", "Knitted_Toys_Store.App\Knitted_Toys_Store.App.csproj", "{39BD180A-79FC-4439-90C4-68C92468D319}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +32,10 @@ Global
 		{EA140A00-BCC4-4A86-8382-14457ED115A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA140A00-BCC4-4A86-8382-14457ED115A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA140A00-BCC4-4A86-8382-14457ED115A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39BD180A-79FC-4439-90C4-68C92468D319}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39BD180A-79FC-4439-90C4-68C92468D319}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39BD180A-79FC-4439-90C4-68C92468D319}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39BD180A-79FC-4439-90C4-68C92468D319}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

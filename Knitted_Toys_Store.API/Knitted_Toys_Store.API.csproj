@@ -19,7 +19,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Knitted_Toys_Store.App\Knitted_Toys_Store.App.csproj" />
     <ProjectReference Include="..\Knitted_Toys_Store.DataAccess\Knitted_Toys_Store.DataAccess.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

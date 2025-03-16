@@ -2,7 +2,6 @@
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Knitted_Toys_Store.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
-using Knitted_Toys_Store.Domain.Abstractions;
 
 namespace Knitted_Toys_Store.DataAccess.Repositories
 {
@@ -44,7 +43,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             return order;
         }
 
-        public async Task UpdateOrderStatus(Guid orderId, OrderStatus newStatus)
+        public async Task UpdateOrderStatusAsync(Guid orderId, OrderStatus newStatus)
         {
             var entityOrder = await _context.Orders.FindAsync(orderId);
 
@@ -54,7 +53,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task RemoveOrder(Guid orderId)
+        public async Task<Guid> RemoveOrderAsync(Guid orderId)
         {
             var entityOrder = await _context.Orders
                 .Include(o => o.OrderItems)
@@ -66,6 +65,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             _context.Orders.Remove(entityOrder);
 
             await _context.SaveChangesAsync();
+            return orderId;
         }
     }
 }
