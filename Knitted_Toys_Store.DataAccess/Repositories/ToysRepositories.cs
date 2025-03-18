@@ -1,4 +1,5 @@
-﻿using Knitted_Toys_Store.DataAccess.Entities;
+﻿using AutoMapper;
+using Knitted_Toys_Store.DataAccess.Entities;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,10 +8,12 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
     public class ToysRepositories : IToysRepositories
     {
         private readonly Knitted_Toys_StoreDBContext _context;
+        private readonly IMapper _mapper;
 
-        public ToysRepositories(Knitted_Toys_StoreDBContext context)
+        public ToysRepositories(Knitted_Toys_StoreDBContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<List<Toy>> GetAllToysAsync() //Получение всех игрушек //Возвращает Toy из типа Domain
@@ -61,11 +64,23 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
         public async Task<Guid> DeleteAsync(Guid id)
         {
-            await _context.Toys
+            var toy = await _context.Toys
                 .Where(t => t.Id == id)
                 .ExecuteDeleteAsync();
 
+            if (toy == null)
+            {
+                throw new ArgumentException("Toy not found.");
+            }
+            await _context.SaveChangesAsync();
             return id;
+        }
+
+        public async Task<Toy?> GetToyByIdAsync(Guid id)
+        {
+            var entityToy = await _context.Toys.FindAsync(id);
+
+            return _mapper.Map<Toy>(entityToy);
         }
     }
 }

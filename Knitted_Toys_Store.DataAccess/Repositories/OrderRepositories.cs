@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Knitted_Toys_Store.DataAccess.Entities;
+using Knitted_Toys_Store.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Knitted_Toys_Store.DataAccess.Repositories

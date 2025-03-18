@@ -8,6 +8,7 @@ namespace Knitted_Toys_Store.App.Services
         Task<Guid> CreateToyAsync(Toy toy);
         Task<Guid> DeleteToysAsync(Guid id);
         Task<List<Toy>> GetAllToysAsync();
+        Task<Toy?> GetToyByIdAsync(Guid id);
         Task<Guid> UpdateToyAsync(Guid id, string name, string description, string size, decimal price, string imageUrl);
     }
 }

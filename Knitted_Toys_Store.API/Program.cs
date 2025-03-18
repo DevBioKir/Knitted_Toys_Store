@@ -3,12 +3,17 @@ using Knitted_Toys_Store.DataAccess;
 using Knitted_Toys_Store.DataAccess.Mapping;
 using Knitted_Toys_Store.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 
 builder.Services.AddControllers();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 builder.Services.AddOpenApi();
 builder.Services.AddAutoMapper(typeof(AppMappingProfile)); //регистрация AppMappingProfile
 builder.Services.AddDbContext<Knitted_Toys_StoreDBContext>(
@@ -33,11 +38,15 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+
+    //app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+app.UseRouting();
 
+app.UseHttpsRedirection();
 app.UseAuthorization();
 //app.Swagger();
 
