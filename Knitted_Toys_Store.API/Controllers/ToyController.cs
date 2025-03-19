@@ -1,4 +1,4 @@
-﻿using Knitted_Toys_Store.API.Contracts;
+﻿using Knitted_Toys_Store.Contracts;
 using Knitted_Toys_Store.App.Services;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -17,14 +17,14 @@ namespace Knitted_Toys_Store.API.Controllers
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<Toy>> GetToyByIdAsync(Guid id)
+        public async Task<ActionResult<ToysResponce>> GetToyByIdAsync(Guid id)
         {
-            var toys = await _toyService.GetToyByIdAsync(id);
-            if (toys == null)
+            var toy = await _toyService.GetToyByIdAsync(id);
+            if (toy == null)
             {
                 return NotFound($"Toy with ID {id} not found.");
             }
-            return Ok(toys);
+            return Ok(toy);
         }
 
         [HttpGet]
@@ -32,7 +32,8 @@ namespace Knitted_Toys_Store.API.Controllers
         {
             var toys = await _toyService.GetAllToysAsync();
 
-            var responceForToys = toys.Select(t => new ToysResponce(t.Id, t.Name, t.Description, t.Size, t.Price, t.ImageUrl));
+            var responceForToys = toys.Select(t => 
+                new ToysResponce(t.Id, t.Name, t.Description, t.Size, t.Price, t.ImageUrl));
             return Ok(responceForToys);
         }
 

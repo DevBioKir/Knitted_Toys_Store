@@ -10,10 +10,14 @@ namespace Knitted_Toys_Store.App.Services
         {
             _cartRepositories = cartRepositories;
         }
+        public async Task<List<Cart>> GetAllCarts()
+        {
+            return await _cartRepositories.GetAllCartsAsync();
+        }
 
         public async Task<Cart?> GetCartByIdAsync(Guid id)
         {
-            return await _cartRepositories.GetCarByIdAsync(id);
+            return await _cartRepositories.GetCartByIdAsync(id);
         }
 
         public async Task<Cart> CreateCartAsync()

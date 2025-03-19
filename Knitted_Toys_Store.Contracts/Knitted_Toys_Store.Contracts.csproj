@@ -7,8 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Knitted_Toys_Store.Contracts\Knitted_Toys_Store.Contracts.csproj" />
-    <ProjectReference Include="..\Knitted_Toys_Store.DataAccess\Knitted_Toys_Store.DataAccess.csproj" />
+    <ProjectReference Include="..\Knitted_Toys.Domain\Knitted_Toys_Store.Domain.csproj" />
   </ItemGroup>
 
 </Project>

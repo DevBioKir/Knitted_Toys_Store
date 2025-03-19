@@ -19,9 +19,12 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.2" />
   </ItemGroup>
 
+	<ItemGroup>
+		<ProjectReference Include="..\Knitted_Toys_Store.App\Knitted_Toys_Store.App.csproj" />
+	</ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\Knitted_Toys_Store.App\Knitted_Toys_Store.App.csproj" />
-    <ProjectReference Include="..\Knitted_Toys_Store.DataAccess\Knitted_Toys_Store.DataAccess.csproj" />
+    <ProjectReference Include="..\Knitted_Toys.Domain\Knitted_Toys_Store.Domain.csproj" />
   </ItemGroup>
 
 </Project>

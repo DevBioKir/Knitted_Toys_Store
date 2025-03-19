@@ -1,7 +1,4 @@
-﻿
-using System.Runtime.InteropServices;
-
-namespace Knitted_Toys_Store.Domain.Models.Domain
+﻿namespace Knitted_Toys_Store.Domain.Models.Domain
 {
     public class Cart
     {

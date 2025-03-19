@@ -51,5 +51,17 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
                 ImageUrl = imageUrl
             };
         }
+        public static Toy Load(Guid id, string name, string description, string size, decimal price, string imageUrl)
+        {
+            return new Toy
+            {
+                Id = id, // Загружаем существующий Id
+                Name = name,
+                Description = description,
+                Size = size,
+                Price = price,
+                ImageUrl = imageUrl
+            };
+        }
     }
 }

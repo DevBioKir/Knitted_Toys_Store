@@ -1,7 +1,4 @@
-﻿
-using Knitted_Toys_Store.Domain.Models.Domain;
-
-namespace Knitted_Toys_Store.DataAccess.Entities
+﻿namespace Knitted_Toys_Store.DataAccess.Entities
 {
     public class CartItemsEntity
     {

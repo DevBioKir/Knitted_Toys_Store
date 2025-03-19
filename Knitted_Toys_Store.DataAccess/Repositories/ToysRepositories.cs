@@ -21,10 +21,10 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             var entitiesToy = await _context.Toys //получение Entties Toy
                 .AsNoTracking() //не отслеживать изменения
                 .ToListAsync();
-            var toys = entitiesToy
-                .Select(t =>
-                    Toy.Create(t.Name, t.Description, t.Size, t.Price, t.ImageUrl))
-                .ToList();
+
+            var toys = entitiesToy.Select(t => Toy.Load(
+                t.Id, t.Name, t.Description, t.Size, t.Price, t.ImageUrl
+                )).ToList();
 
             return toys;
         }

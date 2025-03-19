@@ -16,7 +16,18 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             _mapper = mapper;
         }
 
-        public async Task<Cart?> GetCarByIdAsync(Guid cartId)
+        public async Task<List<Cart>> GetAllCartsAsync()
+        {
+            var entitiesCart = await _context.Carts
+                .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Toy)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return _mapper.Map<List<Cart>>(entitiesCart);
+        }
+
+        public async Task<Cart?> GetCartByIdAsync(Guid cartId)
         {
             var entitiesCart = await _context.Carts
             .Include(c => c.CartItems)
@@ -39,10 +50,22 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
         public async Task<Guid> UpdateAsync(Cart cart)
         {
+            var entityCart = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.Id == cart.Id);
+
+            if (entityCart == null)
+            {
+                throw new InvalidOperationException($"Cart with ID {cart.Id} not found.");
+            }
+
+            cart.CartLastUpdate();
             cart.TotalAmountUpdate();
-            var entityCart = _mapper.Map<CartEntity>(cart);
-            _context.Set<CartEntity>().Update(entityCart);
+
+            _mapper.Map(cart, entityCart);
+            _context.Carts.Update(entityCart);
             await _context.SaveChangesAsync();
+
             return entityCart.Id;
         }
 
@@ -59,22 +82,38 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
         public async Task AddToCartAsync(Guid cartId, Guid toyId, int quantity)
         {
-            var cart = await GetCarByIdAsync(cartId);
-            if (cart == null) throw new InvalidOperationException("Cart not found");
+            var entityCart = await _context.Carts
+                .Include(c => c.CartItems) // Загружаем товары в корзине
+                .ThenInclude(ci => ci.Toy) // Загружаем игрушки
+                .FirstOrDefaultAsync(c => c.Id == cartId);
 
-            var entityToy = await _context.Set<ToyEntity>().FindAsync(toyId);
-            if (entityToy == null) throw new InvalidOperationException("Toy not found");
+            if (entityCart == null) throw new InvalidOperationException("Cart not found");
 
-            var toy = _mapper.Map<ToyEntity>(entityToy);
-            var cartItem = CartItems.Create(cartId, toyId, quantity);
-            cart.CartItems.Add(cartItem);
+            var entityToy = await _context.Toys.FindAsync(toyId);
+            if (entityToy == null)
+                throw new InvalidOperationException("Toy not found");
 
-            await UpdateAsync(cart);
+            var cart = _mapper.Map<Cart>(entityCart);
+
+            var existingItem = cart.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            if (existingItem != null)
+            {
+                existingItem.UpdateQuantity(existingItem.Quantity + quantity);
+            }
+            else
+            {
+                var newItem = CartItems.Create(cartId, toyId, quantity);
+                cart.CartItems.Add(newItem);
+            }
+            cart.TotalAmountUpdate();
+
+            _mapper.Map(cart, entityCart);
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateItemQuantityAsync(Guid cartId, Guid toyId, int newQuantity)
         {
-            var cart = await GetCarByIdAsync(cartId);
+            var cart = await GetCartByIdAsync(cartId);
             if (cart == null) throw new InvalidOperationException("Cart not found");
 
             cart.UpdateItemQuantity(toyId, newQuantity);
@@ -82,7 +121,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
         }
         public async Task RemoveItemFromCartAsync(Guid cartId, Guid toyId)
         {
-            var cart = await GetCarByIdAsync(cartId);
+            var cart = await GetCartByIdAsync(cartId);
             if (cart == null) throw new InvalidOperationException("Cart not found");
 
             cart.RemoveItem(toyId);

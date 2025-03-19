@@ -1,4 +1,4 @@
-﻿namespace Knitted_Toys_Store.API.Contracts
+﻿namespace Knitted_Toys_Store.Contracts
 {
     public record ToysRequest(
         string Name,
