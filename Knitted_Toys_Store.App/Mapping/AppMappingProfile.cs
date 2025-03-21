@@ -2,6 +2,7 @@
 using Knitted_Toys_Store.DataAccess.Entities;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Knitted_Toys_Store.Contracts;
+using Knitted_Toys_Store.Contracts.Contracts;
 
 namespace Knitted_Toys_Store.App.Mapping
 {
@@ -27,7 +28,14 @@ namespace Knitted_Toys_Store.App.Mapping
 
             // Маппинг Cart -> CartResponce
             CreateMap<Cart, CartResponce>()
-                .ForMember(dest => dest.CartItemsResponces, opt => opt.MapFrom(src => src.CartItems));
+                .ConstructUsing(src => new CartResponce(
+                        src.Id,
+                        src.CreateAt,
+                        src.LastUpdate,
+                        src.TotalAmount,
+                        src.CartItems.Select(ci => new CartItemsResponce(
+                            ci.CartId, ci.ToyId, ci.Quantity, ci.AddedAt)).ToList()
+                    ));
 
             // Маппинг CartItemsRequest -> CartItems
             CreateMap<CartItemsRequest, CartItems>()
@@ -48,20 +56,18 @@ namespace Knitted_Toys_Store.App.Mapping
 
             // Маппинг Order -> OrderResponce
             CreateMap<Order, OrderResponce>()
-                .ForMember(dest => dest.OrderItemsResponces, opt => opt.MapFrom(src => src.OrderItems));
+                .ForMember(dest => dest.OrderItemsResponce, opt => opt.MapFrom(src => src.OrderItems));
 
             // Маппинг OrderItemsRequest -> OrderItems
-            CreateMap<OrderItemsRequest, OrderItems>()
+            CreateMap<OrderItemsResponce, OrderItems>()
                 .ForMember(dest => dest.ToyId, opt => opt.MapFrom(src => src.ToyId))
-                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
-                .ForMember(dest => dest.AddedAt, opt => opt.MapFrom(src => src.AddedAt));
+                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity));
 
             // Маппинг OrderItems -> OrderItemsResponce
             CreateMap<OrderItems, OrderItemsResponce>()
                 .ForMember(dest => dest.ToyId, opt => opt.MapFrom(src => src.ToyId))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
-                .ForMember(dest => dest.AddedAt, opt => opt.MapFrom(src => src.AddedAt));
+                .ForMember(dest => dest.PriceAtTime, opt => opt.MapFrom(src => src.PriceAtTime));
         }
-    }
     }
 }

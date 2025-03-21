@@ -1,4 +1,5 @@
-﻿using Knitted_Toys_Store.Domain.Models.Domain;
+﻿using Knitted_Toys_Store.Contracts.Contracts;
+using Knitted_Toys_Store.Domain.Models.Domain;
 
 namespace Knitted_Toys_Store.Contracts
 {
@@ -12,5 +13,6 @@ namespace Knitted_Toys_Store.Contracts
         string PhoneNumber,
         string Email,
         string DeliveryAddress,
-        string DeliveryNotes);
+        string DeliveryNotes,
+        List<OrderItemsResponce> OrderItemsResponce);
 }

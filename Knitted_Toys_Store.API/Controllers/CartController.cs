@@ -1,7 +1,8 @@
-﻿using Knitted_Toys_Store.API.Contracts;
+﻿using Knitted_Toys_Store.Contracts;
 using Knitted_Toys_Store.App.Services;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
 
 namespace Knitted_Toys_Store.API.Controllers
 {
@@ -10,9 +11,11 @@ namespace Knitted_Toys_Store.API.Controllers
     public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;
-        public CartController(ICartService cartService)
+        private readonly IMapper _mapper;
+        public CartController(ICartService cartService, IMapper mapper)
         {
             _cartService = cartService;
+            _mapper = mapper;
         }
 
         [HttpGet("{id:guid}")]
@@ -31,9 +34,8 @@ namespace Knitted_Toys_Store.API.Controllers
         {
             var carts = await _cartService.GetAllCarts();
 
-            var responceForCarts = carts.Select(c =>
-                new CartResponce(c.Id, c.CreateAt, c.LastUpdate, c.TotalAmount));
-            return Ok(carts);
+            var responceForCarts = _mapper.Map<List<CartResponce>>(carts);
+            return Ok(responceForCarts);
         }
 
         [HttpPut("{id:guid}")]
@@ -48,12 +50,36 @@ namespace Knitted_Toys_Store.API.Controllers
                 cart.UpdateItemQuantity(toyId, quantity);
                 await _cartService.UpdateAsync(cart);
 
-                var updateCar = await _cartService.UpdateAsync(cart);
+                // Обновленный товар в корзине
+                var updatedCart = await _cartService.GetCartByIdAsync(cartId);
+
+                var response = _mapper.Map<CartResponce>(updatedCart);
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"An error occurred while updating the cart: {ex.Message}");
             }
+        }
+        [HttpPost]
+        public async Task<ActionResult<Guid>> CreateCartAsync()
+        {
+            try
+            {
+                var cart = await _cartService.CreateCartAsync();
+                return Ok(cart);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<ActionResult<Cart>> DeleteCartAsync(Guid id)
+        {
+            return Ok(await _cartService.DeleteCartAsync(id));
         }
     }
 }

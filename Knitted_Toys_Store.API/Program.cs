@@ -1,9 +1,8 @@
 using Knitted_Toys_Store.App.Services;
 using Knitted_Toys_Store.DataAccess;
-using Knitted_Toys_Store.DataAccess.Mapping;
+using Knitted_Toys_Store.App.Mapping;
 using Knitted_Toys_Store.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
