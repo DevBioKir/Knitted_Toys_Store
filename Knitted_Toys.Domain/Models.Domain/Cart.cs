@@ -1,4 +1,6 @@
-﻿namespace Knitted_Toys_Store.Domain.Models.Domain
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Knitted_Toys_Store.Domain.Models.Domain
 {
     public class Cart
     {
@@ -8,6 +10,9 @@
         public decimal TotalAmount { get; private set; } = 0;
 
         public List<CartItems> CartItems { get; private set; } = []; //у корзины может быть много Toy
+
+        // Для оптимистичной блокировки, используем byte[]
+        public byte[] RowVersion { get; set; }
 
         public static Cart Create() //фабричный метод
         {

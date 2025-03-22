@@ -8,5 +8,8 @@ namespace Knitted_Toys_Store.DataAccess.Entities
         public DateTime LastUpdate { get; set; } //Дата последнего обновления корзины
         public decimal TotalAmount { get; set; } 
         public List<CartItemsEntity> CartItems { get; set; } = []; //у корзины может быть много Toy
+        
+        // Для оптимистичной блокировки, используем byte[]
+        public byte[] RowVersion { get; set; }
     }
 }

@@ -30,5 +30,11 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
 
             Quantity = newQuantity;
         }
+
+        // Метод для установки Toy
+        public void SetToy(Toy toy)
+        {
+            Toy = toy ?? throw new ArgumentNullException(nameof(toy), "Toy cannot be null");
+        }
     }
 }

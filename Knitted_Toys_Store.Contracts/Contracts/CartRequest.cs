@@ -4,5 +4,6 @@
         DateTime CreateAt,
         DateTime LastUpdate,
         decimal TotalAmount,
-        List<CartItemsRequest> CartItemsRequest);
+        List<CartItemsRequest> CartItemsRequest,
+        byte[] RowVersion);
 }

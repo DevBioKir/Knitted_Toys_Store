@@ -5,5 +5,6 @@
         DateTime CreateAt,
         DateTime LastUpdate,
         decimal TotalAmount,
-        List<CartItemsResponce> CartItemsResponces);
+        List<CartItemsResponce> CartItemsResponces,
+        byte[] RowVersion);
 }

@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Knitted_Toys_Store.DataAccess.Entities;
-using Knitted_Toys_Store.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Knitted_Toys_Store.DataAccess.Repositories
@@ -17,6 +16,15 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             _mapper = mapper;
         }
 
+        public async Task<List<Order>> GetAllOrdersAsync()
+        {
+            var entitiesOrders = await _context.Orders
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Toy)
+                .AsNoTracking()
+                .ToListAsync();
+            return _mapper.Map<List<Order>>(entitiesOrders);
+        }
         public async Task<Order?> GetOrderByIdAsync(Guid orderId)
         {
             var entityOrder = await _context.Orders

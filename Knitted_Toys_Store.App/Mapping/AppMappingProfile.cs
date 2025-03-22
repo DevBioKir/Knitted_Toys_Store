@@ -34,7 +34,8 @@ namespace Knitted_Toys_Store.App.Mapping
                         src.LastUpdate,
                         src.TotalAmount,
                         src.CartItems.Select(ci => new CartItemsResponce(
-                            ci.CartId, ci.ToyId, ci.Quantity, ci.AddedAt)).ToList()
+                            ci.CartId, ci.ToyId, ci.Quantity, ci.AddedAt)).ToList(),
+                        src.RowVersion
                     ));
 
             // Маппинг CartItemsRequest -> CartItems

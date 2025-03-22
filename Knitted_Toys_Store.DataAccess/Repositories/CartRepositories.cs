@@ -43,6 +43,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             var entitiesCart = _mapper.Map<CartEntity>(cart);
 
             _context.Set<CartEntity>().Add(entitiesCart);
+            Console.WriteLine($"TotalAmount: {entitiesCart.TotalAmount}"); // отладка
             await _context.SaveChangesAsync();
 
             return cart;
@@ -89,11 +90,21 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
             if (entityCart == null) throw new InvalidOperationException("Cart not found");
 
-            var entityToy = await _context.Toys.FindAsync(toyId);
+            var entityToy = await _context.Toys
+                //.AsNoTracking()
+                .FirstOrDefaultAsync(t => t.Id == toyId);
+
             if (entityToy == null)
                 throw new InvalidOperationException("Toy not found");
 
             var cart = _mapper.Map<Cart>(entityCart);
+
+            // Проверяем, не был ли изменен RowVersion корзины
+            var dbCart = await _context.Carts.AsNoTracking().FirstOrDefaultAsync(c => c.Id == cartId);
+            if (dbCart != null && dbCart.RowVersion != entityCart.RowVersion)
+            {
+                throw new InvalidOperationException("Concurrency conflict: The cart data has been modified by another process.");
+            }
 
             var existingItem = cart.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
             if (existingItem != null)
@@ -103,12 +114,55 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             else
             {
                 var newItem = CartItems.Create(cartId, toyId, quantity);
+                // Логируем, чтобы убедиться, что toy не null
+                Console.WriteLine($"Toy found: {entityToy.Name}, Id: {entityToy.Id}");
+                // Устанавливаем Toy через метод SetToy
+                newItem.SetToy(_mapper.Map<Toy>(entityToy)); // Здесь устанавливаем Toy
                 cart.CartItems.Add(newItem);
             }
             cart.TotalAmountUpdate();
 
             _mapper.Map(cart, entityCart);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                foreach (var entry in ex.Entries)
+                {
+                    var databaseValues = entry.GetDatabaseValues();
+
+                    if (databaseValues == null)
+                    {
+                        // Возможно, баг с EF, попробуем снова загрузить объект напрямую
+                        var exists = await _context.Carts.AnyAsync(c => c.Id == cartId);
+                        if (!exists)
+                            throw new InvalidOperationException("The cart has been deleted by another user.");
+
+                        throw new InvalidOperationException("Concurrency conflict: data was modified by another process.");
+                    }
+
+                    Console.WriteLine("Original Values:");
+                    foreach (var property in entry.OriginalValues.Properties)
+                    {
+                        Console.WriteLine($"{property.Name}: {entry.OriginalValues[property]}");
+                    }
+
+                    Console.WriteLine("Database Values:");
+                    foreach (var property in databaseValues.Properties)
+                    {
+                        Console.WriteLine($"{property.Name}: {databaseValues[property]}");
+                    }
+
+                    // Если данные есть, обновляем оригинальные значения и пробуем снова
+                    entry.OriginalValues.SetValues(databaseValues);
+                }
+
+                // Пробуем сохранить после разрешения конфликта
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task UpdateItemQuantityAsync(Guid cartId, Guid toyId, int newQuantity)

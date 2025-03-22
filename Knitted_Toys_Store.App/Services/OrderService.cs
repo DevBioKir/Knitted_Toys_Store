@@ -11,13 +11,18 @@ namespace Knitted_Toys_Store.App.Services
             _orderRepositories = orderRepositories;
         }
 
+        public async Task<List<Order>> GetAllOrdersAsync()
+        {
+            return await _orderRepositories.GetAllOrdersAsync();
+        }
+
         public async Task<Order?> GetOrderByIdAsync(Guid orderId)
         {
             return await _orderRepositories.GetOrderByIdAsync(orderId);
         }
 
-        public async Task<Order> CreateOrderAsync(Cart cart, string surname, string name, string phone, string email, string deliveryAddress,
-            string deliveryNotes)
+        public async Task<Order> CreateOrderAsync(Cart cart, string surname, string name, string phone, 
+            string email, string deliveryAddress, string deliveryNotes)
         {
             return await _orderRepositories.CreateOrderAsync(cart, surname, name, phone, email, deliveryAddress, deliveryNotes);
         }
