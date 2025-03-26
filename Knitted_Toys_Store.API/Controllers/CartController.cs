@@ -20,7 +20,7 @@ namespace Knitted_Toys_Store.API.Controllers
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<Cart>> GetCartByIdAsync(Guid id)
+        public async Task<ActionResult<CartResponce>> GetCartByIdAsync(Guid id)
         {
             var cart = await _cartService.GetCartByIdAsync(id);
             if (cart == null)

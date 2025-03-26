@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Text.Json.Serialization;
 
 namespace Knitted_Toys_Store.Domain.Models.Domain
 {
@@ -9,6 +9,7 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
         public DateTime LastUpdate { get; private set; } //Дата последнего обновления корзины
         public decimal TotalAmount { get; private set; } = 0;
 
+        //[JsonIgnore]
         public List<CartItems> CartItems { get; private set; } = []; //у корзины может быть много Toy
 
         // Для оптимистичной блокировки, используем byte[]

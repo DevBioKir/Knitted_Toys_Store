@@ -1,4 +1,5 @@
-﻿
+﻿using System.Text.Json.Serialization;
+
 namespace Knitted_Toys_Store.Domain.Models.Domain
 {
     public class CartItems
@@ -8,7 +9,11 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
         public Guid ToyId { get; private set; } //внешний ключ на Toy
         public int Quantity { get; private set; } //количество товара
         public DateTime AddedAt { get; private set; }//дата добавления в корзину
+
+        [JsonIgnore]
         public Cart? Cart { get; private set; } //ссылка на Cart
+
+        [JsonIgnore]
         public Toy? Toy { get; private set; } //ссылка на Toy
 
         public static CartItems Create(Guid cartId, Guid toyId, int quantity)

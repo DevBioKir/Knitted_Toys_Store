@@ -117,14 +117,10 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             }
             else
             {
-                cart.CartItems.Add(new CartItemsEntity
-                {
-                    Id = Guid.NewGuid(),
-                    CartId = cartId,
-                    ToyId = toyId,
-                    Quantity = quantity,
-                    AddedAt = DateTime.UtcNow
-                });
+                var newCartItems = CartItems.Create(cartId, toyId, quantity);
+
+                var newCartItemsEntity = _mapper.Map<CartItemsEntity>(newCartItems);
+                _context.CartItems.Add(newCartItemsEntity);
             }
 
             // Обновляем общую сумму корзины

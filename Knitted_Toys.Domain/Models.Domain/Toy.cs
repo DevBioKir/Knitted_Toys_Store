@@ -1,5 +1,4 @@
-﻿
-namespace Knitted_Toys_Store.Domain.Models.Domain
+﻿namespace Knitted_Toys_Store.Domain.Models.Domain
 {
     public class Toy
     {
