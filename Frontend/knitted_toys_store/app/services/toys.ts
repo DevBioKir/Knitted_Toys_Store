@@ -1,6 +1,3 @@
-import { body } from "framer-motion/client";
-import { headers } from "next/headers";
-
 export interface ToyRequest{
     name: string;
     description: string;
@@ -10,19 +7,63 @@ export interface ToyRequest{
 }
 
 export const getAllToys = async() => {
-    const responce = await fetch("http://localhost:5237/Toy");
+    const response = await fetch("http://localhost:5237/Toy");
 
-    return responce.json();
+    if (!response.ok) {
+        throw new Error(`Ошибка: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Данные с сервера:", data);
+    return data;
 };
 
-export const createBook = async(toyrequest: ToyRequest) => {
-    await fetch("http://localhost:5237/Toy", {
+export const getToyById = async (id: string) => {
+    const response = await fetch(`http://localhost:5237/Toy/${id}`, {
+        method: "GET",
+    });
+
+    if (!response.ok) {
+        throw new Error(`Ошибка: ${response.status}`);
+    }
+
+    return response.json();
+};
+
+export const createToy = async(toyrequest: ToyRequest) => {
+    const response = await fetch("http://localhost:5237/Toy", {
         method: "POST",
         headers: {
-            "content-type": "applicaton/json",
+            "Content-Type": "application/json",
         },
         body: JSON.stringify(toyrequest), 
     });
+
+    if (!response.ok) {
+        throw new Error(`Ошибка: ${response.status}`);
+    }
+}; 
+
+export const updateToy = async(id: string, toyrequest: ToyRequest) => {
+    const response = await fetch(`http://localhost:5237/Toy/${id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(toyrequest),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Ошибка: ${response.status}`);
+    }
 };
 
-//export const updateToy
+export const deleteToy = async(id: string) => {
+    const response = await fetch(`http://localhost:5237/Toy/${id}`, {
+        method: "DELETE",
+    });
+
+    if (!response.ok) {
+        throw new Error(`Ошибка: ${response.status}`);
+    }
+};

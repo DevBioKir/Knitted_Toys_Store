@@ -158,3 +158,17 @@ a:hover,
   opacity: 0.8;
   transform: scale(1.02);
 }
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.card_buttons {
+  margin-top: 10px;
+}
+
+button {
+  margin-right: 10px;
+}
