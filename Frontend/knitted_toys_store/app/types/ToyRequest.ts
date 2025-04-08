@@ -1,5 +1,4 @@
-interface Toy {
-    id: string;
+export interface ToyRequest{
     name: string;
     description: string;
     size: string;

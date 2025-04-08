@@ -1,22 +1,36 @@
-export interface ToyRequest{
-    name: string;
-    description: string;
-    size: string;
-    price: number;
-    imageUrl: string;
-}
+import { ToyRequest } from "../types/ToyRequest";
+import { ToyResponce } from "../types/ToyResponce";
 
-export const getAllToys = async() => {
-    const response = await fetch("http://localhost:5237/Toy");
+
+export const getAllToys = async (): Promise<ToyResponce[]> => {
+    const response = await fetch(`http://localhost:5237/Toy`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
 
     if (!response.ok) {
-        throw new Error(`Ошибка: ${response.status}`);
+        throw new Error("Failed to fetch toys");
     }
 
-    const data = await response.json();
-    console.log("Данные с сервера:", data);
-    return data;
+    const data: ToyResponce[] = await response.json(); // Преобразуем ответ в массив объектов ToyResponce
+    return data; // Возвращаем данные
 };
+
+
+
+// export const getAllToys = async() => {
+//     const response = await fetch("http://localhost:5237/Toy");
+
+//     if (!response.ok) {
+//         throw new Error(`Ошибка: ${response.status}`);
+//     }
+
+//     const data = await response.json();
+//     console.log("Данные с сервера:", data);
+//     return data;
+// };
 
 export const getToyById = async (id: string) => {
     const response = await fetch(`http://localhost:5237/Toy/${id}`, {
@@ -67,3 +81,5 @@ export const deleteToy = async(id: string) => {
         throw new Error(`Ошибка: ${response.status}`);
     }
 };
+export { ToyRequest };
+

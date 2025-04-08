@@ -10,6 +10,7 @@
 
         public Order Order { get; private set; } //ссылка на Orders
         public Toy Toy { get; private set; } //ссылка на Toy
+        //добавить дату создания заказа
 
         private OrderItems() { } // пустой конструктор для EF Core
 

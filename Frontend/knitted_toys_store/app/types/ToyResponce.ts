@@ -1,4 +1,4 @@
-interface Toy {
+export interface ToyResponce{
     id: string;
     name: string;
     description: string;

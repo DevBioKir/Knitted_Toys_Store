@@ -33,7 +33,7 @@ namespace Knitted_Toys_Store.API.Controllers
             var toys = await _toyService.GetAllToysAsync();
 
             var responceForToys = toys.Select(t => 
-                new ToysResponce(t.Id, t.Name, t.Description, t.Size, t.Price, t.ImageUrl));
+                new ToysResponce(t.Id, t.Name, t.Description, t.Size, t.Price, t.ImageUrl)).ToList();
             return Ok(responceForToys);
         }
 
