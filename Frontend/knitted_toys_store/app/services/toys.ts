@@ -18,21 +18,7 @@ export const getAllToys = async (): Promise<ToyResponce[]> => {
     return data; // Возвращаем данные
 };
 
-
-
-// export const getAllToys = async() => {
-//     const response = await fetch("http://localhost:5237/Toy");
-
-//     if (!response.ok) {
-//         throw new Error(`Ошибка: ${response.status}`);
-//     }
-
-//     const data = await response.json();
-//     console.log("Данные с сервера:", data);
-//     return data;
-// };
-
-export const getToyById = async (id: string) => {
+export const getToyById = async (id: string): Promise<ToyResponce> => {
     const response = await fetch(`http://localhost:5237/Toy/${id}`, {
         method: "GET",
     });
@@ -81,5 +67,4 @@ export const deleteToy = async(id: string) => {
         throw new Error(`Ошибка: ${response.status}`);
     }
 };
-export { ToyRequest };
 

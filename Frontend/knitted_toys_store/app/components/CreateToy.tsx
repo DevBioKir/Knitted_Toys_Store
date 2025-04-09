@@ -1,7 +1,8 @@
 import { Input, Modal } from "antd";
 import { ToyRequest } from "../types/ToyRequest";
 import { title } from "process";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Toy } from "../Models/Toy";
 
 interface Prop {
   mode: Mode;
@@ -16,7 +17,7 @@ export enum Mode {
   Create,
   Update
 }
-export const CreateToys = ({
+export const CreateToy = ({
   mode,
   values,
   isModalOpen,
@@ -29,6 +30,16 @@ export const CreateToys = ({
   const [size, setSize] = useState<string>("");
   const [price, setPrice] = useState<number>(1);
   const [imageUrl, setImageUrl] = useState<string>("");
+
+
+useEffect(() => {
+  setName(values.name);
+  setDescription(values.description);
+  setSize(values.size);
+  setPrice(values.price);
+  setImageUrl(values.imageUrl);
+}, [values])
+
 
   const handleOk = async () => {
     const toyRequest: ToyRequest = { name, description, size, price, imageUrl };
@@ -48,6 +59,8 @@ export const CreateToys = ({
         mode === Mode.Create ? "Добавить игрушку" : "Редактировать игрушку"
       }
       open={isModalOpen}
+      onOk={handleOk}
+      onCancel={handleCancel}
       cancelText={"Отмена"}
     >
       <div className="toy_model">

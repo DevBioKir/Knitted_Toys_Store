@@ -1,5 +1,5 @@
-export interface CartItemsRequest {
-    id?: string;
+export interface CartItemsResponce {
+    id: string;
     cartId: string;
     toyId: string;
     quantity: number;
