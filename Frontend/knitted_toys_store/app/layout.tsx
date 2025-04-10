@@ -3,7 +3,7 @@ import { Layout, Menu } from "antd";
 import Link from "next/link";
 import '@ant-design/v5-patch-for-react-19'; // Импорт пакета для совместимости с React 19
 import "./globals.css";
-import MenuItem from "antd/es/menu/MenuItem";
+import CookieConsent from "react-cookie-consent";
 
 const {Header, Content, Footer} = Layout;
 const menuItems = [
@@ -39,6 +39,28 @@ export default function RootLayout({
             © 2025 Магазин мягких игрушек «Космический мишка»
           </Footer>
           {/* {children}*/}</Layout>
+          {/* Компонент уведомления о cookies */}
+        <CookieConsent
+          location="bottom"
+          buttonText="Принять"
+          cookieName="cart_id"
+          style={{
+            background: "#2B373B",
+            color: "#fff",
+            fontSize: "14px",
+            textAlign: "center",
+            padding: "10px",
+          }}
+          buttonStyle={{
+            background: "#f1d600",
+            color: "#000",
+            borderRadius: "5px",
+            fontSize: "13px",
+            padding: "8px 16px",
+          }}
+        >
+          Мы используем cookies для улучшения вашего опыта на сайте. Продолжая использовать сайт, вы соглашаетесь на использование cookies.
+        </CookieConsent>
     </body>
     </html>
   );

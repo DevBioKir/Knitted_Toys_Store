@@ -1,7 +1,7 @@
 import { CartItems } from "./CartItems";
 
-interface Cart {
-    id: string;
+export interface Cart {
+    id?: string;
     createAt: Date;
     lastUpdate: Date;
     totalAmount: number;

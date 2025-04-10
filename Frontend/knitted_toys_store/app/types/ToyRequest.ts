@@ -4,5 +4,5 @@ export interface ToyRequest{
     description: string;
     size: string;
     price: number;
-    imageUrl: string;
+    imageUrl?: string;
 }

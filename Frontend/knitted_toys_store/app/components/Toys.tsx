@@ -18,8 +18,9 @@ export const Toys = ({ toys, onEdit, onDelete }: Props) => {
           style={{ width: 300 }}
         >
           <p>{toy.description}</p>
-          <p>Размер: {toy.size}</p>
+          <p>Размер: {toy.size}мм</p>
           <p>Цена: {toy.price} ₽</p>
+          {/*<p>Ссылка на изображение: {toy.imageUrl}</p>*/}
           <Space>
             <Button onClick={() => onEdit(toy)}>Редактировать</Button>
             <Button danger onClick={() => onDelete(toy.id!)}>
@@ -31,42 +32,3 @@ export const Toys = ({ toys, onEdit, onDelete }: Props) => {
     </div>
   );
 };
-
-
-
-
-// import { Button, Card } from "antd"
-// import { CardTitle } from "./CardTitle"
-// import { Toy } from "../Models/Toy";
-
-// interface Props {
-//     toys: Toy[]
-// }
-
-// export const Toys = ({ toys }: Props) => {
-//     return (
-//       <div className="cards">
-//         {toys.length === 0 ? (
-//           <p>Нет игрушек для отображения.</p>
-//         ) : (
-//           toys.map((toy: Toy) => (
-//             <Card 
-//             key={toy.id} 
-//             title={
-//               <CardTitle 
-//                 name={toy.name} 
-//                 price={toy.price} 
-//                 size={toy.size}
-//             />}>
-
-//               <p>{toy.description}</p>
-//               <div className="card_buttons">
-//                 <Button>Изменить</Button>
-//                 <Button>Удалить</Button>
-//               </div>
-//             </Card>
-//           ))
-//         )}
-//       </div>
-//     );
-//   };

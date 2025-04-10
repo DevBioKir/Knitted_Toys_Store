@@ -3,6 +3,7 @@ using Knitted_Toys_Store.DataAccess;
 using Knitted_Toys_Store.App.Mapping;
 using Knitted_Toys_Store.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Knitted_Toys_Store.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -47,7 +48,7 @@ app.UseRouting();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
-//app.Swagger();
+app.UseCartIdentifier();
 
 app.MapControllers();
 

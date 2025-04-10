@@ -4,6 +4,8 @@ using Knitted_Toys_Store.Domain.Models.Domain;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Microsoft.VisualBasic;
+using Knitted_Toys_Store.API.Middleware;
+using Knitted_Toys_Store.API.Helpers;
 
 namespace Knitted_Toys_Store.API.Controllers
 {
@@ -19,6 +21,17 @@ namespace Knitted_Toys_Store.API.Controllers
             _mapper = mapper;
         }
 
+        private Guid? GetCartIdFromContext()
+        {
+            if (HttpContext.Items.TryGetValue(CartIdentifierMiddleware.CartCookieName, out var cartIdObj)
+                && cartIdObj is Guid cartId)
+            {
+                return cartId;
+            }
+
+            return null;
+        }
+
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<CartResponce>> GetCartByIdAsync(Guid id)
         {
@@ -28,6 +41,19 @@ namespace Knitted_Toys_Store.API.Controllers
                 return NotFound($"Cart with ID {id} not found.");
             }
             return Ok(cart);
+        }
+
+        [HttpGet("GetCartsHelpers")]
+        public async Task<ActionResult<CartResponce>> GetCart()
+        {
+            if (!HttpContext.Items.TryGetValue(CartIdentifierMiddleware.CartCookieName, out var rawCartId) || rawCartId is not Guid cartId)
+                return BadRequest("Cart not found in context.");
+
+            var cart = await _cartService.GetCartByIdAsync(cartId);
+            if (cart == null)
+                return NotFound("Cart not found.");
+
+            return Ok(_mapper.Map<CartResponce>(cart));
         }
 
         [HttpGet]
