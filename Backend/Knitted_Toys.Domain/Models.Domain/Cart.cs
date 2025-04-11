@@ -38,7 +38,9 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
 
         public void UpdateItemQuantity(Guid toyId, int newQuantity)
         {
-            var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId);
+            var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId || ci.ToyId == toyId);
+
+            //var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId);
 
             if (item == null) throw new InvalidOperationException("The toy was not found in the cart");
 
@@ -48,7 +50,7 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
         }
         public void RemoveItem(Guid toyId)
         {
-            var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId);
+            var item = CartItems.FirstOrDefault(ci => ci.ToyId == toyId || ci.Toy?.Id == toyId);
 
             if(item == null) throw new InvalidOperationException("The toy was not found in the cart");
 

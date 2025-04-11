@@ -65,7 +65,7 @@ namespace Knitted_Toys_Store.API.Controllers
             return Ok(responceForCarts);
         }
 
-        [HttpPut("{id:guid}")]
+        [HttpPut/*("{id:guid}")*/]
         public async Task<ActionResult<CartResponce>> UpdateCartAsync(Guid cartId, [FromBody] CartRequest request)
         {
             try

@@ -5,8 +5,8 @@ namespace Knitted_Toys_Store.API.Middleware
     public class CartIdentifierMiddleware
     {
         public const string CartCookieName = "cart_id"; //имя cookie, в которой будет храниться Guid корзины.
-        private readonly RequestDelegate _next; //ссылк на следующий middleware в конвейере
-
+        private readonly RequestDelegate _next; //ссылк на следующий middleware в конвейере     
+        
         public CartIdentifierMiddleware(RequestDelegate next)
         {
             _next = next; //сохраняем ссылку на следующий middleware
@@ -14,25 +14,40 @@ namespace Knitted_Toys_Store.API.Middleware
 
         public async Task InvokeAsync(HttpContext context, ICartService cartService)
         {
+            //Проверка запроса
+            bool isGetAllCartsRequest = context.Request.Path.Value.EndsWith("/Cart") &&
+                context.Request.Method == "GET";
+
             Guid cartId;
-            if (context.Request.Cookies.TryGetValue(CartCookieName, out var cookieValue) && 
+            if (context.Request.Cookies.TryGetValue(CartCookieName, out var cookieValue) &&
                 Guid.TryParse(cookieValue, out cartId))
             {
                 var cart = await cartService.GetCartByIdAsync(cartId);
                 if (cart == null)
                 {
-                    cartId = await CreateNewCartAsync(cartService, context);
+                    // Если корзина не найдена, но cookie существует, создаем новую корзину
+                    // только если это не запрос на получение всех корзин
+                    if (!isGetAllCartsRequest)
+                    {
+                        cartId = await CreateNewCartAsync(cartService, context);
+                        context.Items[CartCookieName] = cartId;
+                    }
+                }
+                else
+                {
+                    // Корзина найдена, добавляем её ID в контекст
+                    context.Items[CartCookieName] = cartId;
                 }
             }
-            else
+            else if (!isGetAllCartsRequest)
             {
+                // Если cookie нет и это не запрос на получение всех корзин,
+                // создаем новую корзину
                 cartId = await CreateNewCartAsync(cartService, context);
+                context.Items[CartCookieName] = cartId;
             }
 
-            // Сохраняем cartId в HttpContext.Items, чтобы контроллеры могли его достать
-            context.Items[CartCookieName] = cartId;
-
-            await _next(context); //передать запрос дальше
+            await _next(context);
         }
 
         private async Task<Guid> CreateNewCartAsync(ICartService cartService, HttpContext httpContext)

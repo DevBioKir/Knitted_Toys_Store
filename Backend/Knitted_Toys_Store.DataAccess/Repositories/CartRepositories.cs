@@ -51,6 +51,10 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
         public async Task<Guid> UpdateAsync(Cart cart)
         {
+            // Очищаем ChangeTracker перед началом операции
+            _context.ChangeTracker.Clear();
+
+            // Загружаем корзину с включенными CartItems
             var entityCart = await _context.Carts
                 .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.Id == cart.Id);
@@ -60,11 +64,45 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
                 throw new InvalidOperationException($"Cart with ID {cart.Id} not found.");
             }
 
+            // Обновляем время и общую сумму корзины
             cart.CartLastUpdate();
             cart.TotalAmountUpdate();
 
-            _mapper.Map(cart, entityCart);
-            _context.Carts.Update(entityCart);
+            // Обновляем основные свойства корзины
+            entityCart.LastUpdate = cart.LastUpdate;
+            entityCart.TotalAmount = cart.TotalAmount;
+
+            // Обрабатываем элементы корзины
+            // 1. Удаляем элементы, которых нет в обновленной корзине
+            var itemsToRemove = entityCart.CartItems
+                .Where(existingItem => !cart.CartItems.Any(newItem => newItem.Id == existingItem.Id))
+                .ToList();
+
+            foreach (var itemToRemove in itemsToRemove)
+            {
+                _context.CartItems.Remove(itemToRemove);
+            }
+
+            // 2. Обновляем существующие элементы и добавляем новые
+            foreach (var newItem in cart.CartItems)
+            {
+                var existingItem = entityCart.CartItems.FirstOrDefault(ci => ci.Id == newItem.Id);
+
+                if (existingItem != null)
+                {
+                    // Обновляем существующий элемент
+                    existingItem.Quantity = newItem.Quantity;
+                }
+                else
+                {
+                    // Добавляем новый элемент
+                    var cartItems = CartItems.Create(cart.Id, newItem.ToyId, newItem.Quantity);
+                    var entityCartItemsEntity = _mapper.Map<CartItemsEntity>(cartItems);
+                    entityCart.CartItems.Add(entityCartItemsEntity);
+                }
+            }
+
+            // Сохраняем изменения
             await _context.SaveChangesAsync();
 
             return entityCart.Id;
@@ -84,7 +122,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
         public async Task AddToCartAsync(Guid cartId, Guid toyId, int quantity)
         {
             var cartWithItems = await _context.Carts
-                .AsNoTracking()
+                //.AsNoTracking()
                 .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.Id == cartId);
 
@@ -92,25 +130,26 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
                 throw new InvalidOperationException("Cart not found");
 
             var toy = await _context.Toys
-                .AsNoTracking()
+                //.AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == toyId);
 
             if (toy == null)
                 throw new InvalidOperationException("Toy not found");
 
             // Очищаем ChangeTracker для избежания конфликтов отслеживания
-            _context.ChangeTracker.Clear();
+            //_context.ChangeTracker.Clear();
 
             // Загружаем корзину ещё раз, для редактирования
-            var cart = await _context.Carts
-                .Include(c => c.CartItems)
-                .FirstOrDefaultAsync(c => c.Id == cartId);
+            //var cart = await _context.Carts
+            //    .Include(c => c.CartItems)
+            //    .FirstOrDefaultAsync(c => c.Id == cartId);
 
-            if (cart == null)
-                throw new InvalidOperationException("Cart not found after clearing context");
+            //if (cart == null)
+            //    throw new InvalidOperationException("Cart not found after clearing context");
 
             // Проверяем, есть ли уже эта игрушка в корзине
-            var existingItem = cart.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            //var existingItem = cart.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            var existingItem = cartWithItems.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
             if (existingItem != null)
             {
                 existingItem.Quantity += quantity;
@@ -124,8 +163,11 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             }
 
             // Обновляем общую сумму корзины
-            cart.LastUpdate = DateTime.UtcNow;
-            cart.TotalAmount = cart.CartItems.Sum(ci => ci.Quantity * (toy.Id == ci.ToyId ? toy.Price : 0));
+            //cart.LastUpdate = DateTime.UtcNow;
+            cartWithItems.LastUpdate = DateTime.UtcNow;
+            cartWithItems.TotalAmount = cartWithItems.CartItems.Sum(ci => ci.Quantity * (ci.ToyId == toyId ? toy.Price :
+                        (ci.Toy != null ? ci.Toy.Price : 0)));
+            //cart.TotalAmount = cart.CartItems.Sum(ci => ci.Quantity * (toy.Id == ci.ToyId ? toy.Price : 0));
 
             try
             {
@@ -140,19 +182,72 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
         public async Task UpdateItemQuantityAsync(Guid cartId, Guid toyId, int newQuantity)
         {
-            var cart = await GetCartByIdAsync(cartId);
-            if (cart == null) throw new InvalidOperationException("Cart not found");
+            if (newQuantity <= 0)
+                throw new ArgumentException("Quantity must be greater than zero");
 
-            cart.UpdateItemQuantity(toyId, newQuantity);
-            await UpdateAsync(cart);
+            // Очищаем ChangeTracker перед началом операции
+            _context.ChangeTracker.Clear();
+
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.Id == cartId);
+
+            if (cart == null)
+                throw new InvalidOperationException("Cart not found");
+
+            var cartItem = cart.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            if (cartItem == null)
+                throw new InvalidOperationException("Item not found in cart");
+
+            cartItem.Quantity = newQuantity;
+            cart.LastUpdate = DateTime.UtcNow;
+
+            // Загружаем цены товаров для расчета общей суммы
+            var toyIds = cart.CartItems.Select(ci => ci.ToyId).ToList();
+            var toys = await _context.Toys
+                .Where(t => toyIds.Contains(t.Id))
+                .ToDictionaryAsync(t => t.Id, t => t.Price);
+
+            // Рассчитываем общую сумму
+            cart.TotalAmount = cart.CartItems.Sum(ci => ci.Quantity * (toys.ContainsKey(ci.ToyId) ? toys[ci.ToyId] : 0));
+
+            await _context.SaveChangesAsync();
         }
         public async Task RemoveItemFromCartAsync(Guid cartId, Guid toyId)
         {
-            var cart = await GetCartByIdAsync(cartId);
-            if (cart == null) throw new InvalidOperationException("Cart not found");
+            // Очищаем ChangeTracker перед началом операции
+            _context.ChangeTracker.Clear();
 
-            cart.RemoveItem(toyId);
-            await UpdateAsync(cart);
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.Id == cartId);
+
+            if (cart == null)
+                throw new InvalidOperationException("Cart not found");
+
+            var cartItem = cart.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            if (cartItem == null)
+                throw new InvalidOperationException("Item not found in cart");
+
+            _context.CartItems.Remove(cartItem);
+            cart.LastUpdate = DateTime.UtcNow;
+
+            // Загружаем цены товаров для расчета общей суммы
+            var remainingToyIds = cart.CartItems
+                .Where(ci => ci.ToyId != toyId)
+                .Select(ci => ci.ToyId)
+                .ToList();
+
+            var toys = await _context.Toys
+                .Where(t => remainingToyIds.Contains(t.Id))
+                .ToDictionaryAsync(t => t.Id, t => t.Price);
+
+            // Рассчитываем общую сумму
+            cart.TotalAmount = cart.CartItems
+                .Where(ci => ci.ToyId != toyId)
+                .Sum(ci => ci.Quantity * (toys.ContainsKey(ci.ToyId) ? toys[ci.ToyId] : 0));
+
+            await _context.SaveChangesAsync();
         }
     }
 }
