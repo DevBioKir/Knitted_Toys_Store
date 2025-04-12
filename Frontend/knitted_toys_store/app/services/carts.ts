@@ -33,6 +33,7 @@ export const getCartById = async (id: string): Promise<CartResponce> => {
     return response.json();
 };
 
+//Убрать параметр в createCart и изменить в CartPage проверку на наличие корзины и создание новой, по итогам проверки на наличие корзины в cookie
 export const createCart = async (cartRequest: CartRequest) => {
     const response = await fetch ("http://localhost:5237/Cart/CreateCart", {
         method: "POST",

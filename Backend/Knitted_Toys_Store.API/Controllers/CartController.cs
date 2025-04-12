@@ -43,7 +43,7 @@ namespace Knitted_Toys_Store.API.Controllers
             return Ok(cart);
         }
 
-        [HttpGet("GetCartsHelpers")]
+        [HttpGet("GetCartsHelpers")] //поиск по cookie, надо добавить что если нет в Cookie ничего, то надо создать корзину и id занести в Cookie
         public async Task<ActionResult<CartResponce>> GetCart()
         {
             if (!HttpContext.Items.TryGetValue(CartIdentifierMiddleware.CartCookieName, out var rawCartId) || rawCartId is not Guid cartId)
