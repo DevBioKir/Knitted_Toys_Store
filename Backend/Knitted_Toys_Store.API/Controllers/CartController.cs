@@ -32,6 +32,19 @@ namespace Knitted_Toys_Store.API.Controllers
             return null;
         }
 
+        //[HttpGet("Create if Cokie Null")]
+        //public async Task<ActionResult<Guid>> CreateIfCookieNull()
+        //{
+        //    if (HttpContext.Items.TryGetValue(CartIdentifierMiddleware.CartCookieName, out var rawCartId) && rawCartId is Guid cartId)
+        //    {
+        //        // Возвращаем ID корзины, который уже есть в контексте
+        //        return Ok(cartId);
+        //    }
+
+        //    return BadRequest("Failed to retrieve or create cart");
+        //}
+
+
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<CartResponce>> GetCartByIdAsync(Guid id)
         {
@@ -43,13 +56,14 @@ namespace Knitted_Toys_Store.API.Controllers
             return Ok(cart);
         }
 
-        [HttpGet("GetCartsHelpers")] //поиск по cookie, надо добавить что если нет в Cookie ничего, то надо создать корзину и id занести в Cookie
-        public async Task<ActionResult<CartResponce>> GetCart()
+        [HttpGet("Current")]
+        public async Task<ActionResult<CartResponce>> GetCurrentCart()
         {
-            if (!HttpContext.Items.TryGetValue(CartIdentifierMiddleware.CartCookieName, out var rawCartId) || rawCartId is not Guid cartId)
+            var cartId = GetCartIdFromContext();
+            if (!cartId.HasValue)
                 return BadRequest("Cart not found in context.");
 
-            var cart = await _cartService.GetCartByIdAsync(cartId);
+            var cart = await _cartService.GetCartByIdAsync(cartId.Value);
             if (cart == null)
                 return NotFound("Cart not found.");
 
