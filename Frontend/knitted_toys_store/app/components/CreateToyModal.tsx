@@ -1,5 +1,5 @@
 import { Modal } from "antd";
-import { ToyRequest } from "../types/ToyRequest";
+import { ToyRequest } from "../types/Toy/ToyRequest";
 import { ToyForm } from "./ToyForm";
 import { data } from "framer-motion/client";
 

@@ -8,14 +8,16 @@ using Knitted_Toys_Store.API.Middleware;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
 builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 builder.Services.AddOpenApi();
 builder.Services.AddAutoMapper(typeof(AppMappingProfile)); //регистрация AppMappingProfile
+
 builder.Services.AddDbContext<Knitted_Toys_StoreDBContext>(
     options =>
     {
@@ -32,6 +34,17 @@ builder.Services.AddScoped<IToysRepositories, ToysRepositories>();
 builder.Services.AddScoped<IOrderRepositories, OrderRepositories>();
 builder.Services.AddScoped<ICartRepositories, CartRepositories>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AlowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
+    });
+});
+
 
 var app = builder.Build();
 
@@ -47,17 +60,10 @@ if (app.Environment.IsDevelopment())
 app.UseRouting();
 
 app.UseHttpsRedirection();
+app.UseCors("AlowFrontend");
 app.UseAuthorization();
 app.UseCartIdentifier();
 
 app.MapControllers();
-
-app.UseCors(r =>
-{
-    r.WithHeaders().AllowAnyHeader();
-    r.WithOrigins("http://localhost:3000");
-    r.WithMethods().AllowAnyMethod();
-});
-
 
 app.Run();

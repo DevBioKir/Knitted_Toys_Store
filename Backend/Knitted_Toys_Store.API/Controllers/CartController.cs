@@ -14,10 +14,12 @@ namespace Knitted_Toys_Store.API.Controllers
     public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;
+        private readonly ILogger<CartIdentifierMiddleware> _logger;
         private readonly IMapper _mapper;
-        public CartController(ICartService cartService, IMapper mapper)
+        public CartController(ICartService cartService, ILogger<CartIdentifierMiddleware> logger, IMapper mapper)
         {
             _cartService = cartService;
+            _logger = logger;
             _mapper = mapper;
         }
 
@@ -31,19 +33,6 @@ namespace Knitted_Toys_Store.API.Controllers
 
             return null;
         }
-
-        //[HttpGet("Create if Cokie Null")]
-        //public async Task<ActionResult<Guid>> CreateIfCookieNull()
-        //{
-        //    if (HttpContext.Items.TryGetValue(CartIdentifierMiddleware.CartCookieName, out var rawCartId) && rawCartId is Guid cartId)
-        //    {
-        //        // Возвращаем ID корзины, который уже есть в контексте
-        //        return Ok(cartId);
-        //    }
-
-        //    return BadRequest("Failed to retrieve or create cart");
-        //}
-
 
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<CartResponce>> GetCartByIdAsync(Guid id)
@@ -59,16 +48,122 @@ namespace Knitted_Toys_Store.API.Controllers
         [HttpGet("Current")]
         public async Task<ActionResult<CartResponce>> GetCurrentCart()
         {
-            var cartId = GetCartIdFromContext();
-            if (!cartId.HasValue)
-                return BadRequest("Cart not found in context.");
+            _logger.LogInformation("Получен запрос на текущую корзину");
 
-            var cart = await _cartService.GetCartByIdAsync(cartId.Value);
-            if (cart == null)
-                return NotFound("Cart not found.");
+            // Проверяем, есть ли ID корзины в Items (установлен middleware)
+            if (HttpContext.Items.TryGetValue(CartIdentifierMiddleware.CartCookieName, out var cartIdObj) &&
+                cartIdObj is Guid cartGuid)
+            {
+                _logger.LogInformation($"Найден ID корзины в HttpContext.Items: {cartGuid}");
 
-            return Ok(_mapper.Map<CartResponce>(cart));
+                // Корзина уже проверена middleware, просто получаем её
+                var existingCart = await _cartService.GetCartByIdAsync(cartGuid);
+                if (existingCart != null)
+                {
+                    _logger.LogInformation($"Найдена существующая корзина с ID: {cartGuid}");
+                    return Ok(existingCart);
+                }
+            }
+
+            // Проверяем наличие cookie
+            var cartIdCookie = Request.Cookies[CartIdentifierMiddleware.CartCookieName];
+            if (cartIdCookie != null)
+            {
+                _logger.LogInformation($"Найден ID корзины в cookie: {cartIdCookie}");
+
+                // Пытаемся преобразовать строку в Guid
+                if (Guid.TryParse(cartIdCookie, out Guid cookieCartGuid))
+                {
+                    // Проверяем, существует ли корзина с таким ID
+                    var existingCart = await _cartService.GetCartByIdAsync(cookieCartGuid);
+                    if (existingCart != null)
+                    {
+                        _logger.LogInformation($"Найдена существующая корзина с ID: {cookieCartGuid}");
+                        return Ok(existingCart);
+                    }
+                    else
+                    {
+                        _logger.LogWarning($"Корзина с ID {cookieCartGuid} не найдена в базе данных");
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning($"Не удалось преобразовать ID корзины из cookie '{cartIdCookie}' в Guid");
+                }
+            }
+            else
+            {
+                _logger.LogInformation("ID корзины не найден в cookie");
+            }
+
+            // Создаем новую корзину
+            _logger.LogInformation("Создаем новую корзину");
+            var newCart = await _cartService.CreateCartAsync();
+
+            // Устанавливаем cookie
+            Response.Cookies.Append(CartIdentifierMiddleware.CartCookieName, newCart.Id.ToString(), new CookieOptions
+            {
+                HttpOnly = false,
+                Expires = DateTimeOffset.Now.AddDays(30),
+                Path = "/"
+            });
+
+            _logger.LogInformation($"Создана новая корзина с ID: {newCart.Id}");
+            return Ok(newCart);
         }
+
+
+
+        //[HttpGet("Current")]
+        //public async Task<ActionResult<CartResponce>> GetCurrentCart()
+        //{
+        //    // Логируем информацию о запросе
+        //    _logger.LogInformation("Получен запрос на текущую корзину");
+
+        //    // Проверяем наличие cookie
+        //    var cartIdCookie = Request.Cookies["cart_id"];
+        //    if (cartIdCookie != null)
+        //    {
+        //        _logger.LogInformation($"Найден ID корзины в cookie: {cartIdCookie}");
+
+        //        if (Guid.TryParse(cartIdCookie, out Guid cartGuid))
+        //        {
+        //            // Проверяем, существует ли корзина с таким ID
+        //            var existingCart = await _cartService.GetCartByIdAsync(cartGuid);
+        //            if (existingCart != null)
+        //            {
+        //                _logger.LogInformation($"Найдена существующая корзина с ID: {cartIdCookie}");
+        //                return Ok(existingCart);
+        //            }
+        //            else
+        //            {
+        //                _logger.LogWarning($"Корзина с ID {cartIdCookie} не найдена в базе данных");
+        //            }
+        //        }
+        //        else
+        //        {
+        //            _logger.LogInformation($"не удалось преобразовать ID корзины из cookie {cartIdCookie} в Guid");
+        //        }
+        //    }
+        //    else
+        //    {
+        //        _logger.LogInformation("ID корзины не найден в cookie");
+        //    }
+
+        //    // Создаем новую корзину
+        //    _logger.LogInformation("Создаем новую корзину");
+        //    var newCart = await _cartService.CreateCartAsync();
+
+        //    // Устанавливаем cookie
+        //    Response.Cookies.Append("cart_id", newCart.Id.ToString(), new CookieOptions
+        //    {
+        //        HttpOnly = false,
+        //        Expires = DateTimeOffset.Now.AddDays(30)
+        //    });
+
+        //    _logger.LogInformation($"Создана новая корзина с ID: {newCart.Id}");
+        //    return Ok(newCart);
+        //}
 
         [HttpGet]
         public async Task<ActionResult<List<CartResponce>>> GetAllCartsAsyn()
@@ -79,7 +174,7 @@ namespace Knitted_Toys_Store.API.Controllers
             return Ok(responceForCarts);
         }
 
-        [HttpPut/*("{id:guid}")*/]
+        [HttpPut]
         public async Task<ActionResult<CartResponce>> UpdateCartAsync(Guid cartId, [FromBody] CartRequest request)
         {
             try

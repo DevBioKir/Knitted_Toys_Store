@@ -1,4 +1,4 @@
-import { CartItemsResponce } from "./CartItemsResponce";
+import { CartItemsResponce } from "../CartItems/CartItemsResponce";
 
 export interface CartResponce {
   id: string;

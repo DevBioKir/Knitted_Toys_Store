@@ -1,5 +1,5 @@
-import { OrderStatus } from "../Models/Order";
-import { OrderItemsRequest } from "./OrderItemsRequest";
+import { OrderStatus } from "../../Models/Order";
+import { OrderItemsRequest } from "../OrderItems/OrderItemsRequest";
 
 export interface OrderRequest{
     id?: string;

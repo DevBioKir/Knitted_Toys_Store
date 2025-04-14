@@ -1,5 +1,5 @@
 import { Input, Modal } from "antd";
-import { ToyRequest } from "../types/ToyRequest";
+import { ToyRequest } from "../types/Toy/ToyRequest";
 import { title } from "process";
 import { useEffect, useState } from "react";
 import { Toy } from "../Models/Toy";

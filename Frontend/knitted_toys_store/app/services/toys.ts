@@ -1,5 +1,5 @@
-import { ToyRequest } from "../types/ToyRequest";
-import { ToyResponce } from "../types/ToyResponce";
+import { ToyRequest } from "../types/Toy/ToyRequest";
+import { ToyResponce } from "../types/Toy/ToyResponce";
 
 
 export const getAllToys = async (): Promise<ToyResponce[]> => {

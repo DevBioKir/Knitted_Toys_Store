@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ToyRequest } from "../types/ToyRequest";
+import { ToyRequest } from "../types/Toy/ToyRequest";
 import { Toy } from "../Models/Toy";
 import { Input, InputNumber } from "antd";
 

@@ -7,7 +7,7 @@ import { createToy, getAllToys, updateToy, deleteToy } from "../services/toys"; 
 import { CreateToyModal } from "../components/CreateToyModal"; // Модалка для создания игрушки
 import { UpdateToyModal } from "../components/UpdateToyModal"; // Модалка для редактирования игрушки
 import { Toy } from "../Models/Toy";
-import { ToyRequest } from "../types/ToyRequest";
+import { ToyRequest } from "../types/Toy/ToyRequest";
 import { Mode } from "../components/CreateToy"; // Импортируем Mode
 
 export default function ToysPage() {
