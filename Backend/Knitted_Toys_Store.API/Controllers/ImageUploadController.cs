@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using SixLabors.ImageSharp;
 
 namespace Knitted_Toys_Store.API.Controllers
 {
@@ -7,12 +9,10 @@ namespace Knitted_Toys_Store.API.Controllers
     [Route("[controller]")]
     public class ImageUploadController : ControllerBase
     {
-        private readonly IWebHostEnvironment _env;
         private readonly ILogger<ImageUploadController> _logger;
 
-        public ImageUploadController(IWebHostEnvironment env, ILogger<ImageUploadController> logger)
+        public ImageUploadController(ILogger<ImageUploadController> logger)
         {
-            _env = env;
             _logger = logger;
         }
 
@@ -34,38 +34,26 @@ namespace Knitted_Toys_Store.API.Controllers
                 if (!allowedExtensions.Contains(extension))
                     return BadRequest("Недопустимый формат файла");
 
-                // Определяем путь для сохранения
-                string uploadsFolder;
-                if (string.IsNullOrEmpty(_env.WebRootPath))
-                {
-                    // Для API проектов без wwwroot
-                    uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Images");
-                }
-                else
-                {
-                    uploadsFolder = Path.Combine(_env.WebRootPath, "Images");
-                }
-
-                _logger.LogInformation($"Путь для сохранения: {uploadsFolder}");
+                // Путь для загрузки файла
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Images");
 
                 if (!Directory.Exists(uploadsFolder))
                 {
-                    try
-                    {
-                        Directory.CreateDirectory(uploadsFolder);
-                        _logger.LogInformation($"Создана директория: {uploadsFolder}");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Ошибка при создании директории");
-                        return StatusCode(500, "Не удалось создать директорию для сохранения файлов");
-                    }
+                    Directory.CreateDirectory(uploadsFolder);
+                    _logger.LogInformation($"Создана директория: {uploadsFolder}");
                 }
 
                 var uniqueFileName = Guid.NewGuid().ToString() + extension;
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                 _logger.LogInformation($"Сохранение файла по пути: {filePath}");
+
+                // Открытие и проверка файла как изображения с помощью ImageSharp
+                using (var image = await Image.LoadAsync(file.OpenReadStream()))
+                {
+                    // Можно добавить дополнительные проверки, например, разрешение изображения или его размер
+                    _logger.LogInformation($"Изображение {file.FileName} успешно загружено.");
+                }
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
@@ -81,6 +69,21 @@ namespace Knitted_Toys_Store.API.Controllers
             {
                 _logger.LogError(ex, "Ошибка при загрузке файла");
                 return StatusCode(500, "Внутренняя ошибка сервера при загрузке файла");
+            }
+        }
+
+        [HttpGet("force-crash")]
+        public IActionResult ForceCrash()
+        {
+            try
+            {
+                throw new Exception("Искусственный краш для теста логирования");
+            }
+            catch (Exception ex)
+            {
+                // Логируем исключение через Serilog
+                Log.Error(ex, "Произошла ошибка при искусственном краше");
+                return StatusCode(500, "Произошла ошибка. Посмотрите логи для деталей.");
             }
         }
     }

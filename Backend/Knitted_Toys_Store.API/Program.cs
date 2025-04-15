@@ -1,3 +1,4 @@
+using Serilog;
 using Knitted_Toys_Store.App.Services;
 using Knitted_Toys_Store.DataAccess;
 using Knitted_Toys_Store.App.Mapping;
@@ -6,22 +7,17 @@ using Microsoft.EntityFrameworkCore;
 using Knitted_Toys_Store.API.Middleware;
 using Microsoft.AspNetCore.Http.Features;
 
-using System.Diagnostics;
-
-AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
-{
-    var exception = args.ExceptionObject as Exception;
-    Debug.WriteLine($"CRITICAL ERRROR: {exception?.Message}");
-    Debug.WriteLine($"Stack Trace: {exception?.StackTrace}");
-
-    File.WriteAllText("crash_log.txt",
-        $"Time: {DateTime.Now}\n" +
-        $"Message: {exception?.Message}\n + " +
-        $"Stacl Trace: {exception?.StackTrace}");
-};
-
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+
+// Настройка Serilog
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File(@"C:\KnittedStoreLogs\log-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+// Используем Serilog для логирования
+builder.Host.UseSerilog();
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -33,11 +29,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddOpenApi();
 builder.Services.AddAutoMapper(typeof(AppMappingProfile)); //регистрация AppMappingProfile
 
-builder.Services.AddDbContext<Knitted_Toys_StoreDBContext>(
-    options =>
-    {
-        options.UseNpgsql(configuration.GetConnectionString(nameof(Knitted_Toys_StoreDBContext)));
-    });
+builder.Services.AddDbContext<Knitted_Toys_StoreDBContext>(options =>
+{
+    options.UseNpgsql(configuration.GetConnectionString(nameof(Knitted_Toys_StoreDBContext)));
+});
 
 //Регистрация сервисов
 builder.Services.AddScoped<IToyService, ToyService>();
@@ -54,9 +49,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AlowFrontend", policy =>
     {
         policy.WithOrigins("http://localhost:3000")
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials();
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
