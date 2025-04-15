@@ -1,6 +1,5 @@
 ﻿using Knitted_Toys_Store.Domain.Models.Domain;
 
-//namespace Knitted_Toys_Store.Domain.Abstractions
 namespace Knitted_Toys_Store.App.Services
 {
     public interface IToyService

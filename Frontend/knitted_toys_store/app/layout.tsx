@@ -4,7 +4,7 @@ import Link from "next/link";
 import '@ant-design/v5-patch-for-react-19';
 import "./globals.css";
 import CookieConsent from "react-cookie-consent";
-import { CartProvider } from "./context/CartContext";
+import { CartProvider } from "./context/CartProvider";
 import { useEffect, useState } from "react";
 
 const {Header, Content, Footer} = Layout;
@@ -15,22 +15,6 @@ const menuItems = [
   { key: "cart", label: <Link href="/carts">Корзина</Link> },
 ];
 
-// Создаем один экземпляр CartProvider для всего приложения
-const CartProviderSingleton = ({ children }: { children: React.ReactNode }) => {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Не рендерим CartProvider на сервере, только на клиенте
-  if (!mounted) {
-    return <>{children}</>;
-  }
-
-  return <CartProvider>{children}</CartProvider>;
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -39,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body>
-        <CartProviderSingleton>
+        <CartProvider>
           <Layout className="min-h-screen">
             <div className="bg-gradient-to-r from-black via-indigo-900 to-black shadow-lg">
               <Header className="bg-transparent">
@@ -77,7 +61,7 @@ export default function RootLayout({
           >
             Мы используем cookies для улучшения вашего опыта на сайте. Продолжая использовать сайт, вы соглашаетесь на использование cookies.
           </CookieConsent>
-        </CartProviderSingleton>
+        </CartProvider>
       </body>
     </html>
   );

@@ -9,14 +9,20 @@ interface Props {
 
 export const Toys = ({ toys, onEdit, onDelete }: Props) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="h-full flex flex-col">
       {toys.map((toy) => (
         <Card
-          key={toy.id}
-          title={toy.name}
-          cover={<img alt={toy.name} src={toy.imageUrl} />}
-          style={{ width: 300 }}
-        >
+        key={toy.id}
+        title={toy.name}
+        cover={
+          <img
+            alt={toy.name}
+            src={toy.imageUrl}
+            style={{ height: 200, objectFit: "cover" }}
+          />
+        }
+        style={{ width: 300 }}
+      >
           <p>{toy.description}</p>
           <p>Размер: {toy.size}мм</p>
           <p>Цена: {toy.price} ₽</p>

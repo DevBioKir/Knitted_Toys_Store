@@ -13,7 +13,7 @@ import {
 import { updateCart } from "../services/carts";
 import { CartRequest } from "../types/Cart/CartRequest";
 import { CartItemsRequest } from "../types/CartItems/CartItemsRequest";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../context/CartProvider";
 
 const { Title, Text } = Typography;
 

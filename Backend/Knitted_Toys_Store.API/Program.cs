@@ -4,6 +4,21 @@ using Knitted_Toys_Store.App.Mapping;
 using Knitted_Toys_Store.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Knitted_Toys_Store.API.Middleware;
+using Microsoft.AspNetCore.Http.Features;
+
+using System.Diagnostics;
+
+AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+{
+    var exception = args.ExceptionObject as Exception;
+    Debug.WriteLine($"CRITICAL ERRROR: {exception?.Message}");
+    Debug.WriteLine($"Stack Trace: {exception?.StackTrace}");
+
+    File.WriteAllText("crash_log.txt",
+        $"Time: {DateTime.Now}\n" +
+        $"Message: {exception?.Message}\n + " +
+        $"Stacl Trace: {exception?.StackTrace}");
+};
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -45,6 +60,10 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; //10MB
+});
 
 var app = builder.Build();
 
@@ -53,9 +72,15 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-
-    //app.MapOpenApi();
 }
+
+var imagesPath = Path.Combine(app.Environment.WebRootPath, "Images");
+if (!Directory.Exists(imagesPath))
+{
+    Directory.CreateDirectory(imagesPath);
+}
+
+app.UseStaticFiles();
 
 app.UseRouting();
 

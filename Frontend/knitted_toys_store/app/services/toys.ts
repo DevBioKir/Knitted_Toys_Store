@@ -8,6 +8,7 @@ export const getAllToys = async (): Promise<ToyResponce[]> => {
         headers: {
             "Content-Type": "application/json",
         },
+        credentials: 'include',
     });
 
     if (!response.ok) {

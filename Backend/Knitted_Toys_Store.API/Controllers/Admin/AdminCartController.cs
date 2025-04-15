@@ -1,24 +1,35 @@
-﻿using Knitted_Toys_Store.Contracts;
+﻿using AutoMapper;
+using Knitted_Toys_Store.API.Middleware;
 using Knitted_Toys_Store.App.Services;
+using Knitted_Toys_Store.Contracts;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
-using Knitted_Toys_Store.API.Middleware;
 
-namespace Knitted_Toys_Store.API.Controllers
+namespace Knitted_Toys_Store.API.Controllers.Admin
 {
     [ApiController]
     [Route("[controller]")]
-    public class CartController : ControllerBase
+    public class AdminCartController : ControllerBase
     {
         private readonly ICartService _cartService;
         private readonly ILogger<CartIdentifierMiddleware> _logger;
         private readonly IMapper _mapper;
-        public CartController(ICartService cartService, ILogger<CartIdentifierMiddleware> logger, IMapper mapper)
+        public AdminCartController(ICartService cartService, ILogger<CartIdentifierMiddleware> logger, IMapper mapper)
         {
             _cartService = cartService;
             _logger = logger;
             _mapper = mapper;
+        }
+
+        [HttpGet("{id:guid} GetCartByIdAsync")]
+        public async Task<ActionResult<CartResponce>> GetCartByIdAsync(Guid id)
+        {
+            var cart = await _cartService.GetCartByIdAsync(id);
+            if (cart == null)
+            {
+                return NotFound($"Cart with ID {id} not found.");
+            }
+            return Ok(cart);
         }
 
         [HttpGet("Current")]
@@ -88,6 +99,68 @@ namespace Knitted_Toys_Store.API.Controllers
             return Ok(newCart);
         }
 
+
+
+        //[HttpGet("Current")]
+        //public async Task<ActionResult<CartResponce>> GetCurrentCart()
+        //{
+        //    // Логируем информацию о запросе
+        //    _logger.LogInformation("Получен запрос на текущую корзину");
+
+        //    // Проверяем наличие cookie
+        //    var cartIdCookie = Request.Cookies["cart_id"];
+        //    if (cartIdCookie != null)
+        //    {
+        //        _logger.LogInformation($"Найден ID корзины в cookie: {cartIdCookie}");
+
+        //        if (Guid.TryParse(cartIdCookie, out Guid cartGuid))
+        //        {
+        //            // Проверяем, существует ли корзина с таким ID
+        //            var existingCart = await _cartService.GetCartByIdAsync(cartGuid);
+        //            if (existingCart != null)
+        //            {
+        //                _logger.LogInformation($"Найдена существующая корзина с ID: {cartIdCookie}");
+        //                return Ok(existingCart);
+        //            }
+        //            else
+        //            {
+        //                _logger.LogWarning($"Корзина с ID {cartIdCookie} не найдена в базе данных");
+        //            }
+        //        }
+        //        else
+        //        {
+        //            _logger.LogInformation($"не удалось преобразовать ID корзины из cookie {cartIdCookie} в Guid");
+        //        }
+        //    }
+        //    else
+        //    {
+        //        _logger.LogInformation("ID корзины не найден в cookie");
+        //    }
+
+        //    // Создаем новую корзину
+        //    _logger.LogInformation("Создаем новую корзину");
+        //    var newCart = await _cartService.CreateCartAsync();
+
+        //    // Устанавливаем cookie
+        //    Response.Cookies.Append("cart_id", newCart.Id.ToString(), new CookieOptions
+        //    {
+        //        HttpOnly = false,
+        //        Expires = DateTimeOffset.Now.AddDays(30)
+        //    });
+
+        //    _logger.LogInformation($"Создана новая корзина с ID: {newCart.Id}");
+        //    return Ok(newCart);
+        //}
+
+        [HttpGet("GetAllCartsAsyn")]
+        public async Task<ActionResult<List<CartResponce>>> GetAllCartsAsyn()
+        {
+            var carts = await _cartService.GetAllCarts();
+
+            var responceForCarts = _mapper.Map<List<CartResponce>>(carts);
+            return Ok(responceForCarts);
+        }
+
         [HttpPut]
         public async Task<ActionResult<CartResponce>> UpdateCartAsync(Guid cartId, [FromBody] CartRequest request)
         {
@@ -123,21 +196,35 @@ namespace Knitted_Toys_Store.API.Controllers
             }
         }
 
-        [HttpPost("AddToys")]
-        public async Task<ActionResult<CartItemsResponce>> AddToCartAsync(Guid cartId, Guid toyId, 
-            int quantity)
+        [HttpPost("CreateCart")]
+        public async Task<ActionResult<Guid>> CreateCartAsync()
         {
-                var cart = await _cartService.GetCartByIdAsync(cartId);
-                Console.WriteLine(cart.RowVersion);
-
-                if (cart == null) return NotFound($"Cart with ID {cartId} not found.");
-
-                var cartItem = await _cartService.AddToCartAsync(cartId, toyId, quantity);
-
-                return Ok(cartItem);
+            try
+            {
+                var cart = await _cartService.CreateCartAsync();
+                return Ok(cart);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
-        [HttpDelete("{id:guid}")]
+        [HttpPost("AddToys")]
+        public async Task<ActionResult<CartItemsResponce>> AddToCartAsync(Guid cartId, Guid toyId,
+            int quantity)
+        {
+            var cart = await _cartService.GetCartByIdAsync(cartId);
+            Console.WriteLine(cart.RowVersion);
+
+            if (cart == null) return NotFound($"Cart with ID {cartId} not found.");
+
+            var cartItem = await _cartService.AddToCartAsync(cartId, toyId, quantity);
+
+            return Ok(cartItem);
+        }
+
+        [HttpDelete("{id:guid} DeleteCartAsync")]
         public async Task<ActionResult<Cart>> DeleteCartAsync(Guid id)
         {
             return Ok(await _cartService.DeleteCartAsync(id));

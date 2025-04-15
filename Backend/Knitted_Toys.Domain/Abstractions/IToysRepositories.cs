@@ -1,7 +1,6 @@
 ﻿using Knitted_Toys_Store.Domain.Models.Domain;
 
 namespace Knitted_Toys_Store.DataAccess.Repositories
-//namespace Knitted_Toys_Store.Domain.Abstractions
 {
     public interface IToysRepositories
     {

@@ -1,16 +1,16 @@
-﻿using Knitted_Toys_Store.Contracts;
-using Knitted_Toys_Store.App.Services;
+﻿using Knitted_Toys_Store.App.Services;
+using Knitted_Toys_Store.Contracts;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Knitted_Toys_Store.API.Controllers
+namespace Knitted_Toys_Store.API.Controllers.Admin
 {
     [ApiController]
     [Route("[controller]")]
-    public class ToyController : ControllerBase
+    public class AdminToyController : ControllerBase
     {
         private readonly IToyService _toyService;
-        public ToyController(IToyService toyService)
+        public AdminToyController(IToyService toyService)
         {
             _toyService = toyService;
         }
@@ -31,7 +31,7 @@ namespace Knitted_Toys_Store.API.Controllers
         {
             var toys = await _toyService.GetAllToysAsync();
 
-            var responceForToys = toys.Select(t => 
+            var responceForToys = toys.Select(t =>
                 new ToysResponce(t.Id, t.Name, t.Description, t.Size, t.Price, t.ImageUrl)).ToList();
             return Ok(responceForToys);
         }
@@ -80,7 +80,7 @@ namespace Knitted_Toys_Store.API.Controllers
         public async Task<ActionResult> DeleteToyAsync(Guid id)
         {
             return Ok(await _toyService.DeleteToysAsync(id));
-            
+
             //var toys = await _toyService.GetToyByIdAsync(id);
             //if (toys == null)
             //{

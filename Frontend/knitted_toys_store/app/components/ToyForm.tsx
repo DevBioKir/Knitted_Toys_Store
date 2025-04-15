@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ToyRequest } from "../types/Toy/ToyRequest";
 import { Toy } from "../Models/Toy";
-import { Input, InputNumber } from "antd";
+import { Input, InputNumber, message } from "antd";
 
 interface ToyFormProp {
   initialValues?: Toy;
@@ -14,6 +14,7 @@ export const ToyForm = ({ initialValues, onSubmit }: ToyFormProp) => {
   const [size, setSize] = useState("");
   const [price, setPrice] = useState(1);
   const [imageUrl, setImageUrl] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (initialValues) {
@@ -25,8 +26,37 @@ export const ToyForm = ({ initialValues, onSubmit }: ToyFormProp) => {
     }
   }, [initialValues]);
 
-  const handleSubmit = () => {
-    onSubmit({ name, description, size, price, imageUrl });
+  const uploadImage = async (file: File): Promise<string | null> => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("http://localhost:5000/api/Image/UploadImage", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Upload failed");
+
+      const data = await response.json();
+      return data.imageUrl; // e.g., /Images/abc.jpg
+    } catch (err) {
+      console.error("Ошибка загрузки файла", err);
+      message.error("Не удалось загрузить изображение");
+      return null;
+    }
+  };
+
+  const handleSubmit = async () => {
+    let finalImageUrl = imageUrl;
+
+    if (imageFile) {
+      const uploaded = await uploadImage(imageFile);
+      if (!uploaded) return;
+      finalImageUrl = uploaded;
+    }
+
+    onSubmit({ name, description, size, price, imageUrl: finalImageUrl });
   };
 
   return (
