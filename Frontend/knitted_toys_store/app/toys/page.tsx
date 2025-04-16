@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "antd";  // Импортируем кнопку из Ant Design
 import { Toys } from "../components/Toys"; // Импортируем компонент Toys
-import { createToy, getAllToys, updateToy, deleteToy } from "../services/toys"; // Импортируем функции для получения игрушек
+import { createToy, getAllToys, updateToy, deleteToy, uploadImage } from "../services/toys"; // Импортируем функции для получения игрушек
 import { CreateToyModal } from "../components/CreateToyModal"; // Модалка для создания игрушки
 import { UpdateToyModal } from "../components/UpdateToyModal"; // Модалка для редактирования игрушки
 import { Toy } from "../Models/Toy";
@@ -96,6 +96,36 @@ export default function ToysPage() {
 
   return (
     <div>
+      {/* Поле загрузки изображения */}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={async (e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            try {
+              const url = await uploadImage(file);
+              setValues((prev) => ({
+                ...prev,
+                imageUrl: url,
+              }));
+            } catch (err) {
+              console.error("Ошибка загрузки изображения", err);
+            }
+          }
+        }}
+        style={{ marginBottom: "10px" }}
+      />
+
+      {/* Отображение загруженного изображения */}
+      {values.imageUrl && (
+        <img
+          src={`http://localhost:5237${values.imageUrl}`}
+          alt="Загруженное изображение"
+          style={{ width: "150px", marginBottom: "10px" }}
+        />
+      )}
+  
       {/* Кнопка для создания новой игрушки */}
       <Button
         type="primary"

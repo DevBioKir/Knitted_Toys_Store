@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { ToyRequest } from "../types/Toy/ToyRequest";
 import { Toy } from "../Models/Toy";
-import { Input, InputNumber, message } from "antd";
+import { Input, InputNumber, Upload, Button, message } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
+import type { UploadChangeParam } from "antd/es/upload";
 
 interface ToyFormProp {
   initialValues?: Toy;
@@ -14,7 +16,6 @@ export const ToyForm = ({ initialValues, onSubmit }: ToyFormProp) => {
   const [size, setSize] = useState("");
   const [price, setPrice] = useState(1);
   const [imageUrl, setImageUrl] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (initialValues) {
@@ -26,37 +27,25 @@ export const ToyForm = ({ initialValues, onSubmit }: ToyFormProp) => {
     }
   }, [initialValues]);
 
-  const uploadImage = async (file: File): Promise<string | null> => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await fetch("http://localhost:5000/api/Image/UploadImage", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error("Upload failed");
-
-      const data = await response.json();
-      return data.imageUrl; // e.g., /Images/abc.jpg
-    } catch (err) {
-      console.error("Ошибка загрузки файла", err);
-      message.error("Не удалось загрузить изображение");
-      return null;
+  const handleUploadChange = (info: UploadChangeParam) => {
+    if (info.file.status === "done") {
+      const url = info.file.response?.filePath;
+      if (url) {
+        setImageUrl(url);
+        message.success("Изображение успешно загружено");
+      }
+    } else if (info.file.status === "error") {
+      message.error("Ошибка загрузки изображения");
     }
   };
 
-  const handleSubmit = async () => {
-    let finalImageUrl = imageUrl;
-
-    if (imageFile) {
-      const uploaded = await uploadImage(imageFile);
-      if (!uploaded) return;
-      finalImageUrl = uploaded;
+  const handleSubmit = () => {
+    if (!imageUrl) {
+      message.warning("Пожалуйста, загрузите изображение");
+      return;
     }
 
-    onSubmit({ name, description, size, price, imageUrl: finalImageUrl });
+    onSubmit({ name, description, size, price, imageUrl });
   };
 
   return (
@@ -76,24 +65,38 @@ export const ToyForm = ({ initialValues, onSubmit }: ToyFormProp) => {
       <Input
         value={size}
         onChange={(e) => setSize(e.target.value)}
-        placeholder="Размер игрушки(указывать в мм)"
+        placeholder="Размер игрушки (в мм)"
         style={{ marginBottom: 10 }}
       />
       <InputNumber
         value={price}
         min={1}
-        onChange={(value) => setPrice(value || 1)}  // защитимся от null
-        placeholder={"Цена"}
+        onChange={(value) => setPrice(value || 1)}
+        placeholder="Цена"
         style={{ width: "100%", marginBottom: 10 }}
       />
-      <Input
-        value={imageUrl}
-        onChange={(e) => setImageUrl(e.target.value)}
-        placeholder="Ссылка на изображение игрушки"
-        style={{ marginBottom: 10 }}
-      />
+
+      <Upload
+        name="file"
+        action="http://localhost:5237/ImageUpload/upload"
+        showUploadList={false}
+        onChange={handleUploadChange}
+      >
+        <Button icon={<UploadOutlined />}>Загрузить изображение</Button>
+      </Upload>
+
+      {imageUrl && (
+        <img
+          src={imageUrl}
+          alt="Превью"
+          style={{ marginTop: 10, maxWidth: 200, border: "1px solid #ccc" }}
+        />
+      )}
+
       <br /><br />
-      <button onClick={handleSubmit}>Сохранить</button>
+      <Button type="primary" onClick={handleSubmit}>
+        Сохранить
+      </Button>
     </div>
   );
 };

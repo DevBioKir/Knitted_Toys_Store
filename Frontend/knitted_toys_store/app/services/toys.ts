@@ -69,3 +69,21 @@ export const deleteToy = async(id: string) => {
     }
 };
 
+export async function uploadImage(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append("file", file); // Важно: ключ "file" должен совпадать с параметром в контроллере
+  
+    const response = await fetch("http://localhost:5237/ImageUpload/upload", {
+      method: "POST",
+      body: formData,
+      // Не указываем Content-Type — browser сам установит multipart/form-data с boundary
+    });
+  
+    if (!response.ok) {
+      throw new Error(`Ошибка при загрузке изображения: ${response.statusText}`);
+    }
+  
+    const data = await response.json();
+    return data.filePath; // вернёт, например: /Images/abc.jpg
+  }
+

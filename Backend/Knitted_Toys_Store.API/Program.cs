@@ -6,6 +6,7 @@ using Knitted_Toys_Store.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Knitted_Toys_Store.API.Middleware;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -25,7 +26,9 @@ builder.Logging.AddDebug();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddOpenApi();
 builder.Services.AddAutoMapper(typeof(AppMappingProfile)); //регистрация AppMappingProfile
 
@@ -55,9 +58,22 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.Configure<IISServerOptions>(options =>
+{
+    options.MaxRequestBodySize = int.MaxValue;
+});
+
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.Limits.MaxRequestBodySize = int.MaxValue;
+});
+
+
 builder.Services.Configure<FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; //10MB
+    options.MultipartBodyLengthLimit = int.MaxValue;
+    options.ValueLengthLimit = int.MaxValue;
+    options.MultipartHeadersLengthLimit = int.MaxValue;
 });
 
 var app = builder.Build();
