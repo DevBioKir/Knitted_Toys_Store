@@ -20,23 +20,29 @@ namespace Knitted_Toys_Store.API.Controllers
 
         [HttpPost("upload")]
         //[Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadImage(IFormFile file)
+        public async Task<IActionResult> UploadImage(IFormFile image)
         {
-            if (file == null || file.Length == 0)
+            if (image == null || image.Length == 0)
                 return BadRequest("Файл не выбран");
 
-            if (!file.ContentType.StartsWith("image/"))
+            if (!image.ContentType.StartsWith("image/"))
                 return BadRequest("Загруженный файл не является изображением");
 
             var imagesFolder = Path.Combine(_env.WebRootPath, "Images");
             if (!Directory.Exists(imagesFolder))
                 Directory.CreateDirectory(imagesFolder);
 
-            var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
+            var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(image.FileName)}";
             var filePath = Path.Combine(imagesFolder, uniqueFileName);
 
-            await using var fileStream = new FileStream(filePath, FileMode.Create);
-            await file.CopyToAsync(fileStream);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await image.CopyToAsync(stream);
+            };
+
+
+                //await using var fileStream = new FileStream(filePath, FileMode.Create);
+                //await image.CopyToAsync(fileStream);
 
             return Ok(new { filePath = $"/Images/{uniqueFileName}" });
         }

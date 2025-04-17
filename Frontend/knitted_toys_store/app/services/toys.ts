@@ -70,8 +70,10 @@ export const deleteToy = async(id: string) => {
 };
 
 export async function uploadImage(file: File): Promise<string> {
+    if (!file) throw new Error("Файл не выбран");
+    
     const formData = new FormData();
-    formData.append("file", file); // Важно: ключ "file" должен совпадать с параметром в контроллере
+    formData.append("image", file); // Важно: ключ "file" должен совпадать с параметром в контроллере
   
     const response = await fetch("http://localhost:5237/ImageUpload/upload", {
       method: "POST",
