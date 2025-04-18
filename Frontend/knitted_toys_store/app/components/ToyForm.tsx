@@ -78,7 +78,7 @@ export const ToyForm = ({ initialValues, onSubmit }: ToyFormProp) => {
 
       <Upload
         name="file"
-        action="http://localhost:5237/ImageUpload/upload"
+        action={`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/ImageUpload/upload`}
         showUploadList={false}
         onChange={handleUploadChange}
       >
@@ -87,7 +87,7 @@ export const ToyForm = ({ initialValues, onSubmit }: ToyFormProp) => {
 
       {imageUrl && (
         <img
-          src={imageUrl}
+          src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${imageUrl}`}
           alt="Превью"
           style={{ marginTop: 10, maxWidth: 200, border: "1px solid #ccc" }}
         />

@@ -120,7 +120,7 @@ export default function ToysPage() {
       {/* Отображение загруженного изображения */}
       {values.imageUrl && (
         <img
-          src={`http://localhost:5237${values.imageUrl}`}
+          src={`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}${values.imageUrl}`}
           alt="Загруженное изображение"
           style={{ width: "150px", marginBottom: "10px" }}
         />

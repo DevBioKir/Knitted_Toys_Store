@@ -3,7 +3,7 @@ import { ToyResponce } from "../types/Toy/ToyResponce";
 
 
 export const getAllToys = async (): Promise<ToyResponce[]> => {
-    const response = await fetch(`http://localhost:5237/Toy`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Toy`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -20,7 +20,7 @@ export const getAllToys = async (): Promise<ToyResponce[]> => {
 };
 
 export const getToyById = async (id: string): Promise<ToyResponce> => {
-    const response = await fetch(`http://localhost:5237/Toy/${id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Toy/${id}`, {
         method: "GET",
     });
 
@@ -32,7 +32,7 @@ export const getToyById = async (id: string): Promise<ToyResponce> => {
 };
 
 export const createToy = async(toyrequest: ToyRequest) => {
-    const response = await fetch("http://localhost:5237/Toy", {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Toy`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -46,7 +46,7 @@ export const createToy = async(toyrequest: ToyRequest) => {
 }; 
 
 export const updateToy = async(id: string, toyrequest: ToyRequest) => {
-    const response = await fetch(`http://localhost:5237/Toy/${id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Toy/${id}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export const updateToy = async(id: string, toyrequest: ToyRequest) => {
 };
 
 export const deleteToy = async(id: string) => {
-    const response = await fetch(`http://localhost:5237/Toy/${id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Toy/${id}`, {
         method: "DELETE",
     });
 
@@ -75,7 +75,7 @@ export async function uploadImage(file: File): Promise<string> {
     const formData = new FormData();
     formData.append("image", file); // Важно: ключ "file" должен совпадать с параметром в контроллере
   
-    const response = await fetch("http://localhost:5237/ImageUpload/upload", {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/ImageUpload/upload`, {
       method: "POST",
       body: formData,
       // Не указываем Content-Type — browser сам установит multipart/form-data с boundary

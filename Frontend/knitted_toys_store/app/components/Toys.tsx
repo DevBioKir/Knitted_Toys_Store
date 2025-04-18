@@ -8,18 +8,22 @@ interface Props {
 }
 
 export const Toys = ({ toys, onEdit, onDelete }: Props) => {
+  const baseUrl = process.env.NEXT_PUBLIC_DEV_API_BASE_URL;
+
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col gap-4">
       {toys.map((toy) => (
         <Card
         key={toy.id}
         title={toy.name}
         cover={
-          <img
-            alt={toy.name}
-            src={toy.imageUrl}
-            style={{ height: 200, objectFit: "cover" }}
-          />
+          toy.imageUrl ? (
+            <img
+              alt={toy.name}
+              src={`${baseUrl}${toy.imageUrl}`}
+              style={{ height: 200, objectFit: "cover" }}
+            />
+          ) : null
         }
         style={{ width: 300 }}
       >

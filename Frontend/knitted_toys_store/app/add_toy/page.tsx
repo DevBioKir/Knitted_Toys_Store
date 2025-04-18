@@ -42,20 +42,24 @@ export default function AddToyPage() {
     <div style={{ maxWidth: 500, margin: "0 auto", padding: 20 }}>
       <h2>Добавить новую игрушку</h2>
       <Form layout="vertical" onFinish={onFinish}>
-        <Form.Item name="name" label="Название" rules={[{ required: true, message: "Введите название" }]}>
-          <Input />
+        <Form.Item name="name" label="Название" rules={[{ required: true, message: "Введите название игрушки" }]}>
+          <Input
+          placeholder="Имя нового плюшевого друга"/>
         </Form.Item>
 
-        <Form.Item name="description" label="Описание">
-          <Input.TextArea rows={3} />
+        <Form.Item name="description" label="Описание" rules={[{ required: true, message: "Введите описание игрушки" }]}>
+          <Input.TextArea rows={3}
+          placeholder="Описание материалов, способа вязки"/>
         </Form.Item>
 
-        <Form.Item name="size" label="Размер">
-          <Input />
+        <Form.Item name="size" label="Размер" rules={[{ required: true, message: "Введите размер игрушки" }]}>
+          <Input 
+          placeholder="Размер игрушки в мм (110x110)"/>
         </Form.Item>
 
         <Form.Item name="price" label="Цена" rules={[{ required: true }]}>
-          <InputNumber min={1} style={{ width: "100%" }} />
+          <InputNumber min={1} style={{ width: "100%" }} 
+          placeholder="Цена в рублях"/>
         </Form.Item>
 
         <Form.Item label="Изображение">
@@ -87,7 +91,7 @@ export default function AddToyPage() {
 
           {imageUrl && (
             <img
-              src={`http://localhost:5237${imageUrl}`}
+              src={`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}${imageUrl}`}
               alt="Загруженное изображение"
               style={{ marginTop: 10, width: "100%", maxHeight: 200, objectFit: "cover" }}
             />

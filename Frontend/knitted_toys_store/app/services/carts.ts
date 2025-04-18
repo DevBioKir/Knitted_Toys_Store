@@ -11,7 +11,7 @@ import { CartResponce } from "../types/Cart/CartResponce";
 
 
 export const getAllCarts = async (): Promise<CartResponce[]> => {
-    const response = await fetch(`http://localhost:5237/Cart`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -27,7 +27,7 @@ export const getAllCarts = async (): Promise<CartResponce[]> => {
 };
 
 export const getCartById = async (id: string): Promise<CartResponce> => {
-    const response = await fetch(`http://localhost:5237/Cart/${id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/${id}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -61,7 +61,7 @@ export const getCurrentCart = async(): Promise<CartResponce> => {
             cachedCartId = cartIdFromCookie;
         }
         
-        const response = await fetch("http://localhost:5237/Cart/Current", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/Current`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -85,7 +85,7 @@ export const getCurrentCart = async(): Promise<CartResponce> => {
 }
 
 export const createCart = async (cartRequest: CartRequest) => {
-    const response = await fetch ("http://localhost:5237/Cart/CreateCart", {
+    const response = await fetch (`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/CreateCart`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -99,7 +99,7 @@ export const createCart = async (cartRequest: CartRequest) => {
 };
 
 export const updateCart = async (cartId: string, cartRequest: CartRequest): Promise<CartResponce> => {
-    const response = await fetch(`http://localhost:5237/Cart?cartId=${cartId}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart?cartId=${cartId}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
