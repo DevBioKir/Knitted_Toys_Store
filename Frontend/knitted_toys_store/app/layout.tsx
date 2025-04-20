@@ -5,7 +5,7 @@ import '@ant-design/v5-patch-for-react-19';
 import "./globals.css";
 import CookieConsent from "react-cookie-consent";
 import { CartProvider } from "./context/CartProvider";
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 
 const {Header, Content, Footer} = Layout;
 
@@ -13,7 +13,6 @@ const menuItems = [
   { key: "home", label: <Link href="/">Главная</Link> },
   { key: "Toys", label: <Link href="/toys">Каталог игрушек</Link> },
   { key: "cart", label: <Link href="/carts">Корзина</Link> },
-  {key: "addToys", label: <Link href="/add_toy">Добавление игрушки</Link>}
 ];
 
 export default function RootLayout({

@@ -11,34 +11,41 @@ export const Toys = ({ toys, onEdit, onDelete }: Props) => {
   const baseUrl = process.env.NEXT_PUBLIC_DEV_API_BASE_URL;
 
   return (
-    <div className="h-full flex flex-col gap-4">
-      {toys.map((toy) => (
-        <Card
-        key={toy.id}
-        title={toy.name}
-        cover={
-          toy.imageUrl ? (
-            <img
-              alt={toy.name}
-              src={`${baseUrl}${toy.imageUrl}`}
-              style={{ height: 200, objectFit: "cover" }}
-            />
-          ) : null
-        }
-        style={{ width: 300 }}
+    <div style={{ padding: "20px" }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+          gap: "16px",
+          maxWidth: "1200px",
+          margin: "0 auto",
+        }}
       >
-          <p>{toy.description}</p>
-          <p>Размер: {toy.size}мм</p>
-          <p>Цена: {toy.price} ₽</p>
-          {/*<p>Ссылка на изображение: {toy.imageUrl}</p>*/}
-          <Space>
-            <Button onClick={() => onEdit(toy)}>Редактировать</Button>
-            <Button danger onClick={() => onDelete(toy.id!)}>
-              Удалить
-            </Button>
-          </Space>
-        </Card>
-      ))}
+        {toys.map((toy) => (
+          <Card
+            key={toy.id}
+            title={toy.name}
+            cover={
+              toy.imageUrl ? (
+                <img
+                  alt={toy.name}
+                  src={`${baseUrl}${toy.imageUrl}`}
+                  style={{ height: 200, objectFit: "cover" }}
+                />
+              ) : null
+            }
+            style={{ width: 300 }}
+          >
+            <p>{toy.description}</p>
+            <p>Размер: {toy.size}мм</p>
+            <p>Цена: {toy.price} ₽</p>
+            <Space>
+              <Button onClick={() => onEdit(toy)}>Редактировать</Button>
+              <Button danger onClick={() => onDelete(toy.id!)}>Удалить</Button>
+            </Space>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };
