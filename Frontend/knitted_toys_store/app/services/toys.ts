@@ -38,6 +38,7 @@ export const createToy = async(toyrequest: ToyRequest) => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(toyrequest), 
+        credentials: "include",
     });
 
     if (!response.ok) {
@@ -78,6 +79,7 @@ export async function uploadImage(file: File): Promise<string> {
     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/ImageUpload/upload`, {
       method: "POST",
       body: formData,
+      credentials: "include",
       // Не указываем Content-Type — browser сам установит multipart/form-data с boundary
     });
   

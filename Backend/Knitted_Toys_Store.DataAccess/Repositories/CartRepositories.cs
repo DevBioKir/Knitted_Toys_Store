@@ -136,19 +136,6 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             if (toy == null)
                 throw new InvalidOperationException("Toy not found");
 
-            // Очищаем ChangeTracker для избежания конфликтов отслеживания
-            //_context.ChangeTracker.Clear();
-
-            // Загружаем корзину ещё раз, для редактирования
-            //var cart = await _context.Carts
-            //    .Include(c => c.CartItems)
-            //    .FirstOrDefaultAsync(c => c.Id == cartId);
-
-            //if (cart == null)
-            //    throw new InvalidOperationException("Cart not found after clearing context");
-
-            // Проверяем, есть ли уже эта игрушка в корзине
-            //var existingItem = cart.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
             var existingItem = cartWithItems.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
             if (existingItem != null)
             {
@@ -163,7 +150,6 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             }
 
             // Обновляем общую сумму корзины
-            //cart.LastUpdate = DateTime.UtcNow;
             cartWithItems.LastUpdate = DateTime.UtcNow;
             cartWithItems.TotalAmount = cartWithItems.CartItems.Sum(ci => ci.Quantity * (ci.ToyId == toyId ? toy.Price :
                         (ci.Toy != null ? ci.Toy.Price : 0)));

@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import {
   Button,
@@ -19,15 +20,34 @@ const { Title, Text } = Typography;
 
 export default function CartPage() {
   const { cart, refreshCart, isLoading } = useCart();
-  const cartItemsResponces = cart?.cartItemsResponces ?? [];
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  // Используем правильное поле из интерфейса CartResponce
+  const cartItemsResponces = cart?.cartItemsResponces || [];
+
+  // Отладочная информация
+  console.log("Состояние корзины:", {
+    cart,
+    cartItemsResponces,
+    hasItems: Array.isArray(cartItemsResponces) && cartItemsResponces.length > 0,
+    isLoading
+  });
+
+  // Принудительное обновление при монтировании
+  useEffect(() => {
+    refreshCart();
+  }, []);
 
   const handleUpdateCart = async (items: CartItemsRequest[]) => {
     if (!cart) return;
-
+    setIsUpdating(true);
+    
     const cartRequest: CartRequest = {
       id: cart.id,
       createAt: cart.createAt,
       lastUpdate: new Date().toISOString(),
+      // Сумма рассчитывается на сервере, но мы все равно должны передать значение
+      // из-за типа CartRequest. Сервер перезапишет это значение.
       totalAmount: cart.totalAmount,
       rowVersion: cart.rowVersion,
       cartItems: items,
@@ -43,13 +63,15 @@ export default function CartPage() {
         refreshCart();
       } else {
         message.error("Ошибка при обновлении корзины");
+        console.error(error);
       }
+    } finally {
+      setIsUpdating(false);
     }
   };
 
   const handleChangeQuantity = (toyId: string, delta: number) => {
     if (!cart) return;
-
     const updatedItems: CartItemsRequest[] = cartItemsResponces.map((item) => ({
       id: item.id,
       cartId: item.cartId,
@@ -57,13 +79,11 @@ export default function CartPage() {
       quantity: Math.max(1, item.quantity + (item.toyId === toyId ? delta : 0)),
       addedAt: item.addedAt,
     }));
-
     handleUpdateCart(updatedItems);
   };
 
   const handleRemoveItem = (toyId: string) => {
     if (!cart) return;
-
     const updatedItems: CartItemsRequest[] = cartItemsResponces
       .filter((item) => item.toyId !== toyId)
       .map((item) => ({
@@ -73,7 +93,6 @@ export default function CartPage() {
         quantity: item.quantity,
         addedAt: item.addedAt,
       }));
-
     handleUpdateCart(updatedItems);
   };
 
@@ -82,7 +101,7 @@ export default function CartPage() {
     handleUpdateCart([]);
   };
 
-  if (isLoading) {
+  if (isLoading || isUpdating) {
     return (
       <div className="flex justify-center items-center h-64">
         <Spin size="large" />
@@ -90,7 +109,8 @@ export default function CartPage() {
     );
   }
 
-  const hasItems = cartItemsResponces.length > 0;
+  // Улучшенная проверка наличия товаров
+  const hasItems = Array.isArray(cartItemsResponces) && cartItemsResponces.length > 0;
 
   return (
     <div className="p-4 max-w-2xl mx-auto">
@@ -149,7 +169,10 @@ export default function CartPage() {
           </div>
         </>
       ) : (
-        <Text>Корзина пуста</Text>
+        <div>
+          <Text>Корзина пуста</Text>
+          <Button onClick={refreshCart} className="ml-4">Обновить корзину</Button>
+        </div>
       )}
     </div>
   );

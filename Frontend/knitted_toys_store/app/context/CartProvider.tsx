@@ -1,7 +1,8 @@
 "use client";
+
 const DEBUG = true;
 
-function logDebug(...args: any[]){
+function logDebug(...args: any[]) {
   if (DEBUG) {
     console.log(`[CartContext]`, ...args);
   }
@@ -17,7 +18,7 @@ function waitForCartCookie(timeoutMs = 2000): Promise<void> {
     const check = () => {
       const cartId = document.cookie
         .split("; ")
-        .find((row) => row.startsWith("cartId="));
+        .find((row) => row.startsWith("cartId=") || row.startsWith("cart_id="));
       if (cartId || Date.now() - start > timeoutMs) {
         resolve();
       } else {
@@ -48,39 +49,50 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cart, setCartState] = useState<CartResponce | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const hasInitialized = useRef(false);
+  const refreshInProgress = useRef(false);
 
   const refreshCart = async () => {
-    if (isLoading) return;
+    if (refreshInProgress.current) return;
+    refreshInProgress.current = true;
     setIsLoading(true);
+    
     try {
       await waitForCartCookie();
       const data = await getCurrentCart();
-      setCartState(data);
+      
+      logDebug("Получены данные корзины:", data);
+      
+      if (data) {
+        // Нормализуем данные для фронтенда
+        const normalizedData = { ...data };
+        
+        // Если есть cartItems, но нет cartItemsResponces, копируем данные
+        if (!normalizedData.cartItemsResponces && normalizedData.cartItems) {
+          logDebug("Копируем cartItems в cartItemsResponces");
+          normalizedData.cartItemsResponces = normalizedData.cartItems;
+        }
+        
+        // Проверяем, что cartItemsResponces - это массив
+        if (!Array.isArray(normalizedData.cartItemsResponces)) {
+          logDebug("cartItemsResponces не является массивом, устанавливаем пустой массив");
+          normalizedData.cartItemsResponces = [];
+        }
+        
+        setCartState(normalizedData);
+      }
     } catch (error) {
       console.error("Ошибка при получении корзины", error);
     } finally {
       setIsLoading(false);
+      refreshInProgress.current = false;
     }
   };
 
   useEffect(() => {
     if (hasInitialized.current) return;
     hasInitialized.current = true;
-
-    const initCart = async () => {
-      setIsLoading(true);
-      try {
-        await waitForCartCookie();
-        const data = await getCurrentCart();
-        setCartState(data);
-      } catch (error) {
-        console.error("Ошибка при инициализации корзины", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initCart();
+    
+    refreshCart();
   }, []);
 
   return (

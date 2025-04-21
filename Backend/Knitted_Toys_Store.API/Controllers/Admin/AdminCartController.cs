@@ -21,7 +21,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
             _mapper = mapper;
         }
 
-        [HttpGet("{id:guid} GetCartByIdAsync")]
+        [HttpGet("{id:guid}")]
         public async Task<ActionResult<CartResponce>> GetCartByIdAsync(Guid id)
         {
             var cart = await _cartService.GetCartByIdAsync(id);

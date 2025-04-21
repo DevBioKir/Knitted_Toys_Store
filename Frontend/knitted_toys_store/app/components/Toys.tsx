@@ -1,13 +1,17 @@
 import { Card, Button, Space } from "antd";
 import { Toy } from "../Models/Toy";
+import { Cart } from "../Models/Cart";
 
 interface Props {
   toys: Toy[];
+  // carts: Cart[];
   onEdit: (toy: Toy) => void;
-  onDelete: (id: string) => void;
+  // onDelete: (id: string) => void;
+  onAddToCart: (idToy: string) => void;
 }
 
-export const Toys = ({ toys, onEdit, onDelete }: Props) => {
+export const Toys = ({ toys, onEdit, onAddToCart }: Props) => {
+  //{/*onDelete*/}
   const baseUrl = process.env.NEXT_PUBLIC_DEV_API_BASE_URL;
 
   return (
@@ -40,8 +44,10 @@ export const Toys = ({ toys, onEdit, onDelete }: Props) => {
             <p>Размер: {toy.size}мм</p>
             <p>Цена: {toy.price} ₽</p>
             <Space>
-              <Button onClick={() => onEdit(toy)}>Редактировать</Button>
-              <Button danger onClick={() => onDelete(toy.id!)}>Удалить</Button>
+              {/* <Button onClick={() => onEdit(toy)}>Редактировать</Button> */}
+              <Button danger onClick={() => onAddToCart(toy.id!)}>
+                Добавить в корзину
+              </Button>
             </Space>
           </Card>
         ))}

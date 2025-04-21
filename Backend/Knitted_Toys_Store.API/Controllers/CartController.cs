@@ -88,6 +88,17 @@ namespace Knitted_Toys_Store.API.Controllers
             return Ok(newCart);
         }
 
+        [HttpGet("{id:guid}")]
+        public async Task<ActionResult<CartResponce>> GetCartByIdAsync(Guid id)
+        {
+            var cart = await _cartService.GetCartByIdAsync(id);
+            if (cart == null)
+            {
+                return NotFound($"Cart with ID {id} not found.");
+            }
+            return Ok(cart);
+        }
+
         [HttpPut]
         public async Task<ActionResult<CartResponce>> UpdateCartAsync(Guid cartId, [FromBody] CartRequest request)
         {

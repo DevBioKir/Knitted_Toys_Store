@@ -16,6 +16,7 @@ export const getAllCarts = async (): Promise<CartResponce[]> => {
         headers: {
             "Content-Type": "application/json",
         },
+        credentials: "include",
     });
 
     if (!response.ok) {
@@ -32,6 +33,7 @@ export const getCartById = async (id: string): Promise<CartResponce> => {
         headers: {
             "Content-Type": "application/json",
         },
+        credentials: "include",
     });
 
     if (!response.ok) {
@@ -48,12 +50,12 @@ export const getCurrentCart = async(): Promise<CartResponce> => {
     try {
         // Проверяем, есть ли ID корзины в cookie
         const cookies = document.cookie.split('; ');
-        const cartCookie = cookies.find(c => c.startsWith('cart_id='));
+        const cartCookie = cookies.find(c => c.startsWith('cart_id=') || c.startsWith('cartId='));
         const cartIdFromCookie = cartCookie ? cartCookie.split('=')[1] : null;
         
         // Если ID корзины в cookie совпадает с кэшированным, выводим лог
         if (cartIdFromCookie && cachedCartId && cartIdFromCookie === cachedCartId) {
-            console.log(`Используем существующую корзину: ${cachedCartId}`);
+            logDebug(`Используем существующую корзину: ${cachedCartId}`);
         }
         
         // Обновляем кэшированный ID
@@ -71,18 +73,36 @@ export const getCurrentCart = async(): Promise<CartResponce> => {
         if (!response.ok) {
             throw new Error("Не удалось получить текущую корзину");
         }
-            
-        const data: CartResponce = await response.json();
         
-        // Обновляем кэшированный ID после получения ответа
-        cachedCartId = data.id;
+        // Получаем сырые данные
+        const rawData = await response.json();
+        logDebug("Сырые данные от API:", rawData);
         
-        return data;
+        // Нормализуем данные
+        let cartData: CartResponce;
+        
+        // Проверяем структуру данных
+        if (Array.isArray(rawData)) {
+            logDebug("API вернул массив, берем первый элемент");
+            cartData = rawData[0];
+        } else {
+            logDebug("API вернул объект");
+            cartData = rawData;
+        }
+        
+        // Нормализуем поля
+        if (!cartData.cartItemsResponces && cartData.cartItems) {
+            logDebug("Копируем cartItems в cartItemsResponces");
+            cartData.cartItemsResponces = cartData.cartItems;
+        }
+        
+        return cartData;
     } catch (error) {
         console.error("Ошибка при получении корзины:", error);
         throw error;
     }
 }
+
 
 export const createCart = async (cartRequest: CartRequest) => {
     const response = await fetch (`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/CreateCart`, {
@@ -90,6 +110,7 @@ export const createCart = async (cartRequest: CartRequest) => {
         headers: {
             "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(cartRequest),
     });
 
@@ -104,12 +125,30 @@ export const updateCart = async (cartId: string, cartRequest: CartRequest): Prom
         headers: {
             "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(cartRequest),
     });
 
     if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Ошибка при обновлении корзины: ${errorText}`);
+    }
+
+    return await response.json();
+};
+
+export const addToCart = async (idCart: string, idToy: string, quantity: number) => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/AddToys?cartId=${idCart}&toyId=${idToy}&quantity=${quantity}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error("Ошибка при добавлении игрушки в корзину")
     }
 
     return await response.json();

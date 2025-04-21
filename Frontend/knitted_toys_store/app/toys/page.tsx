@@ -1,14 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "antd";  // Импортируем кнопку из Ant Design
+import { Button, message } from "antd"; // Импортируем кнопку из Ant Design
 import { Toys } from "../components/Toys"; // Импортируем компонент Toys
-import { createToy, getAllToys, updateToy, deleteToy, uploadImage } from "../services/toys"; // Импортируем функции для получения игрушек
+import {
+  createToy,
+  getAllToys,
+  updateToy,
+  deleteToy,
+  uploadImage,
+} from "../services/toys"; // Импортируем функции для получения игрушек
 import { CreateToyModal } from "../components/CreateToyModal"; // Модалка для создания игрушки
 import { UpdateToyModal } from "../components/UpdateToyModal"; // Модалка для редактирования игрушки
 import { Toy } from "../Models/Toy";
 import { ToyRequest } from "../types/Toy/ToyRequest";
 import { Mode } from "../components/CreateToy"; // Импортируем Mode
+import { addToCart, getCurrentCart } from "../services/carts";
+import { CartResponce } from "../types/Cart/CartResponce";
 
 export default function ToysPage() {
   const [values, setValues] = useState<Toy>({
@@ -19,28 +27,49 @@ export default function ToysPage() {
     imageUrl: "",
   });
 
-  const [toys, setToys] = useState<Toy[]>([]);  // Состояние для списка игрушек
-  const [loading, setLoading] = useState(true);  // Состояние для загрузки данных
+  const [toys, setToys] = useState<Toy[]>([]); // Состояние для списка игрушек
+  const [loading, setLoading] = useState(true); // Состояние для загрузки данных
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [mode, setMode] = useState<Mode>(Mode.Create); // Добавляем режим (создание или редактирование)
   const [toyToEdit, setToyToEdit] = useState<Toy | null>(null); // Для редактирования игрушки
+  const [cart, setCart] = useState<CartResponce | null>(null); // Состояние для текущей корзины
 
   useEffect(() => {
-    const getToys = async () => {
-      const toys = await getAllToys();
-      setLoading(false);
-      setToys(toys);
+    const fetchData = async () => {
+      try {
+        const [toysData, cartData] = await Promise.all([
+          getAllToys(),
+          getCurrentCart(),
+        ]);
+        setToys(toysData);
+        setCart(cartData); // ← сохраняем корзину
+      } catch (err) {
+        console.error("Ошибка при загрузке данных:", err);
+        message.error("Не удалось загрузить данные");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    getToys();
-  }, []);  // Хук запускается только один раз при монтировании компонента
+    fetchData();
+  }, []);
 
+  const refreshToys = async () => {
+    try{
+      const updatedToys = await getAllToys();
+      setToys(updatedToys);
+    } catch (err) {
+      console.error("Ошибка обновления игрушек", err);
+      message.error("Не удалось обновить список игрушек");
+    }
+  }
+  
+  
   // Функция для создания игрушки
   const handleCreate = async (toyRequest: ToyRequest) => {
     try {
-      await createToy(toyRequest);  // Вызываем сервис для создания игрушки
-      const updatedToys = await getAllToys();  // Обновляем список игрушек после создания
-      setToys(updatedToys);
+      await createToy(toyRequest); // Вызываем сервис для создания игрушки
+      refreshToys();
       setIsModalOpen(false); // Закрываем модалку после создания
     } catch (error) {
       console.error("Ошибка при создании игрушки", error);
@@ -50,9 +79,8 @@ export default function ToysPage() {
   // Функция для обновления игрушки
   const handleUpdate = async (id: string, toyRequest: ToyRequest) => {
     try {
-      await updateToy(id, toyRequest);  // Вызываем сервис для обновления игрушки
-      const updatedToys = await getAllToys();  // Обновляем список игрушек после обновления
-      setToys(updatedToys);
+      await updateToy(id, toyRequest); // Вызываем сервис для обновления игрушки
+      refreshToys();
       setIsModalOpen(false); // Закрываем модалку после обновления
     } catch (error) {
       console.error("Ошибка при обновлении игрушки", error);
@@ -62,11 +90,24 @@ export default function ToysPage() {
   // Функция для удаления игрушки
   const handleDelete = async (id: string) => {
     try {
-      await deleteToy(id);  // Удаляем игрушку
-      const updatedToys = await getAllToys();  // Обновляем список игрушек
-      setToys(updatedToys);
+      await deleteToy(id); // Удаляем игрушку
+      refreshToys();
     } catch (error) {
       console.error("Ошибка при удалении игрушки", error);
+    }
+  };
+
+  const handleAddToy = async (idToy: string) => {
+    if (!cart) {
+      message.error("Корзина не найдена");
+      return;
+    }
+    try {
+      await addToCart(cart.id, idToy, 1); // по умолчанию quantity = 1
+      message.success("Товар добавлен в корзину");
+    } catch (error) {
+      console.error("Ошибка при добавлении в корзину:", error);
+      message.error("Не удалось добавить товар в корзину");
     }
   };
 
@@ -125,7 +166,7 @@ export default function ToysPage() {
           style={{ width: "150px", marginBottom: "10px" }}
         />
       )}
-  
+
       {/* Кнопка для создания новой игрушки */}
       <Button
         type="primary"
@@ -155,7 +196,15 @@ export default function ToysPage() {
       )}
 
       {/* Отображаем игрушки через компонент Toys */}
-      {loading ? <p>Загрузка...</p> : <Toys toys={toys} onEdit={openUpdateModal} onDelete={handleDelete} />}
+      {loading ? (
+        <p>Загрузка...</p>
+      ) : (
+        <Toys 
+        toys={toys} 
+        // carts={[]}
+        onEdit={openUpdateModal} 
+        onAddToCart={handleAddToy} />
+      )}
     </div>
   );
 }

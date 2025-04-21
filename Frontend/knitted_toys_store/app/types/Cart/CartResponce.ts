@@ -7,4 +7,7 @@ export interface CartResponce {
   totalAmount: number;
   cartItemsResponces: CartItemsResponce[];
   rowVersion: string;
+
+
+  cartItems?: CartItemsResponce[];
 }
