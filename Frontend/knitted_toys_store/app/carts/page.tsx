@@ -10,6 +10,7 @@ import {
   Popconfirm,
   Space,
   Spin,
+  Avatar,
 } from "antd";
 import { updateCart } from "../services/carts";
 import { CartRequest } from "../types/Cart/CartRequest";
@@ -29,8 +30,9 @@ export default function CartPage() {
   console.log("Состояние корзины:", {
     cart,
     cartItemsResponces,
-    hasItems: Array.isArray(cartItemsResponces) && cartItemsResponces.length > 0,
-    isLoading
+    hasItems:
+      Array.isArray(cartItemsResponces) && cartItemsResponces.length > 0,
+    isLoading,
   });
 
   // Принудительное обновление при монтировании
@@ -41,13 +43,11 @@ export default function CartPage() {
   const handleUpdateCart = async (items: CartItemsRequest[]) => {
     if (!cart) return;
     setIsUpdating(true);
-    
+
     const cartRequest: CartRequest = {
       id: cart.id,
       createAt: cart.createAt,
-      lastUpdate: new Date().toISOString(),
-      // Сумма рассчитывается на сервере, но мы все равно должны передать значение
-      // из-за типа CartRequest. Сервер перезапишет это значение.
+      lastUpdate: cart.lastUpdate,
       totalAmount: cart.totalAmount,
       rowVersion: cart.rowVersion,
       cartItems: items,
@@ -78,6 +78,8 @@ export default function CartPage() {
       toyId: item.toyId,
       quantity: Math.max(1, item.quantity + (item.toyId === toyId ? delta : 0)),
       addedAt: item.addedAt,
+      toyName: item.toyName,
+      toyImageUrl: item.toyImageUrl,
     }));
     handleUpdateCart(updatedItems);
   };
@@ -92,6 +94,8 @@ export default function CartPage() {
         toyId: item.toyId,
         quantity: item.quantity,
         addedAt: item.addedAt,
+        toyName: item.toyName,
+        toyImageUrl: item.toyImageUrl,
       }));
     handleUpdateCart(updatedItems);
   };
@@ -110,7 +114,8 @@ export default function CartPage() {
   }
 
   // Улучшенная проверка наличия товаров
-  const hasItems = Array.isArray(cartItemsResponces) && cartItemsResponces.length > 0;
+  const hasItems =
+    Array.isArray(cartItemsResponces) && cartItemsResponces.length > 0;
 
   return (
     <div className="p-4 max-w-2xl mx-auto">
@@ -136,18 +141,34 @@ export default function CartPage() {
                   ]}
                 >
                   <List.Item.Meta
-                    title={
-                      <Text strong>
-                        Товар: {item.toyId}
-                      </Text>
+                    avatar={
+                      <Avatar
+                        src={`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}${item.toyImageUrl}`}
+                        alt={item.toyName}
+                        size={300}
+                        shape="square"
+                        style={{
+                          border: '1px solid #f0f0f0', // лёгкая рамка
+                          objectFit: 'cover',
+                        }}
+                      />
                     }
+                    title={<Text strong>{item.toyName}</Text>}
                     description={
                       <Space direction="vertical">
                         <Text>Количество: {item.quantity}</Text>
                         <Space>
-                          <Button onClick={() => handleChangeQuantity(item.toyId, -1)}>-</Button>
+                          <Button
+                            onClick={() => handleChangeQuantity(item.toyId, -1)}
+                          >
+                            -
+                          </Button>
                           <Text>{item.quantity}</Text>
-                          <Button onClick={() => handleChangeQuantity(item.toyId, 1)}>+</Button>
+                          <Button
+                            onClick={() => handleChangeQuantity(item.toyId, 1)}
+                          >
+                            +
+                          </Button>
                         </Space>
                       </Space>
                     }
@@ -171,7 +192,9 @@ export default function CartPage() {
       ) : (
         <div>
           <Text>Корзина пуста</Text>
-          <Button onClick={refreshCart} className="ml-4">Обновить корзину</Button>
+          <Button onClick={refreshCart} className="ml-4">
+            Обновить корзину
+          </Button>
         </div>
       )}
     </div>

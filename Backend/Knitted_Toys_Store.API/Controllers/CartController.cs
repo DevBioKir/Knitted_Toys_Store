@@ -37,7 +37,8 @@ namespace Knitted_Toys_Store.API.Controllers
                 if (existingCart != null)
                 {
                     _logger.LogInformation($"Найдена существующая корзина с ID: {cartGuid}");
-                    return Ok(existingCart);
+                    var responceForCarts = _mapper.Map<CartResponce>(existingCart);
+                    return Ok(responceForCarts);
                 }
             }
 
@@ -55,7 +56,8 @@ namespace Knitted_Toys_Store.API.Controllers
                     if (existingCart != null)
                     {
                         _logger.LogInformation($"Найдена существующая корзина с ID: {cookieCartGuid}");
-                        return Ok(existingCart);
+                        var responceForCarts = _mapper.Map<CartResponce>(existingCart);
+                        return Ok(responceForCarts);
                     }
                     else
                     {
@@ -96,7 +98,8 @@ namespace Knitted_Toys_Store.API.Controllers
             {
                 return NotFound($"Cart with ID {id} not found.");
             }
-            return Ok(cart);
+            var responceForCart = _mapper.Map<CartResponce>(cart);
+            return Ok(responceForCart);
         }
 
         [HttpPut]
@@ -146,12 +149,6 @@ namespace Knitted_Toys_Store.API.Controllers
                 var cartItem = await _cartService.AddToCartAsync(cartId, toyId, quantity);
 
                 return Ok(cartItem);
-        }
-
-        [HttpDelete("{id:guid}")]
-        public async Task<ActionResult<Cart>> DeleteCartAsync(Guid id)
-        {
-            return Ok(await _cartService.DeleteCartAsync(id));
         }
     }
 }

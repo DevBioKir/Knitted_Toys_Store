@@ -4,6 +4,7 @@
         Guid CartId,
         Guid ToyId,
         int Quantity,
-        DateTime AddedAt);
-        //ToysResponce Toy);/////
+        DateTime AddedAt,
+        string ToyName,
+        string ToyImageUrl);
 }

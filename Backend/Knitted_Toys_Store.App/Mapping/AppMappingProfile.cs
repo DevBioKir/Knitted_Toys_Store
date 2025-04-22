@@ -29,15 +29,23 @@ namespace Knitted_Toys_Store.App.Mapping
 
             // Маппинг Cart -> CartResponce
             CreateMap<Cart, CartResponce>()
-                .ConstructUsing(src => new CartResponce(
-                        src.Id,
-                        src.CreateAt,
-                        src.LastUpdate,
-                        src.TotalAmount,
-                        src.CartItems.Select(ci => new CartItemsResponce(
-                            ci.CartId, ci.ToyId, ci.Quantity, ci.AddedAt)).ToList(),
-                        src.RowVersion
-                    ));
+                .ForCtorParam("Id", opt => opt.MapFrom(src => src.Id))
+                .ForCtorParam("CreateAt", opt => opt.MapFrom(src => src.CreateAt))
+                .ForCtorParam("LastUpdate", opt => opt.MapFrom(src => src.LastUpdate))
+                .ForCtorParam("TotalAmount", opt => opt.MapFrom(src => src.TotalAmount))
+                .ForCtorParam("CartItemsResponces", opt => opt.MapFrom(src => src.CartItems))
+                .ForCtorParam("RowVersion", opt => opt.MapFrom(src => src.RowVersion));
+
+            //CreateMap<Cart, CartResponce>()
+            //    .ConstructUsing(src => new CartResponce(
+            //            src.Id,
+            //            src.CreateAt,
+            //            src.LastUpdate,
+            //            src.TotalAmount,
+            //            src.CartItems.Select(ci => new CartItemsResponce(
+            //                ci.CartId, ci.ToyId, ci.Quantity, ci.AddedAt)).ToList(),
+            //            src.RowVersion
+            //        ));
 
             // Маппинг CartItemsRequest -> CartItems
             CreateMap<CartItemsRequest, CartItems>()
@@ -50,8 +58,10 @@ namespace Knitted_Toys_Store.App.Mapping
                 .ForMember(dest => dest.CartId, opt => opt.MapFrom(src => src.CartId))
                 .ForMember(dest => dest.ToyId, opt => opt.MapFrom(src => src.ToyId))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
-                .ForMember(dest => dest.AddedAt, opt => opt.MapFrom(src => src.AddedAt));
-
+                .ForMember(dest => dest.AddedAt, opt => opt.MapFrom(src => src.AddedAt))
+                .ForMember(dect => dect.ToyName, opt => opt.MapFrom(src => src.Toy != null ? src.Toy.Name : string.Empty)) ///
+                .ForMember(dect => dect.ToyImageUrl, opt => opt.MapFrom(src => src.Toy != null ? src.Toy.ImageUrl : string.Empty));///
+            
             // Маппинг OrderRequest -> Order
             CreateMap<OrderRequest, Order>()
                 .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItemsRequest));

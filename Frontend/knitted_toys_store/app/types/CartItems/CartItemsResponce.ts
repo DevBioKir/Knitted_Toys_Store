@@ -4,4 +4,6 @@ export interface CartItemsResponce {
     toyId: string;
     quantity: number;
     addedAt: Date;
+    toyName: string;
+    toyImageUrl: string;
 }
