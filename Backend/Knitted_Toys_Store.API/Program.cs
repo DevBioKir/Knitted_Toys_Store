@@ -4,7 +4,7 @@ using Knitted_Toys_Store.DataAccess;
 using Knitted_Toys_Store.App.Mapping;
 using Knitted_Toys_Store.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Knitted_Toys_Store.API.Middleware;
+using Knitted_Toys_Store.Infrastructure.Middleware;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 

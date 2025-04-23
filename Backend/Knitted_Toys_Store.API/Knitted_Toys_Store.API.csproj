@@ -27,7 +27,7 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Knitted_Toys.Domain\Knitted_Toys_Store.Domain.csproj" />
+    <ProjectReference Include="..\Knitted_Toys_Store.Infrastructure\Knitted_Toys_Store.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

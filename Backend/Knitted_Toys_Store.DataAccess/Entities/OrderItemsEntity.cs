@@ -11,7 +11,7 @@ namespace Knitted_Toys_Store.DataAccess.Entities
         public int Quantity { get; set; } //количество товара
         public decimal PriceAtTime { get; set; } //цена на момент заказа
 
-        public required OrderEntity Order { get; set; } //ссылка на Orders
-        public required ToyEntity Toy { get; set; } //ссылка на Toy
+        public OrderEntity? Order { get; set; } //ссылка на Orders
+        public ToyEntity? Toy { get; set; } //ссылка на Toy
     }
 }

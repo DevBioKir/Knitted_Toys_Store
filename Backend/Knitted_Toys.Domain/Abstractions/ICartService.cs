@@ -1,4 +1,5 @@
 ﻿using Knitted_Toys_Store.Domain.Models.Domain;
+using Microsoft.AspNetCore.Http;
 
 namespace Knitted_Toys_Store.App.Services
 {
@@ -9,6 +10,7 @@ namespace Knitted_Toys_Store.App.Services
         Task<Guid> DeleteCartAsync(Guid id);
         Task<List<Cart>> GetAllCarts();
         Task<Cart?> GetCartByIdAsync(Guid id);
+        Task<Cart> GetCurrentCartAsync(HttpContext httpContext, HttpResponse responce);
         Task<Guid> RemoveItemFromCartAsync(Guid cartId, Guid toyId);
         Task<Guid> UpdateAsync(Cart cart);
         Task<Guid> UpdateItemQuantityAsync(Guid cartId, Guid toyId, int newQuantity);

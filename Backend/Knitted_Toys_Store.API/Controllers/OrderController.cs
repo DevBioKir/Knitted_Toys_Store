@@ -15,9 +15,10 @@ namespace Knitted_Toys_Store.API.Controllers
         private readonly ICartService _cartService;
         private readonly IMapper _mapper;
 
-        public OrderController(IOrderService orderService, IMapper mapper)
+        public OrderController(IOrderService orderService, ICartService cartService, IMapper mapper)
         {
             _orderService = orderService;
+            _cartService = cartService;
             _mapper = mapper;
         }
 
@@ -41,16 +42,16 @@ namespace Knitted_Toys_Store.API.Controllers
             return Ok(responceForOrders);
         }
 
-        //[HttpPost]
-        //public async Task<ActionResult<OrderResponce>> CreateOrderAsync(string surname,
-        //    string name, string phone, string email, string deliveryAddress, string deliveryNotes)
-        //{
-            
-        //    //var cart = await _cartService.GetCartСurrent - Добавить в CartRepository
-        //    var order = await _orderService.CreateOrderAsync(cart, surname, name, phone, email,
-        //            deliveryAddress, deliveryNotes);
+        [HttpPost]
+        public async Task<ActionResult<OrderResponce>> CreateOrderAsync(string surname,
+            string name, string phone, string email, string deliveryAddress, string deliveryNotes)
+        {
 
-        //        return Ok(order);
-        //}
+            var cart = await _cartService.GetCurrentCartAsync(HttpContext, Response);
+            var order = await _orderService.CreateOrderAsync(cart, surname, name, phone, email,
+                    deliveryAddress, deliveryNotes);
+
+            return Ok(order);
+        }
     }
 }

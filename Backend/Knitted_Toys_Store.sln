@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knitted_Toys_Store.App", "K
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knitted_Toys_Store.Contracts", "Knitted_Toys_Store.Contracts\Knitted_Toys_Store.Contracts.csproj", "{6C518BFD-964A-4A66-B708-181219D0964B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knitted_Toys_Store.Infrastructure", "Knitted_Toys_Store.Infrastructure\Knitted_Toys_Store.Infrastructure.csproj", "{0CC1B62B-CBE7-4AD0-88A7-B8E9CBD4E7EF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,10 @@ Global
 		{6C518BFD-964A-4A66-B708-181219D0964B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C518BFD-964A-4A66-B708-181219D0964B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C518BFD-964A-4A66-B708-181219D0964B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CC1B62B-CBE7-4AD0-88A7-B8E9CBD4E7EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CC1B62B-CBE7-4AD0-88A7-B8E9CBD4E7EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CC1B62B-CBE7-4AD0-88A7-B8E9CBD4E7EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CC1B62B-CBE7-4AD0-88A7-B8E9CBD4E7EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

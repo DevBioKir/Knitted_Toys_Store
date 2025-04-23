@@ -180,12 +180,12 @@ export default function CartPage() {
           <div className="flex justify-between items-center mt-4">
             <Text strong>Итого: {cart?.totalAmount} ₽</Text>
             <Popconfirm
-              title="Очистить корзину?"
+              title="Оформить заказ"
               onConfirm={handleClearCart}
               okText="Да"
               cancelText="Нет"
             >
-              <Button danger>Очистить корзину</Button>
+              <Button danger>Оформить заказ</Button>
             </Popconfirm>
           </div>
         </>

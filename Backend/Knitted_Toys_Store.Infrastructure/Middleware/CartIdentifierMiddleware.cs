@@ -1,6 +1,10 @@
 ﻿using Knitted_Toys_Store.App.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
-namespace Knitted_Toys_Store.API.Middleware
+namespace Knitted_Toys_Store.Infrastructure.Middleware
 {
     public class CartIdentifierMiddleware
     {
