@@ -4,11 +4,15 @@ import { useState } from "react";
 import { Button, Form, Input, InputNumber, Upload, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { RcFile } from "antd/es/upload";
-import { ToyRequest } from "../types/Toy/ToyRequest";
-import { createToy, uploadImage } from "../services/toys";
+import { ToyRequest } from "../../types/Toy/ToyRequest";
+import { createToy, uploadImage } from "../../services/toys";
 import { useRouter } from "next/navigation";
 
-export default function AddToyPage() {
+interface AddToyPageProp {
+  onToyCreated?: () => void; 
+}
+
+export default function AddToyPage({ onToyCreated } : AddToyPageProp) {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [uploading, setUploading] = useState(false);
   const router = useRouter();
@@ -17,7 +21,12 @@ export default function AddToyPage() {
     try {
       await createToy({ ...values, imageUrl });
       message.success("Игрушка успешно создана");
-      router.push("/toys");
+      
+      if(onToyCreated){
+        onToyCreated();
+      }else{
+        router.push("/toys");
+      }
     } catch (error) {
       console.error(error);
       message.error("Ошибка при создании игрушки");

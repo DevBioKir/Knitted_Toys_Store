@@ -26,7 +26,7 @@
 
         public List<OrderItems> OrderItems { get; private set; } = []; //у одного заказа может быть много товаров
 
-        private Order() { }
+        //private Order() { }
         public static Order Create(
             string surname, string name, string phone, string email, string deliveryAddress,
             string deliveryNotes, List<OrderItems> orderItems)
@@ -54,7 +54,7 @@
                 PhoneNumber = phone,
                 Email = email,
                 DeliveryAddress = deliveryAddress,
-                //OrderItems = orderItems
+                OrderItems = orderItems
             };
         }
         public void UpdateStatus(OrderStatus newStatus)

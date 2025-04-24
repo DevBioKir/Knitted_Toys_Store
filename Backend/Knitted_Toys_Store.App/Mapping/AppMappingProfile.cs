@@ -19,7 +19,19 @@ namespace Knitted_Toys_Store.App.Mapping
 
             CreateMap<CartItems, CartItemsEntity>().ReverseMap();
 
-            CreateMap<OrderItems, OrderItemsEntity>().ReverseMap();
+            CreateMap<OrderItems, OrderItemsEntity>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.OrderId))
+                .ForMember(dest => dest.ToyId, opt => opt.MapFrom(src => src.ToyId))
+                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
+                .ForMember(dest => dest.PriceAtTime, opt => opt.MapFrom(src => src.PriceAtTime))
+                .ForMember(dest => dest.Order, opt => opt.Ignore()) // если ты не хочешь вложенное маппить
+                .ForMember(dest => dest.Toy, opt => opt.Ignore());  // тоже можно проигнорировать
+
+            CreateMap<OrderItemsEntity, OrderItems>()
+                .ConstructUsing(src =>
+                OrderItems.Create(src.OrderId, src.ToyId, src.Quantity, src.PriceAtTime)
+                );
 
             // Маппинг между запросами (DTO) и доменными моделями
 
@@ -68,7 +80,17 @@ namespace Knitted_Toys_Store.App.Mapping
 
             // Маппинг Order -> OrderResponce
             CreateMap<Order, OrderResponce>()
-                .ForMember(dest => dest.OrderItemsResponce, opt => opt.MapFrom(src => src.OrderItems));
+                .ForCtorParam("Id", opt => opt.MapFrom(src => src.Id))
+                .ForCtorParam("OrderDate", opt => opt.MapFrom(src => src.OrderDate))
+                .ForCtorParam("TotalAmount", opt => opt.MapFrom(src => src.TotalAmount))
+                .ForCtorParam("Status", opt => opt.MapFrom(src => src.Status))
+                .ForCtorParam("SurnameCustomer", opt => opt.MapFrom(src => src.SurnameCustomer!))
+                .ForCtorParam("NameCustomer", opt => opt.MapFrom(src => src.NameCustomer!))
+                .ForCtorParam("PhoneNumber", opt => opt.MapFrom(src => src.PhoneNumber!))
+                .ForCtorParam("Email", opt => opt.MapFrom(src => src.Email!))
+                .ForCtorParam("DeliveryAddress", opt => opt.MapFrom(src => src.DeliveryAddress!))
+                .ForCtorParam("DeliveryNotes", opt => opt.MapFrom(src => src.DeliveryNotes!))
+                .ForCtorParam("OrderItemsResponce", opt => opt.MapFrom(src => src.OrderItems));
 
             // Маппинг OrderItemsRequest -> OrderItems
             CreateMap<OrderItemsResponce, OrderItems>()

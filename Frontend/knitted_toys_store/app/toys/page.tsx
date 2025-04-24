@@ -9,13 +9,12 @@ import {
   updateToy,
   deleteToy,
 } from "../services/toys"; // Импортируем функции для получения игрушек
-import { CreateToyModal } from "../components/CreateToyModal"; // Модалка для создания игрушки
 import { UpdateToyModal } from "../components/UpdateToyModal"; // Модалка для редактирования игрушки
 import { Toy } from "../Models/Toy";
 import { ToyRequest } from "../types/Toy/ToyRequest";
-import { Mode } from "../components/CreateToy"; // Импортируем Mode
 import { addToCart, getCurrentCart } from "../services/carts";
 import { CartResponce } from "../types/Cart/CartResponce";
+import AdminEasterEgg from "../components/Admin/AdminEasterEgg";
 
 export default function ToysPage() {
   const [values, setValues] = useState<Toy>({
@@ -28,9 +27,6 @@ export default function ToysPage() {
 
   const [toys, setToys] = useState<Toy[]>([]); // Состояние для списка игрушек
   const [loading, setLoading] = useState(true); // Состояние для загрузки данных
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [mode, setMode] = useState<Mode>(Mode.Create); // Добавляем режим (создание или редактирование)
-  const [toyToEdit, setToyToEdit] = useState<Toy | null>(null); // Для редактирования игрушки
   const [cart, setCart] = useState<CartResponce | null>(null); // Состояние для текущей корзины
 
   useEffect(() => {
@@ -53,48 +49,15 @@ export default function ToysPage() {
     fetchData();
   }, []);
 
-  const refreshToys = async () => {
-    try{
-      const updatedToys = await getAllToys();
-      setToys(updatedToys);
-    } catch (err) {
-      console.error("Ошибка обновления игрушек", err);
-      message.error("Не удалось обновить список игрушек");
-    }
-  }
-  
-  
-  // Функция для создания игрушки
-  const handleCreate = async (toyRequest: ToyRequest) => {
-    try {
-      await createToy(toyRequest); // Вызываем сервис для создания игрушки
-      refreshToys();
-      setIsModalOpen(false); // Закрываем модалку после создания
-    } catch (error) {
-      console.error("Ошибка при создании игрушки", error);
-    }
-  };
-
-  // Функция для обновления игрушки
-  const handleUpdate = async (id: string, toyRequest: ToyRequest) => {
-    try {
-      await updateToy(id, toyRequest); // Вызываем сервис для обновления игрушки
-      refreshToys();
-      setIsModalOpen(false); // Закрываем модалку после обновления
-    } catch (error) {
-      console.error("Ошибка при обновлении игрушки", error);
-    }
-  };
-
-  // Функция для удаления игрушки
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteToy(id); // Удаляем игрушку
-      refreshToys();
-    } catch (error) {
-      console.error("Ошибка при удалении игрушки", error);
-    }
-  };
+  // const refreshToys = async () => {
+  //   try{
+  //     const updatedToys = await getAllToys();
+  //     setToys(updatedToys);
+  //   } catch (err) {
+  //     console.error("Ошибка обновления игрушек", err);
+  //     message.error("Не удалось обновить список игрушек");
+  //   }
+  // }
 
   const handleAddToy = async (idToy: string) => {
     if (!cart) {
@@ -110,32 +73,13 @@ export default function ToysPage() {
     }
   };
 
-  // Функция для открытия модалки в режиме создания
-  const openCreateModal = () => {
-    setMode(Mode.Create);
-    setValues({
-      name: "",
-      description: "",
-      size: "",
-      price: 1,
-      imageUrl: "",
-    });
-    setIsModalOpen(true);
-  };
-
-  // Функция для открытия модалки в режиме редактирования
-  const openUpdateModal = (toy: Toy) => {
-    setMode(Mode.Update);
-    setToyToEdit(toy); // Устанавливаем toy для редактирования
-    setIsModalOpen(true);
-  };
-
   useEffect(() => {
     console.log("Полученные игрушки в состоянии:", toys); // Логируем состояние после получения
   }, [toys]); // Следим за изменениями в массиве toys
 
   return (
     <div>
+      <AdminEasterEgg />
       {/* Отображение загруженного изображения */}
       {values.imageUrl && (
         <img
@@ -145,33 +89,12 @@ export default function ToysPage() {
         />
       )}
 
-      {/* Модалка для создания игрушки */}
-      {mode === Mode.Create && (
-        <CreateToyModal
-          isOpen={isModalOpen}
-          onCancel={() => setIsModalOpen(false)}
-          onCreate={handleCreate}
-        />
-      )}
-
-      {/* Модалка для редактирования игрушки */}
-      {mode === Mode.Update && toyToEdit && (
-        <UpdateToyModal
-          toy={toyToEdit}
-          isOpen={isModalOpen}
-          onCancel={() => setIsModalOpen(false)}
-          onUpdate={handleUpdate}
-        />
-      )}
-
       {/* Отображаем игрушки через компонент Toys */}
       {loading ? (
         <p>Загрузка...</p>
       ) : (
         <Toys 
         toys={toys} 
-        // carts={[]}
-        onEdit={openUpdateModal} 
         onAddToCart={handleAddToy} />
       )}
     </div>

@@ -27,17 +27,17 @@ export const ToyForm = ({ initialValues, onSubmit }: ToyFormProp) => {
     }
   }, [initialValues]);
 
-  const handleUploadChange = (info: UploadChangeParam) => {
-    if (info.file.status === "done") {
-      const url = info.file.response?.filePath;
-      if (url) {
-        setImageUrl(url);
-        message.success("Изображение успешно загружено");
-      }
-    } else if (info.file.status === "error") {
-      message.error("Ошибка загрузки изображения");
-    }
-  };
+  // const handleUploadChange = (info: UploadChangeParam) => {
+  //   if (info.file.status === "done") {
+  //     const url = info.file.response?.filePath;
+  //     if (url) {
+  //       setImageUrl(url);
+  //       message.success("Изображение успешно загружено");
+  //     }
+  //   } else if (info.file.status === "error") {
+  //     message.error("Ошибка загрузки изображения");
+  //   }
+  // };
 
   const handleSubmit = () => {
     if (!imageUrl) {
@@ -80,7 +80,7 @@ export const ToyForm = ({ initialValues, onSubmit }: ToyFormProp) => {
         name="file"
         action={`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/ImageUpload/upload`}
         showUploadList={false}
-        onChange={handleUploadChange}
+        //onChange={handleUploadChange}
       >
         <Button icon={<UploadOutlined />}>Загрузить изображение</Button>
       </Upload>

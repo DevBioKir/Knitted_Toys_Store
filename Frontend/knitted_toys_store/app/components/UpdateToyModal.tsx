@@ -2,7 +2,6 @@ import { Modal } from "antd";
 import { Toy } from "../Models/Toy";
 import { ToyRequest } from "../types/Toy/ToyRequest";
 import { ToyForm } from "./ToyForm";
-import { data } from "framer-motion/client";
 
 interface Prop {
   toy: Toy;

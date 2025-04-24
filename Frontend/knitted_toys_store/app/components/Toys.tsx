@@ -1,16 +1,15 @@
 import { Card, Button, Space } from "antd";
 import { Toy } from "../Models/Toy";
-import { Cart } from "../Models/Cart";
 
 interface Props {
   toys: Toy[];
   // carts: Cart[];
-  onEdit: (toy: Toy) => void;
+  //onEdit: (toy: Toy) => void;
   // onDelete: (id: string) => void;
   onAddToCart: (idToy: string) => void;
 }
 
-export const Toys = ({ toys, onEdit, onAddToCart }: Props) => {
+export const Toys = ({ toys, onAddToCart }: Props) => {
   //{/*onDelete*/}
   const baseUrl = process.env.NEXT_PUBLIC_DEV_API_BASE_URL;
 

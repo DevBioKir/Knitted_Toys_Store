@@ -12,16 +12,16 @@
         public Toy Toy { get; private set; } //ссылка на Toy
         //добавить дату создания заказа
 
-        private OrderItems() { } // пустой конструктор для EF Core
+        //private OrderItems() { } // пустой конструктор для EF Core
 
-        private OrderItems(Guid orderId, Guid toyId, int quantity, decimal priceAtTime)
-        {
-            Id = Guid.NewGuid();
-            OrderId = orderId;
-            ToyId = toyId;
-            Quantity = quantity;
-            PriceAtTime = priceAtTime;
-        }
+        //private OrderItems(Guid orderId, Guid toyId, int quantity, decimal priceAtTime)
+        //{
+        //    Id = Guid.NewGuid();
+        //    OrderId = orderId;
+        //    ToyId = toyId;
+        //    Quantity = quantity;
+        //    PriceAtTime = priceAtTime;
+        //}
 
         public static OrderItems Create(Guid orderId, Guid toyId, int quantity, decimal priceAtTime)
         {
@@ -31,7 +31,14 @@
             if (priceAtTime < 0)
                 throw new ArgumentException("Price must be non-negative.");
 
-            return new OrderItems(orderId, toyId, quantity, priceAtTime);
+            return new OrderItems
+            {
+                Id = Guid.NewGuid(),
+                OrderId = orderId,
+                ToyId = toyId,
+                Quantity = quantity,
+                PriceAtTime = priceAtTime
+            };
         }
     }
 }
