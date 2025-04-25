@@ -1,9 +1,11 @@
 "use client";
 
 import { message, Tabs } from "antd";
-import AddToyPage from "../components/Admin/AddToys";
+import AddToyPage from "../components/Admin/Toys/AddToys";
 import { useState } from "react";
 import ToysPage from "../toys/page";
+import AdminToysPage from "./Toys/AdminToys";
+import CartPage from "../carts/page";
 
 export default function AdminPage() {
   const [activeTable, setActiveTable] = useState("toys");
@@ -31,9 +33,17 @@ export default function AdminPage() {
             key: "toys",
             label: "Каталог игрушек",
             children: (
-                <ToysPage/>
+                <AdminToysPage/>
             )
-        }
+        },
+        {
+          key: "carts",
+          label: "Корзина",
+          children: (
+            <CartPage />
+          )
+        },
+        
     ]}
     />
     </div>

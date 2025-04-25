@@ -44,7 +44,7 @@ export const Toys = ({ toys, onAddToCart }: Props) => {
             <p>Цена: {toy.price} ₽</p>
             <Space>
               {/* <Button onClick={() => onEdit(toy)}>Редактировать</Button> */}
-              <Button danger onClick={() => onAddToCart(toy.id!)}>
+              <Button onClick={() => onAddToCart(toy.id!)}>
                 Добавить в корзину
               </Button>
             </Space>

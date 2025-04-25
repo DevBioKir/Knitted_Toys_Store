@@ -3,15 +3,8 @@
 import { useEffect, useState } from "react";
 import { Button, message } from "antd"; // Импортируем кнопку из Ant Design
 import { Toys } from "../components/Toys"; // Импортируем компонент Toys
-import {
-  createToy,
-  getAllToys,
-  updateToy,
-  deleteToy,
-} from "../services/toys"; // Импортируем функции для получения игрушек
-import { UpdateToyModal } from "../components/UpdateToyModal"; // Модалка для редактирования игрушки
+import { getAllToys } from "../services/toys"; // Импортируем функции для получения игрушек
 import { Toy } from "../Models/Toy";
-import { ToyRequest } from "../types/Toy/ToyRequest";
 import { addToCart, getCurrentCart } from "../services/carts";
 import { CartResponce } from "../types/Cart/CartResponce";
 import AdminEasterEgg from "../components/Admin/AdminEasterEgg";
@@ -49,17 +42,7 @@ export default function ToysPage() {
     fetchData();
   }, []);
 
-  // const refreshToys = async () => {
-  //   try{
-  //     const updatedToys = await getAllToys();
-  //     setToys(updatedToys);
-  //   } catch (err) {
-  //     console.error("Ошибка обновления игрушек", err);
-  //     message.error("Не удалось обновить список игрушек");
-  //   }
-  // }
-
-  const handleAddToy = async (idToy: string) => {
+  const handleAddToyToCart = async (idToy: string) => {
     if (!cart) {
       message.error("Корзина не найдена");
       return;
@@ -95,7 +78,7 @@ export default function ToysPage() {
       ) : (
         <Toys 
         toys={toys} 
-        onAddToCart={handleAddToy} />
+        onAddToCart={handleAddToyToCart} />
       )}
     </div>
   );

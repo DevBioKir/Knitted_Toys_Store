@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Button, Form, Input, InputNumber, Upload, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { RcFile } from "antd/es/upload";
-import { ToyRequest } from "../../types/Toy/ToyRequest";
-import { createToy, uploadImage } from "../../services/toys";
+import { ToyRequest } from "../../../types/Toy/ToyRequest";
+import { createToy, uploadImage } from "../../../services/toys";
 import { useRouter } from "next/navigation";
 
 interface AddToyPageProp {

@@ -1,10 +1,10 @@
-import { CartItemsRequest } from "../CartItems/CartItemsRequest"
+import { CartItemsRequest } from "../CartItems/CartItemsRequest";
 
 export interface CartRequest {
-    id?: string;
-    createAt: string;
-    lastUpdate: string;
-    totalAmount: number;
-    cartItems: CartItemsRequest[];
-    rowVersion: string;
+  id?: string;
+  createAt: Date;
+  lastUpdate: Date;
+  totalAmount: number;
+  cartItemsRequest: CartItemsRequest[];
+  rowVersion: string;
 }
