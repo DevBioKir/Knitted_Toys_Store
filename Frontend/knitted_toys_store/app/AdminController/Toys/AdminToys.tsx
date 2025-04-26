@@ -16,6 +16,7 @@ export default function AdminToysPage() {
       const data = await getAllToys();
       setToys(data);
     } catch (err) {
+      console.error(err);
       message.error("Ошибка при загрузке игрушек");
     } finally {
       setLoading(false);
@@ -32,9 +33,11 @@ export default function AdminToysPage() {
       message.success("Игрушка удалена");
       fetchToys();
     } catch (err) {
+      console.error(err);
       message.error("Не удалось удалить игрушку");
     }
   };
+  
   return (
     <div style={{ padding: "24px" }}>
       <h2>Игрушки</h2>

@@ -50,7 +50,7 @@ export default function CartPage() {
       lastUpdate: cart.lastUpdate,
       totalAmount: cart.totalAmount,
       rowVersion: cart.rowVersion,
-      cartItems: items,
+      cartItemsRequest: items,
     };
 
     try {

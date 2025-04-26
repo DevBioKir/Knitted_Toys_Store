@@ -179,9 +179,12 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
             return Ok(cartItem);
         }
 
-        [HttpDelete("{id:guid} DeleteCartAsync")]
+        [HttpDelete("DeleteCartAsync")]
         public async Task<ActionResult<Cart>> DeleteCartAsync(Guid id)
         {
+            var cart = await _cartService.GetCartByIdAsync(id);
+            if (cart == null) return NotFound($"Cart with ID {id} not found.");
+
             return Ok(await _cartService.DeleteCartAsync(id));
         }
     }

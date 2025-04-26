@@ -11,7 +11,7 @@ import { CartResponce } from "../types/Cart/CartResponce";
 
 
 export const getAllCarts = async (): Promise<CartResponce[]> => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/GetAllCartsAsyn`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -28,7 +28,7 @@ export const getAllCarts = async (): Promise<CartResponce[]> => {
 };
 
 export const getCartById = async (id: string): Promise<CartResponce> => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/${id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/${id}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -103,7 +103,7 @@ export const getCurrentCart = async(): Promise<CartResponce> => {
     }
 }
 
-
+//Возможно стоит сделать через админ http запрос
 export const createCart = async (cartRequest: CartRequest) => {
     const response = await fetch (`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/CreateCart`, {
         method: "POST",
@@ -147,9 +147,28 @@ export const addToCart = async (idCart: string, idToy: string, quantity: number)
     });
 
     if (!response.ok) {
-        const errorText = await response.text();
+        await response.text();
         throw new Error("Ошибка при добавлении игрушки в корзину")
     }
 
     return await response.json();
 };
+
+export const deleteCart = async (idCart: string) => {
+    await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/DeleteCartAsync?id=${idCart}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",
+    });
+}
+
+// export const removeFromCart = async (idCart: string, idToy: string) => {
+//     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/RemoveToy?cartId=${idCart}&toyId=${idToy}`, {
+//         method: "DELETE",
+//         headers: {
+//             "Content-Type": "application/json",
+//         },
+//         credentials: "include",
+//     });

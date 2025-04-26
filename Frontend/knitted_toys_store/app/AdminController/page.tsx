@@ -6,6 +6,7 @@ import { useState } from "react";
 import ToysPage from "../toys/page";
 import AdminToysPage from "./Toys/AdminToys";
 import CartPage from "../carts/page";
+import AdminCartsPage from "./Carts/AdminCarts";
 
 export default function AdminPage() {
   const [activeTable, setActiveTable] = useState("toys");
@@ -40,7 +41,7 @@ export default function AdminPage() {
           key: "carts",
           label: "Корзина",
           children: (
-            <CartPage />
+            <AdminCartsPage />
           )
         },
         
