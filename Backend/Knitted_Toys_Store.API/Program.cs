@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Knitted_Toys_Store.Infrastructure.Middleware;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -76,6 +77,14 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartHeadersLengthLimit = int.MaxValue;
 });
 
+builder.Services
+    .AddAuthentication("Basic")
+    .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("Basic", null);
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrator"));
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -95,8 +104,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseHttpsRedirection();
 app.UseCors("AlowFrontend");
+
+
+app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseCartIdentifier();
 

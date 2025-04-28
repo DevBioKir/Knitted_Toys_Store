@@ -3,6 +3,7 @@ using Knitted_Toys_Store.App.Services;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Knitted_Toys_Store.Infrastructure.Middleware;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Knitted_Toys_Store.API.Controllers
 {

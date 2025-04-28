@@ -1,12 +1,13 @@
 "use client";
 
 import { Toy } from "@/app/Models/Toy";
-import { updateToy, uploadImage } from "@/app/services/toys";
 import { ToyRequest } from "@/app/types/Toy/ToyRequest";
 import { Button, Form, Input, InputNumber, message } from "antd";
 import Upload, { RcFile } from "antd/es/upload";
 import { UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
+import { updateToyAdmin, uploadImage } from "@/app/services/Admin/serviceToysAdmin";
+
 
 interface Props {
   toy: Toy;
@@ -34,7 +35,7 @@ export const UpdateToyForm = ({ toy, onSuccess }: Props) => {
         message.error("Id игрушки отсутствует");
         return;
       }
-      await updateToy(toy.id, toyRequest);
+      await updateToyAdmin(toy.id, toyRequest);
       message.success("Игрушка обновлена");
       onSuccess();
     } catch (err) {

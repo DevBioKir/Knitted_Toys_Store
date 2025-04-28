@@ -6,12 +6,14 @@ function logDebug(...args: any[]){
   }
 }
 
-import { CartRequest } from "../types/Cart/CartRequest";
-import { CartResponce } from "../types/Cart/CartResponce";
+
+import { CartResponce } from "@/app/types/Cart/CartResponce";
+import { CartRequest } from "@/app/types/Cart/CartRequest";
 
 
-export const getAllCarts = async (): Promise<CartResponce[]> => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/GetAllCartsAsyn`, {
+
+export const getAllCartsAdmin = async (): Promise<CartResponce[]> => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/GetAllCartsAsyn`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -27,8 +29,8 @@ export const getAllCarts = async (): Promise<CartResponce[]> => {
     return data; // Возвращаем данные
 };
 
-export const getCartById = async (id: string): Promise<CartResponce> => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/${id}`, {
+export const getCartByIdAdmin = async (id: string): Promise<CartResponce> => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/${id}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -46,7 +48,7 @@ export const getCartById = async (id: string): Promise<CartResponce> => {
 // Переменная для кэширования ID корзины
 let cachedCartId: string | null = null;
 
-export const getCurrentCart = async(): Promise<CartResponce> => {
+export const getCurrentCartAdmin = async(): Promise<CartResponce> => {
     try {
         // Проверяем, есть ли ID корзины в cookie
         const cookies = document.cookie.split('; ');
@@ -63,7 +65,7 @@ export const getCurrentCart = async(): Promise<CartResponce> => {
             cachedCartId = cartIdFromCookie;
         }
         
-        const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/Current`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/Current`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -103,8 +105,24 @@ export const getCurrentCart = async(): Promise<CartResponce> => {
     }
 }
 
+//Возможно стоит сделать через админ http запрос
+export const createCart = async (cartRequest: CartRequest) => {
+    const response = await fetch (`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/CreateCart`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(cartRequest),
+    });
+
+    if (!response.ok) {
+        throw new Error("Не удалось создать корзину");
+    }
+};
+
 export const updateCart = async (cartId: string, cartRequest: CartRequest): Promise<CartResponce> => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart?cartId=${cartId}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart?cartId=${cartId}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -122,7 +140,7 @@ export const updateCart = async (cartId: string, cartRequest: CartRequest): Prom
 };
 
 export const addToCart = async (idCart: string, idToy: string, quantity: number) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/AddToys?cartId=${idCart}&toyId=${idToy}&quantity=${quantity}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/AddToys?cartId=${idCart}&toyId=${idToy}&quantity=${quantity}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -137,6 +155,16 @@ export const addToCart = async (idCart: string, idToy: string, quantity: number)
 
     return await response.json();
 };
+
+export const deleteCart = async (idCart: string) => {
+    await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/DeleteCartAsync?id=${idCart}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",
+    });
+}
 
 // export const removeFromCart = async (idCart: string, idToy: string) => {
 //     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/RemoveToy?cartId=${idCart}&toyId=${idToy}`, {

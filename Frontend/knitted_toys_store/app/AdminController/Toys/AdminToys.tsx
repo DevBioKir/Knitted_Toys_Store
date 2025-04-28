@@ -1,10 +1,11 @@
 "use client";
 
 import { Toy } from "@/app/Models/Toy";
-import { deleteToy, getAllToys } from "@/app/services/toys";
 import { Button, message } from "antd";
 import { useEffect, useState } from "react";
 import { UpdateToyForm } from "../../components/Admin/Toys/UpdateToyForm";
+import { deleteToyAdmin, getAllToysAdmin } from "@/app/services/Admin/serviceToysAdmin";
+
 
 export default function AdminToysPage() {
   const [toys, setToys] = useState<Toy[]>([]);
@@ -13,7 +14,7 @@ export default function AdminToysPage() {
 
   const fetchToys = async () => {
     try {
-      const data = await getAllToys();
+      const data = await getAllToysAdmin();
       setToys(data);
     } catch (err) {
       console.error(err);
@@ -29,7 +30,7 @@ export default function AdminToysPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteToy(id);
+      await deleteToyAdmin(id);
       message.success("Игрушка удалена");
       fetchToys();
     } catch (err) {

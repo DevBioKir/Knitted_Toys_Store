@@ -4,11 +4,13 @@ using Knitted_Toys_Store.App.Services;
 using Knitted_Toys_Store.Contracts;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Knitted_Toys_Store.API.Controllers.Admin
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize(Policy = "AdminOnly")]
     public class AdminCartController : ControllerBase
     {
         private readonly ICartService _cartService;

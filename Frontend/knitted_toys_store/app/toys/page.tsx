@@ -8,6 +8,7 @@ import { Toy } from "../Models/Toy";
 import { addToCart, getCurrentCart } from "../services/carts";
 import { CartResponce } from "../types/Cart/CartResponce";
 import AdminEasterEgg from "../components/Admin/AdminEasterEgg";
+import AdminLoginForm from "../components/Admin/AdminLoginForm";
 
 export default function ToysPage() {
   const [values, setValues] = useState<Toy>({
@@ -63,6 +64,7 @@ export default function ToysPage() {
   return (
     <div>
       <AdminEasterEgg />
+      {/* <AdminLoginForm /> */}
       {/* Отображение загруженного изображения */}
       {values.imageUrl && (
         <img

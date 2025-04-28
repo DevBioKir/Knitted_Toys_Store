@@ -2,14 +2,29 @@
 
 import { message, Tabs } from "antd";
 import AddToyPage from "../components/Admin/Toys/AddToys";
-import { useState } from "react";
-import ToysPage from "../toys/page";
+import { useEffect, useState } from "react";
 import AdminToysPage from "./Toys/AdminToys";
-import CartPage from "../carts/page";
 import AdminCartsPage from "./Carts/AdminCarts";
+import { useRouter } from "next/navigation";
 
 export default function AdminPage() {
   const [activeTable, setActiveTable] = useState("toys");
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("admin_token");
+
+    if(!token) {
+      router.replace("/admin_login");
+    }else{
+      setLoading(false);
+    }
+  }, [router]);
+
+  if (loading){
+    return(<div>Проверка доступа...</div>)
+  }
 
   return (
     <div style={{ padding: 24, maxWidth: 1200, margin: "0 auto" }}>

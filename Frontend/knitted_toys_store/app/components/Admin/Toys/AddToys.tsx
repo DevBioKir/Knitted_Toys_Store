@@ -5,8 +5,9 @@ import { Button, Form, Input, InputNumber, Upload, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { RcFile } from "antd/es/upload";
 import { ToyRequest } from "../../../types/Toy/ToyRequest";
-import { createToy, uploadImage } from "../../../services/toys";
 import { useRouter } from "next/navigation";
+import { createToyAdmin, uploadImage } from "@/app/services/Admin/serviceToysAdmin";
+
 
 interface AddToyPageProp {
   onToyCreated?: () => void; 
@@ -19,7 +20,7 @@ export default function AddToyPage({ onToyCreated } : AddToyPageProp) {
 
   const onFinish = async (values: ToyRequest) => {
     try {
-      await createToy({ ...values, imageUrl });
+      await createToyAdmin({ ...values, imageUrl });
       message.success("Игрушка успешно создана");
       
       if(onToyCreated){

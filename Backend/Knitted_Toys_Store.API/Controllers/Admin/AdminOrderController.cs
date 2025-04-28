@@ -2,20 +2,24 @@
 using Knitted_Toys_Store.App.Services;
 using Knitted_Toys_Store.Contracts;
 using Knitted_Toys_Store.Domain.Models.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Knitted_Toys_Store.API.Controllers.Admin
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize(Policy = "AdminOnly")]
     public class AdminOrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly ICartService _cartService;
         private readonly IMapper _mapper;
 
-        public AdminOrderController(IOrderService orderService, IMapper mapper)
+        public AdminOrderController(IOrderService orderService, IMapper mapper, ICartService cartService)
         {
             _orderService = orderService;
+            _cartService = cartService;
             _mapper = mapper;
         }
 
@@ -39,20 +43,16 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
             return Ok(responceForOrders);
         }
 
-        //[HttpPost]
-        //public async Task<ActionResult<OrderResponce>> CreateOrderAsync(Cart cart, string surname, 
-        //    string name, string phone, string email, string deliveryAddress, string deliveryNotes)
-        //{
-        //    try
-        //    {
-        //        var cartId = 
-        //        var order = await _orderService.CreateOrderAsync(cart, surname, name, phone, email, 
-        //            deliveryAddress, deliveryNotes);
-        //    }
-        //    catch (Exception ex)
-        //    {
+        [HttpPost]
+        public async Task<ActionResult<OrderResponce>> CreateOrderAsync(string surname,
+            string name, string phone, string email, string deliveryAddress, string deliveryNotes)
+        {
 
-        //    }
-        //}
+            var cart = await _cartService.GetCurrentCartAsync(HttpContext, Response);
+            var order = await _orderService.CreateOrderAsync(cart, surname, name, phone, email,
+                    deliveryAddress, deliveryNotes);
+
+            return Ok(order);
+        }
     }
 }

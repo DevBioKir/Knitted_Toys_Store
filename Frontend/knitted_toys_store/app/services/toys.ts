@@ -70,24 +70,24 @@ export const deleteToy = async(id: string) => {
     }
 };
 
-export async function uploadImage(file: File): Promise<string> {
-    if (!file) throw new Error("Файл не выбран");
+// export async function uploadImage(file: File): Promise<string> {
+//     if (!file) throw new Error("Файл не выбран");
     
-    const formData = new FormData();
-    formData.append("image", file); // Важно: ключ "file" должен совпадать с параметром в контроллере
+//     const formData = new FormData();
+//     formData.append("image", file); // Важно: ключ "file" должен совпадать с параметром в контроллере
   
-    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/ImageUpload/upload`, {
-      method: "POST",
-      body: formData,
-      credentials: "include",
-      // Не указываем Content-Type — browser сам установит multipart/form-data с boundary
-    });
+//     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/ImageUpload/upload`, {
+//       method: "POST",
+//       body: formData,
+//       credentials: "include",
+//       // Не указываем Content-Type — browser сам установит multipart/form-data с boundary
+//     });
   
-    if (!response.ok) {
-      throw new Error(`Ошибка при загрузке изображения: ${response.statusText}`);
-    }
+//     if (!response.ok) {
+//       throw new Error(`Ошибка при загрузке изображения: ${response.statusText}`);
+//     }
   
-    const data = await response.json();
-    return data.filePath; // вернёт, например: /Images/abc.jpg
-  }
+//     const data = await response.json();
+//     return data.filePath; // вернёт, например: /Images/abc.jpg
+//   }
 

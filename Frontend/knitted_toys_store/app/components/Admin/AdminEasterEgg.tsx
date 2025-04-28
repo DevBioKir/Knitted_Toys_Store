@@ -16,7 +16,7 @@ const AdminEasterEgg = () => {
                 if (next === "admin") {
                     // делаем редирект с задержкой, чтобы избежать конфликта с setState
                     setTimeout(() => {
-                        router.push("/AdminController"); //тут поставить страницу админ контроля
+                        router.push("/admin_login"); //тут поставить страницу админ контроля
                     }, 0);
                 }
             }
