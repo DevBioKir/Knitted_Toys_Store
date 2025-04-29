@@ -1,9 +1,12 @@
 "use client";
 
+import { UpdateCartForm } from "@/app/components/Admin/Carts/UpdateCartForm";
 import { useCart } from "@/app/context/CartProvider";
 import { Cart } from "@/app/Models/Cart";
-import { deleteCart, getAllCartsAdmin } from "@/app/services/Admin/serviceCartsAdmin";
-
+import {
+  deleteCart,
+  getAllCartsAdmin,
+} from "@/app/services/Admin/serviceCartsAdmin";
 import { Button, List, message } from "antd";
 import { useEffect, useState } from "react";
 
@@ -11,10 +14,10 @@ export default function AdminCartsPage() {
   const [carts, setCarts] = useState<Cart[]>([]);
   const [loading, setLoading] = useState(true);
   const { cart, refreshCart, isLoading } = useCart();
-  //const [editingCart, setEditingCart] = useState<Cart | null>(null);
+  const [editingCart, setEditingCart] = useState<Cart | null>(null);
   //const [removedCart, setRemovedCart] = useState<Cart | null>(null);
 
-  const cartItemsResponces = cart?.cartItemsResponces || [];
+  const CartItemsResponses = cart?.cartItemsResponses || [];
 
   const fetchCart = async () => {
     try {
@@ -76,7 +79,7 @@ export default function AdminCartsPage() {
                 <p>Общая сумма корзины: {cart.totalAmount}р</p>
                 <List
                   itemLayout="horizontal"
-                  dataSource={cartItemsResponces}
+                  dataSource={CartItemsResponses}
                   renderItem={(item) => (
                     <List.Item>
                       <List.Item.Meta
@@ -100,12 +103,12 @@ export default function AdminCartsPage() {
                 />
 
                 {/* Кнопки */}
-                {/* <Button
+                <Button
                       onClick={() => setEditingCart(cart)}
                       style={{ marginRight: 8 }}
                     >
                       Редактировать
-                    </Button> */}
+                    </Button>
                 <Button onClick={() => handleDelete(cart.id!)}>Удалить</Button>
               </div>
             </div>
@@ -113,15 +116,15 @@ export default function AdminCartsPage() {
         </>
       )}
 
-      {/* {editingToy && (
-            <UpdateToyForm
-              toy={editingToy}
-              onSuccess={() => {
-                setEditingToy(null);
-                fetchToys();
-              }}
-            />
-          )} */}
+      {editingCart && (
+        <UpdateCartForm
+          cart={editingCart}
+          onSuccess={() => {
+            setEditingCart(null);
+            fetchCart();
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -7,29 +7,41 @@ function logDebug(...args: any[]){
 }
 
 
-import { CartResponce } from "@/app/types/Cart/CartResponce";
+import { CartResponse } from "@/app/types/Cart/CartResponse";
 import { CartRequest } from "@/app/types/Cart/CartRequest";
+import adminAPI from "./adminAPI";
 
 
-
-export const getAllCartsAdmin = async (): Promise<CartResponce[]> => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/GetAllCartsAsyn`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        credentials: "include",
-    });
-
-    if (!response.ok) {
-        throw new Error("Failed to fetch carts");
+export const getAllCartsAdmin = async (): Promise<CartResponse[]> => {
+    try{
+        const response = await adminAPI.get("/AdminCart/GetAllCartsAsyn");
+        return response.data;
+    } catch(err) {
+        console.error("Ошибка при поиске всех корзин", err);
+        throw err;
     }
-
-    const data: CartResponce[] = await response.json(); // Преобразуем ответ в массив объектов CartResponce
-    return data; // Возвращаем данные
 };
 
-export const getCartByIdAdmin = async (id: string): Promise<CartResponce> => {
+
+
+// export const getAllCartsAdmin = async (): Promise<CartResponse[]> => {
+//     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/GetAllCartsAsyn`, {
+//         method: "GET",
+//         headers: {
+//             "Content-Type": "application/json",
+//         },
+//         credentials: "include",
+//     });
+
+//     if (!response.ok) {
+//         throw new Error("Failed to fetch carts");
+//     }
+
+//     const data: CartResponse[] = await response.json(); // Преобразуем ответ в массив объектов Cartresponse
+//     return data; // Возвращаем данные
+// };
+
+export const getCartByIdAdmin = async (id: string): Promise<CartResponse> => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/${id}`, {
         method: "GET",
         headers: {
@@ -48,7 +60,7 @@ export const getCartByIdAdmin = async (id: string): Promise<CartResponce> => {
 // Переменная для кэширования ID корзины
 let cachedCartId: string | null = null;
 
-export const getCurrentCartAdmin = async(): Promise<CartResponce> => {
+export const getCurrentCartAdmin = async(): Promise<CartResponse> => {
     try {
         // Проверяем, есть ли ID корзины в cookie
         const cookies = document.cookie.split('; ');
@@ -64,24 +76,30 @@ export const getCurrentCartAdmin = async(): Promise<CartResponce> => {
         if (cartIdFromCookie) {
             cachedCartId = cartIdFromCookie;
         }
-        
-        const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/Current`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            cache: "no-store"
+
+        const response = await adminAPI.get<CartResponse>("/AdminCart/Current", {
+            headers: {
+                "Cache-Control": "no-store",
+            },
+            params: {
+                t: Date.now(), // обходим кеширование через URL
+            },
         });
+
+        // const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/Current`, {
+        //     method: "GET",
+        //     headers: { "Content-Type": "application/json" },
+        //     credentials: "include",
+        //     cache: "no-store"
+        // });
         
-        if (!response.ok) {
-            throw new Error("Не удалось получить текущую корзину");
-        }
-        
+
         // Получаем сырые данные
-        const rawData = await response.json();
+        const rawData = response.data;
         logDebug("Сырые данные от API:", rawData);
         
         // Нормализуем данные
-        let cartData: CartResponce;
+        let cartData: CartResponse;
         
         // Проверяем структуру данных
         if (Array.isArray(rawData)) {
@@ -93,9 +111,9 @@ export const getCurrentCartAdmin = async(): Promise<CartResponce> => {
         }
         
         // Нормализуем поля
-        if (!cartData.cartItemsResponces && cartData.cartItems) {
-            logDebug("Копируем cartItems в cartItemsResponces");
-            cartData.cartItemsResponces = cartData.cartItems;
+        if (!cartData.cartItemsResponses && cartData.cartItems) {
+            logDebug("Копируем cartItems в CartItemsResponses");
+            cartData.cartItemsResponses = cartData.cartItems;
         }
         
         return cartData;
@@ -121,7 +139,7 @@ export const createCart = async (cartRequest: CartRequest) => {
     }
 };
 
-export const updateCart = async (cartId: string, cartRequest: CartRequest): Promise<CartResponce> => {
+export const updateCartAdmin = async (cartId: string, cartRequest: CartRequest): Promise<CartResponse> => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart?cartId=${cartId}`, {
         method: "PUT",
         headers: {

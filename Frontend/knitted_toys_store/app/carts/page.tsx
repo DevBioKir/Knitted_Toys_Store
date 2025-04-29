@@ -23,15 +23,15 @@ export default function CartPage() {
   const { cart, refreshCart, isLoading } = useCart();
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Используем правильное поле из интерфейса CartResponce
-  const cartItemsResponces = cart?.cartItemsResponces || [];
+  // Используем правильное поле из интерфейса CartResponse
+  const CartItemsResponses = cart?.cartItemsResponses || [];
 
   // Отладочная информация
   console.log("Состояние корзины:", {
     cart,
-    cartItemsResponces,
+    CartItemsResponses,
     hasItems:
-      Array.isArray(cartItemsResponces) && cartItemsResponces.length > 0,
+      Array.isArray(CartItemsResponses) && CartItemsResponses.length > 0,
     isLoading,
   });
 
@@ -72,7 +72,7 @@ export default function CartPage() {
 
   const handleChangeQuantity = (toyId: string, delta: number) => {
     if (!cart) return;
-    const updatedItems: CartItemsRequest[] = cartItemsResponces.map((item) => ({
+    const updatedItems: CartItemsRequest[] = CartItemsResponses.map((item) => ({
       id: item.id,
       cartId: item.cartId,
       toyId: item.toyId,
@@ -86,7 +86,7 @@ export default function CartPage() {
 
   const handleRemoveItem = (toyId: string) => {
     if (!cart) return;
-    const updatedItems: CartItemsRequest[] = cartItemsResponces
+    const updatedItems: CartItemsRequest[] = CartItemsResponses
       .filter((item) => item.toyId !== toyId)
       .map((item) => ({
         id: item.id,
@@ -115,7 +115,7 @@ export default function CartPage() {
 
   // Улучшенная проверка наличия товаров
   const hasItems =
-    Array.isArray(cartItemsResponces) && cartItemsResponces.length > 0;
+    Array.isArray(CartItemsResponses) && CartItemsResponses.length > 0;
 
   return (
     <div className="p-4 max-w-2xl mx-auto">
@@ -124,7 +124,7 @@ export default function CartPage() {
         <>
           <List
             itemLayout="horizontal"
-            dataSource={cartItemsResponces}
+            dataSource={CartItemsResponses}
             renderItem={(item) => (
               <Card className="mb-4">
                 <List.Item

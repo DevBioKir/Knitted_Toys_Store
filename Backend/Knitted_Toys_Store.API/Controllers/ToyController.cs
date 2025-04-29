@@ -16,7 +16,7 @@ namespace Knitted_Toys_Store.API.Controllers
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<ToysResponce>> GetToyByIdAsync(Guid id)
+        public async Task<ActionResult<ToysResponse>> GetToyByIdAsync(Guid id)
         {
             var toy = await _toyService.GetToyByIdAsync(id);
             if (toy == null)
@@ -27,12 +27,12 @@ namespace Knitted_Toys_Store.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ToysResponce>>> GetToysAsync()
+        public async Task<ActionResult<List<ToysResponse>>> GetToysAsync()
         {
             var toys = await _toyService.GetAllToysAsync();
 
             var responceForToys = toys.Select(t => 
-                new ToysResponce(t.Id, t.Name, t.Description, t.Size, t.Price, t.ImageUrl)).ToList();
+                new ToysResponse(t.Id, t.Name, t.Description, t.Size, t.Price, t.ImageUrl)).ToList();
             return Ok(responceForToys);
         }
 

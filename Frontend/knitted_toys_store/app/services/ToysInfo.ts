@@ -1,9 +1,9 @@
-import { ToyResponce } from "../types/Toy/ToyResponce";
+import { ToyResponse } from "../types/Toy/ToyResponse";
 
 // Кэш для хранения данных об игрушках
-const toyCache: Record<string, ToyResponce> = {};
+const toyCache: Record<string, ToyResponse> = {};
 
-export const getToyById = async (id: string): Promise<ToyResponce | null> => {
+export const getToyById = async (id: string): Promise<ToyResponse | null> => {
   // Проверяем кэш
   if (toyCache[id]) {
     return toyCache[id];
@@ -23,7 +23,7 @@ export const getToyById = async (id: string): Promise<ToyResponce | null> => {
       return null;
     }
 
-    const data: ToyResponce = await response.json();
+    const data: ToyResponse = await response.json();
     
     // Сохраняем в кэш
     toyCache[id] = data;
@@ -35,8 +35,8 @@ export const getToyById = async (id: string): Promise<ToyResponce | null> => {
   }
 };
 
-export const getToysByIds = async (ids: string[]): Promise<Record<string, ToyResponce>> => {
-  const result: Record<string, ToyResponce> = {};
+export const getToysByIds = async (ids: string[]): Promise<Record<string, ToyResponse>> => {
+  const result: Record<string, ToyResponse> = {};
   
   // Получаем уникальные ID
   const uniqueIds = [...new Set(ids)];

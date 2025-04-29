@@ -10,7 +10,7 @@ function logDebug(...args: any[]) {
 
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { getCurrentCart } from "../services/carts";
-import { CartResponce } from "../types/Cart/CartResponce";
+import { CartResponse } from "../types/Cart/CartResponse";
 
 function waitForCartCookie(timeoutMs = 2000): Promise<void> {
   const start = Date.now();
@@ -30,9 +30,9 @@ function waitForCartCookie(timeoutMs = 2000): Promise<void> {
 }
 
 type CartContextType = {
-  cart: CartResponce | null;
+  cart: CartResponse | null;
   refreshCart: () => Promise<void>;
-  setCart: (cart: CartResponce | null) => void;
+  setCart: (cart: CartResponse | null) => void;
   isLoading: boolean;
 };
 
@@ -46,7 +46,7 @@ const CartContext = createContext<CartContextType>({
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
-  const [cart, setCartState] = useState<CartResponce | null>(null);
+  const [cart, setCartState] = useState<CartResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const hasInitialized = useRef(false);
   const refreshInProgress = useRef(false);
@@ -66,16 +66,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         // Нормализуем данные для фронтенда
         const normalizedData = { ...data };
         
-        // Если есть cartItems, но нет cartItemsResponces, копируем данные
-        if (!normalizedData.cartItemsResponces && normalizedData.cartItems) {
-          logDebug("Копируем cartItems в cartItemsResponces");
-          normalizedData.cartItemsResponces = normalizedData.cartItems;
+        // Если есть cartItems, но нет CartItemsResponses, копируем данные
+        if (!normalizedData.cartItemsResponses && normalizedData.cartItems) {
+          logDebug("Копируем cartItems в CartItemsResponses");
+          normalizedData.cartItemsResponses = normalizedData.cartItems;
         }
         
-        // Проверяем, что cartItemsResponces - это массив
-        if (!Array.isArray(normalizedData.cartItemsResponces)) {
-          logDebug("cartItemsResponces не является массивом, устанавливаем пустой массив");
-          normalizedData.cartItemsResponces = [];
+        // Проверяем, что CartItemsResponses - это массив
+        if (!Array.isArray(normalizedData.cartItemsResponses)) {
+          logDebug("CartItemsResponses не является массивом, устанавливаем пустой массив");
+          normalizedData.cartItemsResponses = [];
         }
         
         setCartState(normalizedData);

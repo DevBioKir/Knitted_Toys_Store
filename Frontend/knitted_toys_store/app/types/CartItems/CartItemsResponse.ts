@@ -1,4 +1,4 @@
-export interface CartItemsResponce {
+export interface CartItemsResponse {
     id: string;
     cartId: string;
     toyId: string;

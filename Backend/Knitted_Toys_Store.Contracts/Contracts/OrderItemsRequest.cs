@@ -1,4 +1,4 @@
-﻿namespace Knitted_Toys_Store.Contracts.Contracts
+﻿namespace Knitted_Toys_Store.Contracts
 {
     public record OrderItemsRequest(
         Guid Id,

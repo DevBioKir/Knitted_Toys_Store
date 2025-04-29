@@ -1,7 +1,8 @@
 import { OrderStatus } from "../../Models/Order";
-import { OrderItemsResponce } from "../OrderItems/OrderItemsResponce";
+import { OrderItemsResponse } from "../OrderItems/OrderItemsResponce";
 
-export interface OrderResponce{
+
+export interface OrderResponse{
     id: string;
     odredDate: string;
     totalAmount: string;
@@ -12,5 +13,5 @@ export interface OrderResponce{
     email: string;
     deliveryAddress: string;
     deliveryNotes: string;
-    orderItemsRequest: OrderItemsResponce;
+    orderItemsRequest: OrderItemsResponse;
 }

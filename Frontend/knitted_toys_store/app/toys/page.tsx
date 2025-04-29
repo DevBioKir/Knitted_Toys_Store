@@ -6,7 +6,7 @@ import { Toys } from "../components/Toys"; // Импортируем компо�
 import { getAllToys } from "../services/toys"; // Импортируем функции для получения игрушек
 import { Toy } from "../Models/Toy";
 import { addToCart, getCurrentCart } from "../services/carts";
-import { CartResponce } from "../types/Cart/CartResponce";
+import { Cartresponse } from "../types/Cart/Cartresponse";
 import AdminEasterEgg from "../components/Admin/AdminEasterEgg";
 import AdminLoginForm from "../components/Admin/AdminLoginForm";
 
@@ -21,7 +21,7 @@ export default function ToysPage() {
 
   const [toys, setToys] = useState<Toy[]>([]); // Состояние для списка игрушек
   const [loading, setLoading] = useState(true); // Состояние для загрузки данных
-  const [cart, setCart] = useState<CartResponce | null>(null); // Состояние для текущей корзины
+  const [cart, setCart] = useState<Cartresponse | null>(null); // Состояние для текущей корзины
 
   useEffect(() => {
     const fetchData = async () => {

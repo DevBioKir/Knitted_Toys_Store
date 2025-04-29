@@ -24,7 +24,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<CartResponce>> GetCartByIdAsync(Guid id)
+        public async Task<ActionResult<CartResponse>> GetCartByIdAsync(Guid id)
         {
             var cart = await _cartService.GetCartByIdAsync(id);
             if (cart == null)
@@ -35,10 +35,10 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
         }
 
         [HttpGet("Current")]
-        public async Task<ActionResult<CartResponce>> GetCurrentCart()
+        public async Task<ActionResult<CartResponse>> GetCurrentCart()
         {
             var cartCurrent = await _cartService.GetCurrentCartAsync(HttpContext, Response);
-            var responceForCarts = _mapper.Map<CartResponce>(cartCurrent);
+            var responceForCarts = _mapper.Map<CartResponse>(cartCurrent);
 
             return Ok(responceForCarts);
         }
@@ -110,16 +110,16 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
         //}
 
         [HttpGet("GetAllCartsAsyn")]
-        public async Task<ActionResult<List<CartResponce>>> GetAllCartsAsyn()
+        public async Task<ActionResult<List<CartResponse>>> GetAllCartsAsyn()
         {
             var carts = await _cartService.GetAllCarts();
 
-            var responceForCarts = _mapper.Map<List<CartResponce>>(carts);
+            var responceForCarts = _mapper.Map<List<CartResponse>>(carts);
             return Ok(responceForCarts);
         }
 
         [HttpPut]
-        public async Task<ActionResult<CartResponce>> UpdateCartAsync(Guid cartId, [FromBody] CartRequest request)
+        public async Task<ActionResult<CartResponse>> UpdateCartAsync(Guid cartId, [FromBody] CartRequest request)
         {
             try
             {
@@ -143,7 +143,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
                 // Обновленный товар в корзине
                 var updatedCart = await _cartService.GetCartByIdAsync(cartId);
 
-                var response = _mapper.Map<CartResponce>(updatedCart);
+                var response = _mapper.Map<CartResponse>(updatedCart);
 
                 return Ok(response);
             }
@@ -168,7 +168,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
         }
 
         [HttpPost("AddToys")]
-        public async Task<ActionResult<CartItemsResponce>> AddToCartAsync(Guid cartId, Guid toyId,
+        public async Task<ActionResult<CartItemsResponse>> AddToCartAsync(Guid cartId, Guid toyId,
             int quantity)
         {
             var cart = await _cartService.GetCartByIdAsync(cartId);

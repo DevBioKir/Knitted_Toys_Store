@@ -3,7 +3,7 @@ using Knitted_Toys_Store.Domain.Models.Domain;
 
 namespace Knitted_Toys_Store.Contracts
 {
-    public record OrderResponce(
+    public record OrderResponse(
         Guid Id,
         DateTime OrderDate,
         decimal TotalAmount,
@@ -14,5 +14,5 @@ namespace Knitted_Toys_Store.Contracts
         string Email,
         string DeliveryAddress,
         string DeliveryNotes,
-        List<OrderItemsResponce> OrderItemsResponce);
+        List<OrderItemsResponse> OrderItemsResponce);
 }

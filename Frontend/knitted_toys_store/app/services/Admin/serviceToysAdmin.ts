@@ -1,33 +1,19 @@
 
 import { ToyRequest } from "@/app/types/Toy/ToyRequest";
-import { ToyResponce } from "@/app/types/Toy/ToyResponce";
 import adminAPI from "./adminAPI";
+import { ToyResponse } from "@/app/types/Toy/ToyResponse";
 
-
-export const getAllToysAdmin = async (): Promise<ToyResponce[]> => {
-    const response = await adminAPI("/AdminToy")
-    return response.data; // Возвращаем данные
+export const getAllToysAdmin = async (): Promise<ToyResponse[]> => {
+    try{
+        const response = await adminAPI.get("/AdminToy")
+        return response.data;
+    } catch(err) {
+        console.error("Ошибка при поиске всех игрушек", err);
+        throw err;
+    }
 };
 
-
-// export const getAllToysAdmin = async (): Promise<ToyResponce[]> => {
-//     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminToy`, {
-//         method: "GET",
-//         headers: {
-//             "Content-Type": "application/json",
-//         },
-//         credentials: 'include',
-//     });
-
-//     if (!response.ok) {
-//         throw new Error("Failed to fetch toys");
-//     }
-
-//     const data: ToyResponce[] = await response.json(); // Преобразуем ответ в массив объектов ToyResponce
-//     return data; // Возвращаем данные
-// };
-
-export const getToyByIdAdmin = async (id: string): Promise<ToyResponce> => {
+export const getToyByIdAdmin = async (id: string): Promise<ToyResponse> => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminToy/${id}`, {
         method: "GET",
     });
@@ -39,42 +25,30 @@ export const getToyByIdAdmin = async (id: string): Promise<ToyResponce> => {
     return response.json();
 };
 
-export const createToyAdmin = async(toyrequest: ToyRequest) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminToy`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(toyrequest), 
-        credentials: "include",
-    });
-
-    if (!response.ok) {
-        throw new Error(`Ошибка: ${response.status}`);
+export const createToyAdmin = async(toyRequest: ToyRequest) => {
+    try{
+        const response = await adminAPI.post("/AdminToy", toyRequest);
+    } catch(err) {
+        console.error("Ошибка при создании игрушки", err);
+        throw err;
     }
 }; 
 
-export const updateToyAdmin = async(id: string, toyrequest: ToyRequest) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminToy/${id}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(toyrequest),
-    });
-
-    if (!response.ok) {
-        throw new Error(`Ошибка: ${response.status}`);
+export const updateToyAdmin = async(id: string, toyRequest: ToyRequest) => {
+    try{
+        const response = await adminAPI.put(`/AdminToy/${id}`, toyRequest);
+    } catch(err) {
+        console.error("Ошибка при измении игрушки", err);
+        throw err;
     }
 };
 
 export const deleteToyAdmin = async(id: string) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminToyks/${id}`, {
-        method: "DELETE",
-    });
-
-    if (!response.ok) {
-        throw new Error(`Ошибка: ${response.status}`);
+    try{
+        const response = await adminAPI.delete(`/AdminToy/${id}`);
+    } catch(err) {
+        console.error("Ошибка при удалении игрушки", err);
+        throw err;
     }
 };
 
@@ -88,7 +62,6 @@ export async function uploadImage(file: File): Promise<string> {
       method: "POST",
       body: formData,
       credentials: "include",
-      // Не указываем Content-Type — browser сам установит multipart/form-data с boundary
     });
   
     if (!response.ok) {
@@ -96,6 +69,6 @@ export async function uploadImage(file: File): Promise<string> {
     }
   
     const data = await response.json();
-    return data.filePath; // вернёт, например: /Images/abc.jpg
+    return data.filePath;
   }
 

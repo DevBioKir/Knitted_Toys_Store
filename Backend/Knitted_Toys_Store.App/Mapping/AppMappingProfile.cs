@@ -2,8 +2,7 @@
 using Knitted_Toys_Store.DataAccess.Entities;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Knitted_Toys_Store.Contracts;
-using Knitted_Toys_Store.Contracts.Contracts;
-using System.Linq;
+
 
 namespace Knitted_Toys_Store.App.Mapping
 {
@@ -39,13 +38,13 @@ namespace Knitted_Toys_Store.App.Mapping
             CreateMap<CartRequest, Cart>()
                 .ForMember(dest => dest.CartItems, opt => opt.MapFrom(src => src.CartItemsRequest));
 
-            // Маппинг Cart -> CartResponce
-            CreateMap<Cart, CartResponce>()
+            // Маппинг Cart -> CartResponse
+            CreateMap<Cart, CartResponse>()
                 .ForCtorParam("Id", opt => opt.MapFrom(src => src.Id))
                 .ForCtorParam("CreateAt", opt => opt.MapFrom(src => src.CreateAt))
                 .ForCtorParam("LastUpdate", opt => opt.MapFrom(src => src.LastUpdate))
                 .ForCtorParam("TotalAmount", opt => opt.MapFrom(src => src.TotalAmount))
-                .ForCtorParam("CartItemsResponces", opt => opt.MapFrom(src => src.CartItems))
+                .ForCtorParam("CartItemsResponses", opt => opt.MapFrom(src => src.CartItems))
                 .ForCtorParam("RowVersion", opt => opt.MapFrom(src => src.RowVersion));
 
             //CreateMap<Cart, CartResponce>()
@@ -65,8 +64,8 @@ namespace Knitted_Toys_Store.App.Mapping
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
                 .ForMember(dest => dest.AddedAt, opt => opt.MapFrom(src => src.AddedAt));
 
-            // Маппинг CartItems -> CartItemsResponce
-            CreateMap<CartItems, CartItemsResponce>()
+            // Маппинг CartItems -> CartItemsResponse
+            CreateMap<CartItems, CartItemsResponse>()
                 .ForMember(dest => dest.CartId, opt => opt.MapFrom(src => src.CartId))
                 .ForMember(dest => dest.ToyId, opt => opt.MapFrom(src => src.ToyId))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
@@ -78,8 +77,8 @@ namespace Knitted_Toys_Store.App.Mapping
             CreateMap<OrderRequest, Order>()
                 .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItemsRequest));
 
-            // Маппинг Order -> OrderResponce
-            CreateMap<Order, OrderResponce>()
+            // Маппинг Order -> OrderResponse
+            CreateMap<Order, OrderResponse>()
                 .ForCtorParam("Id", opt => opt.MapFrom(src => src.Id))
                 .ForCtorParam("OrderDate", opt => opt.MapFrom(src => src.OrderDate))
                 .ForCtorParam("TotalAmount", opt => opt.MapFrom(src => src.TotalAmount))
@@ -93,12 +92,12 @@ namespace Knitted_Toys_Store.App.Mapping
                 .ForCtorParam("OrderItemsResponce", opt => opt.MapFrom(src => src.OrderItems));
 
             // Маппинг OrderItemsRequest -> OrderItems
-            CreateMap<OrderItemsResponce, OrderItems>()
+            CreateMap<OrderItemsResponse, OrderItems>()
                 .ForMember(dest => dest.ToyId, opt => opt.MapFrom(src => src.ToyId))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity));
 
-            // Маппинг OrderItems -> OrderItemsResponce
-            CreateMap<OrderItems, OrderItemsResponce>()
+            // Маппинг OrderItems -> OrderItemsResponse
+            CreateMap<OrderItems, OrderItemsResponse>()
                 .ForMember(dest => dest.ToyId, opt => opt.MapFrom(src => src.ToyId))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
                 .ForMember(dest => dest.PriceAtTime, opt => opt.MapFrom(src => src.PriceAtTime));

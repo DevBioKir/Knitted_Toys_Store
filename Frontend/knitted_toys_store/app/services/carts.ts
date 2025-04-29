@@ -7,10 +7,10 @@ function logDebug(...args: any[]){
 }
 
 import { CartRequest } from "../types/Cart/CartRequest";
-import { CartResponce } from "../types/Cart/CartResponce";
+import { CartResponse } from "../types/Cart/CartResponse";
 
 
-export const getAllCarts = async (): Promise<CartResponce[]> => {
+export const getAllCarts = async (): Promise<CartResponse[]> => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/GetAllCartsAsyn`, {
         method: "GET",
         headers: {
@@ -23,11 +23,11 @@ export const getAllCarts = async (): Promise<CartResponce[]> => {
         throw new Error("Failed to fetch carts");
     }
 
-    const data: CartResponce[] = await response.json(); // Преобразуем ответ в массив объектов CartResponce
+    const data: CartResponse[] = await response.json(); // Преобразуем ответ в массив объектов Cartresponse
     return data; // Возвращаем данные
 };
 
-export const getCartById = async (id: string): Promise<CartResponce> => {
+export const getCartById = async (id: string): Promise<CartResponse> => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/${id}`, {
         method: "GET",
         headers: {
@@ -46,7 +46,7 @@ export const getCartById = async (id: string): Promise<CartResponce> => {
 // Переменная для кэширования ID корзины
 let cachedCartId: string | null = null;
 
-export const getCurrentCart = async(): Promise<CartResponce> => {
+export const getCurrentCart = async(): Promise<CartResponse> => {
     try {
         // Проверяем, есть ли ID корзины в cookie
         const cookies = document.cookie.split('; ');
@@ -79,7 +79,7 @@ export const getCurrentCart = async(): Promise<CartResponce> => {
         logDebug("Сырые данные от API:", rawData);
         
         // Нормализуем данные
-        let cartData: CartResponce;
+        let cartData: CartResponse;
         
         // Проверяем структуру данных
         if (Array.isArray(rawData)) {
@@ -91,9 +91,9 @@ export const getCurrentCart = async(): Promise<CartResponce> => {
         }
         
         // Нормализуем поля
-        if (!cartData.cartItemsResponces && cartData.cartItems) {
-            logDebug("Копируем cartItems в cartItemsResponces");
-            cartData.cartItemsResponces = cartData.cartItems;
+        if (!cartData.cartItemsResponses && cartData.cartItems) {
+            logDebug("Копируем cartItems в CartItemsResponses");
+            cartData.cartItemsResponses = cartData.cartItems;
         }
         
         return cartData;
@@ -103,7 +103,7 @@ export const getCurrentCart = async(): Promise<CartResponce> => {
     }
 }
 
-export const updateCart = async (cartId: string, cartRequest: CartRequest): Promise<CartResponce> => {
+export const updateCart = async (cartId: string, cartRequest: CartRequest): Promise<CartResponse> => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart?cartId=${cartId}`, {
         method: "PUT",
         headers: {

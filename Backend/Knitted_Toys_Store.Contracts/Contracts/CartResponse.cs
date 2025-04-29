@@ -1,10 +1,10 @@
 ﻿namespace Knitted_Toys_Store.Contracts
 {
-    public record CartResponce(
+    public record CartResponse(
         Guid Id,
         DateTime CreateAt,
         DateTime LastUpdate,
         decimal TotalAmount,
-        List<CartItemsResponce> CartItemsResponces,
+        List<CartItemsResponse> CartItemsResponses,
         byte[] RowVersion);
 }

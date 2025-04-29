@@ -1,6 +1,6 @@
 ﻿namespace Knitted_Toys_Store.Contracts
 {
-    public record ToysResponce(
+    public record ToysResponse(
         Guid Id,
         string Name,
         string Description,

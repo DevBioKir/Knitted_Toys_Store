@@ -1,8 +1,8 @@
 import { ToyRequest } from "../types/Toy/ToyRequest";
-import { ToyResponce } from "../types/Toy/ToyResponce";
+import { ToyResponse } from "../types/Toy/ToyResponse";
 
 
-export const getAllToys = async (): Promise<ToyResponce[]> => {
+export const getAllToys = async (): Promise<ToyResponse[]> => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Toy`, {
         method: "GET",
         headers: {
@@ -15,11 +15,11 @@ export const getAllToys = async (): Promise<ToyResponce[]> => {
         throw new Error("Failed to fetch toys");
     }
 
-    const data: ToyResponce[] = await response.json(); // Преобразуем ответ в массив объектов ToyResponce
+    const data: ToyResponse[] = await response.json(); // Преобразуем ответ в массив объектов ToyResponse
     return data; // Возвращаем данные
 };
 
-export const getToyById = async (id: string): Promise<ToyResponce> => {
+export const getToyById = async (id: string): Promise<ToyResponse> => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Toy/${id}`, {
         method: "GET",
     });

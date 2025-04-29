@@ -1,7 +1,7 @@
-import { CartItemsResponce } from "../types/CartItems/CartItemsResponce";
-import { ToyResponce } from "../types/Toy/ToyResponce";
+import { CartItemsResponse } from "../types/CartItems/CartItemsResponse";
+import { ToyResponse } from "../types/Toy/ToyResponse";
 
 export interface CartItemWithToyInfo {
-    cartItem: CartItemsResponce;
-    toy: ToyResponce | null;
+    cartItem: CartItemsResponse;
+    toy: ToyResponse | null;
 }

@@ -1,4 +1,4 @@
-export interface OrderItemsResponce {
+export interface OrderItemsResponse {
     id: string;
     orderId: string;
     toyId: string;

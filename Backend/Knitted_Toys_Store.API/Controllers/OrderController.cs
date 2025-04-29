@@ -35,16 +35,16 @@ namespace Knitted_Toys_Store.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<OrderResponce>>> GetAllOrdersAsync()
+        public async Task<ActionResult<List<OrderResponse>>> GetAllOrdersAsync()
         {
             var orders = await _orderService.GetAllOrdersAsync();
 
-            var responceForOrders = _mapper.Map<List<OrderResponce>>(orders);
+            var responceForOrders = _mapper.Map<List<OrderResponse>>(orders);
             return Ok(responceForOrders);
         }
 
         [HttpPost]
-        public async Task<ActionResult<OrderResponce>> CreateOrderAsync(string surname,
+        public async Task<ActionResult<OrderResponse>> CreateOrderAsync(string surname,
             string name, string phone, string email, string deliveryAddress, string deliveryNotes)
         {
 
