@@ -6,6 +6,7 @@ import { Cart } from "@/app/Models/Cart";
 import {
   deleteCart,
   getAllCartsAdmin,
+  updateCartAdmin,
 } from "@/app/services/Admin/serviceCartsAdmin";
 import { Button, List, message } from "antd";
 import { useEffect, useState } from "react";
@@ -40,6 +41,7 @@ export default function AdminCartsPage() {
       await deleteCart(id);
       message.success("Корзина удалена");
       fetchCart();
+      message.success("страница с корзинами обновлена");
     } catch (err) {
       console.error(err);
       message.error("Не удалось удалить корзину");
