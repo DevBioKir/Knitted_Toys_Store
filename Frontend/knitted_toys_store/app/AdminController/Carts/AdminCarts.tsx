@@ -4,7 +4,7 @@ import { UpdateCartForm } from "@/app/components/Admin/Carts/UpdateCartForm";
 import { useCart } from "@/app/context/CartProvider";
 import { Cart } from "@/app/Models/Cart";
 import {
-  deleteCart,
+  deleteCartAdmin,
   getAllCartsAdmin,
   updateCartAdmin,
 } from "@/app/services/Admin/serviceCartsAdmin";
@@ -38,7 +38,7 @@ export default function AdminCartsPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteCart(id);
+      await deleteCartAdmin(id);
       message.success("Корзина удалена");
       fetchCart();
       message.success("страница с корзинами обновлена");
