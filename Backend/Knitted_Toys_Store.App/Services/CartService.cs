@@ -91,21 +91,27 @@ namespace Knitted_Toys_Store.App.Services
             return await _cartRepositories.DeleteAsync(id);
         }
 
-        public async Task<Guid> AddToCartAsync(Guid cartId, Guid toyId, int quantity)
+        public async Task<Guid> AddToCartAsync(Guid cartId, Guid toyId, int quantity) //добавление товара в корзину
         {
             await _cartRepositories.AddToCartAsync(cartId, toyId, quantity);
             return toyId;
         }
 
-        public async Task<Guid> ReduceQuantityItemAsync(Guid cartId, Guid toyId)
+        public async Task<Guid> ReduceQuantityItemAsync(Guid cartId, Guid toyId) //удаление товара по единице в позиции
         {
             await _cartRepositories.ReduceQuantityItemAsync(cartId, toyId);
             return cartId;
         }
 
-        public async Task<Guid> RemoveItemFromCartAsync(Guid cartId, Guid toyId)
+        public async Task<Guid> RemoveItemFromCartAsync(Guid cartId, Guid toyId) //удаление позиции полностью
         {
             await _cartRepositories.RemoveItemFromCartAsync(cartId, toyId);
+            return toyId;
+        }
+
+        public async Task<Guid> SetItemQuantityAsync(Guid cartId, Guid toyId, int quantity)
+        {
+            await _cartRepositories.SetItemQuantityAsync(cartId, toyId, quantity);
             return toyId;
         }
     }

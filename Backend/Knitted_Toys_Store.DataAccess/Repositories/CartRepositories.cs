@@ -119,103 +119,166 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             return cartId;
         }
 
-        public async Task AddToCartAsync(Guid cartId, Guid toyId, int quantity)
+        public async Task AddToCartAsync(Guid cartId, Guid toyId, int quantity) //добавить товар к уже существующему
         {
-            var cartWithItems = await _context.Carts
-                //.AsNoTracking()
+            var entityCart = await _context.Carts
                 .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.Id == cartId);
 
-            if (cartWithItems == null)
+            if (entityCart == null)
                 throw new InvalidOperationException("Cart not found");
 
-            var toy = await _context.Toys
-                //.AsNoTracking()
-                .FirstOrDefaultAsync(t => t.Id == toyId);
-
+            var toy = await _context.Toys.FirstOrDefaultAsync(t => t.Id == toyId);
             if (toy == null)
                 throw new InvalidOperationException("Toy not found");
 
-            var existingItem = cartWithItems.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
-            if (existingItem != null)
-            {
-                existingItem.Quantity += quantity;
-            }
-            else
-            {
-                var newCartItems = CartItems.Create(cartId, toyId, quantity);
+            var cart = _mapper.Map<Cart>(entityCart);
 
-                var newCartItemsEntity = _mapper.Map<CartItemsEntity>(newCartItems);
-                _context.CartItems.Add(newCartItemsEntity);
-            }
+            cart.UpdateItemQuantity(toyId, quantity);
 
-            // Обновляем общую сумму корзины
-            cartWithItems.LastUpdate = DateTime.UtcNow;
-            cartWithItems.TotalAmount = cartWithItems.CartItems.Sum(ci => ci.Quantity * (ci.ToyId == toyId ? toy.Price :
-                        (ci.Toy != null ? ci.Toy.Price : 0)));
-            //cart.TotalAmount = cart.CartItems.Sum(ci => ci.Quantity * (toy.Id == ci.ToyId ? toy.Price : 0));
+            // Обновляем сущность из модели и сохраняем
+            var updatedEntity = _mapper.Map<CartEntity>(cart);
+            _context.Entry(entityCart).CurrentValues.SetValues(updatedEntity);
 
-            try
-            {
-                await _context.SaveChangesAsync();
-                return; // Успех, выходим из метода
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                Console.WriteLine("Concurrency conflict, retrying...");
-            }
+            // Обновляем коллекцию CartItems вручную
+            entityCart.CartItems = updatedEntity.CartItems;
+
+            await _context.SaveChangesAsync();
         }
 
-        public async Task ReduceQuantityItemAsync(Guid cartId, Guid toyId)
+        //public async Task AddToCartAsync(Guid cartId, Guid toyId, int quantity)
+        //{
+        //    var cartWithItems = await _context.Carts
+        //        .Include(c => c.CartItems)
+        //        .FirstOrDefaultAsync(c => c.Id == cartId);
+
+        //    if (cartWithItems == null)
+        //        throw new InvalidOperationException("Cart not found");
+
+        //    var toy = await _context.Toys
+        //        .FirstOrDefaultAsync(t => t.Id == toyId);
+
+        //    if (toy == null)
+        //        throw new InvalidOperationException("Toy not found");
+
+        //    var existingItem = cartWithItems.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+        //    if (existingItem != null)
+        //    {
+        //        existingItem.Quantity += quantity;
+        //    }
+        //    else
+        //    {
+        //        var newCartItems = CartItems.Create(cartId, toyId, quantity);
+
+        //        var newCartItemsEntity = _mapper.Map<CartItemsEntity>(newCartItems);
+        //        _context.CartItems.Add(newCartItemsEntity);
+        //    }
+
+        //    // Обновляем общую сумму корзины
+        //    cartWithItems.LastUpdate = DateTime.UtcNow;
+        //    cartWithItems.TotalAmount = cartWithItems.CartItems.Sum(ci => ci.Quantity * (ci.ToyId == toyId ? toy.Price :
+        //                (ci.Toy != null ? ci.Toy.Price : 0)));
+        //    //cart.TotalAmount = cart.CartItems.Sum(ci => ci.Quantity * (toy.Id == ci.ToyId ? toy.Price : 0));
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //        return; // Успех, выходим из метода
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        Console.WriteLine("Concurrency conflict, retrying...");
+        //    }
+        //}
+
+        public async Task ReduceQuantityItemAsync(Guid cartId, Guid toyId) //уменьшение товара на единицу
         {
-            var cartWithItems = await _context.Carts
+            var entityCart = await _context.Carts
                 .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.Id == cartId);
 
-            if (cartWithItems == null)
+            if (entityCart == null)
                 throw new InvalidOperationException("Cart not found");
 
-            var toy = await _context.Toys
-                .FirstOrDefaultAsync(t => t.Id == toyId);
+            var cart = _mapper.Map<Cart>(entityCart);
+            cart.ReduceItemQuantity(toyId);
 
-            if (toy == null)
-                throw new InvalidOperationException("Toy not found");
+            var updatedEntity = _mapper.Map<CartEntity>(cart);
+            _context.Entry(entityCart).CurrentValues.SetValues(updatedEntity);
+            entityCart.CartItems = updatedEntity.CartItems;
 
-            var existingItem = cartWithItems.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
-            if (existingItem != null)
-            {
-                if (existingItem.Quantity > 1)
-                {
-                    existingItem.Quantity -= 1;
-                }
-                else
-                {
-                    //удаляем поцизию в корзине если осталась 1 шт.
-                    _context.CartItems.Remove(existingItem);
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException("Товар не найден в корзине");
-            }
-
-            // Обновляем общую сумму корзины
-            cartWithItems.LastUpdate = DateTime.UtcNow;
-            cartWithItems.TotalAmount = cartWithItems.CartItems
-                .Sum(ci => ci.Quantity * (ci.Toy != null ? ci.Toy.Price : 0));
-
-            try
-            {
-                await _context.SaveChangesAsync();
-                return; // Успех, выходим из метода
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                Console.WriteLine("Concurrency conflict, retrying...");
-            }
+            await _context.SaveChangesAsync();
         }
 
-        public async Task RemoveItemFromCartAsync(Guid cartId, Guid toyId)
+        //public async Task ReduceQuantityItemAsync(Guid cartId, Guid toyId) //удаление единицы товара в позиции
+        //{
+        //    var cartWithItems = await _context.Carts
+        //        .Include(c => c.CartItems)
+        //        .FirstOrDefaultAsync(c => c.Id == cartId);
+
+        //    if (cartWithItems == null)
+        //        throw new InvalidOperationException("Cart not found");
+
+        //    var toy = await _context.Toys
+        //        .FirstOrDefaultAsync(t => t.Id == toyId);
+
+        //    if (toy == null)
+        //        throw new InvalidOperationException("Toy not found");
+
+        //    var existingItem = cartWithItems.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+        //    if (existingItem != null)
+        //    {
+        //        if (existingItem.Quantity > 1)
+        //        {
+        //            existingItem.Quantity -= 1;
+        //        }
+        //        else
+        //        {
+        //            //удаляем поцизию в корзине если осталась 1 шт.
+        //            _context.CartItems.Remove(existingItem);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        throw new InvalidOperationException("Товар не найден в корзине");
+        //    }
+
+        //    // Обновляем общую сумму корзины
+        //    cartWithItems.LastUpdate = DateTime.UtcNow;
+        //    cartWithItems.TotalAmount = cartWithItems.CartItems
+        //        .Sum(ci => ci.Quantity * (ci.Toy != null ? ci.Toy.Price : 0));
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //        return; // Успех, выходим из метода
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        Console.WriteLine("Concurrency conflict, retrying...");
+        //    }
+        //}
+        public async Task SetItemQuantityAsync(Guid cartId, Guid toyId, int quantity)//добавить точное количество
+        {
+            var entityCart = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.Id == cartId);
+
+            if (entityCart == null)
+                throw new InvalidOperationException("Cart not found");
+
+            var cart = _mapper.Map<Cart>(entityCart);
+
+            cart.SetItemQuantity(toyId, quantity);
+
+            var updatedEntity = _mapper.Map<CartEntity>(cart);
+            _context.Entry(entityCart).CurrentValues.SetValues(updatedEntity);
+            entityCart.CartItems = updatedEntity.CartItems;
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoveItemFromCartAsync(Guid cartId, Guid toyId)//удаление позиции товара из корзины полностью
         {
             // Очищаем ChangeTracker перед началом операции
             _context.ChangeTracker.Clear();

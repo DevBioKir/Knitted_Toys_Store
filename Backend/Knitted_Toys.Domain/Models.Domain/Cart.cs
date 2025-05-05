@@ -36,7 +36,7 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
             TotalAmount = CartItems.Sum(item => item.Quantity * item.Toy.Price);
         }
 
-        public void SetItemQuantity(Guid toyId, int quantity) //если надо полностью обновить корзину
+        public void SetItemQuantity(Guid toyId, int quantity) //если надо полностью обновить корзину точным значением
         {
             if (quantity < 0)
                 throw new ArgumentException("The number must be greater than 0");
@@ -51,7 +51,26 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
             TotalAmountUpdate();
         }
 
-        public void UpdateItemQuantity(Guid toyId, int quantityToAdd)
+        public void ReduceItemQuantity(Guid toyId)
+        {
+            var item = CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            if (item == null)
+                throw new InvalidOperationException("Item not found");
+
+            if (item.Quantity > 1)
+            {
+                item.UpdateQuantity(item.Quantity - 1);
+            }
+            else
+            {
+                CartItems.Remove(item);
+            }
+
+            CartLastUpdate();
+            TotalAmountUpdate();
+        }
+
+        public void UpdateItemQuantity(Guid toyId, int quantityToAdd)// добавить к уже существующему
         {
             if(quantityToAdd < 0)
                 throw new ArgumentException("The number must be greater than 0");
