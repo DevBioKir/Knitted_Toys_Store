@@ -36,18 +36,36 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
             TotalAmount = CartItems.Sum(item => item.Quantity * item.Toy.Price);
         }
 
-        public void UpdateItemQuantity(Guid toyId, int newQuantity)
+        public void SetItemQuantity(Guid toyId, int quantity) //если надо полностью обновить корзину
         {
+            if (quantity < 0)
+                throw new ArgumentException("The number must be greater than 0");
+
             var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId || ci.ToyId == toyId);
 
-            //var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId);
+            if (item == null)
+                throw new InvalidOperationException("The toy was not found in the cart");
 
-            if (item == null) throw new InvalidOperationException("The toy was not found in the cart");
-
-            item.UpdateQuantity(newQuantity);
+            item.UpdateQuantity(quantity);
             CartLastUpdate();
             TotalAmountUpdate();
         }
+
+        public void UpdateItemQuantity(Guid toyId, int quantityToAdd)
+        {
+            if(quantityToAdd < 0)
+                throw new ArgumentException("The number must be greater than 0");
+
+            var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId || ci.ToyId == toyId);
+
+            if (item == null)
+                throw new InvalidOperationException("The toy was not found in the cart");
+
+            item.UpdateQuantity(item.Quantity + quantityToAdd);
+            CartLastUpdate();
+            TotalAmountUpdate();
+        }
+
         public void RemoveItem(Guid toyId)
         {
             var item = CartItems.FirstOrDefault(ci => ci.ToyId == toyId || ci.Toy?.Id == toyId);

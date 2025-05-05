@@ -157,23 +157,6 @@ export const updateCartAdmin = async (
     throw err;
   }
 };
-// export const updateCartAdmin = async (cartId: string, cartRequest: CartRequest): Promise<CartResponse> => {
-//     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart?cartId=${cartId}`, {
-//         method: "PUT",
-//         headers: {
-//             "Content-Type": "application/json",
-//         },
-//         credentials: "include",
-//         body: JSON.stringify(cartRequest),
-//     });
-
-//     if (!response.ok) {
-//         const errorText = await response.text();
-//         throw new Error(`Ошибка при обновлении корзины: ${errorText}`);
-//     }
-
-//     return await response.json();
-// };
 
 export const addToCart = async (
   idCart: string,
@@ -206,24 +189,15 @@ export const deleteCartAdmin = async (idCart: string) => {
     console.error("Ошибка при удалении игрушки", err);
     throw err;
   }
-
-//   await fetch(
-//     `${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/DeleteCartAsync?id=${idCart}`,
-//     {
-//       method: "DELETE",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       credentials: "include",
-//     }
-//   );
 };
 
-// export const removeFromCart = async (idCart: string, idToy: string) => {
-//     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/RemoveToy?cartId=${idCart}&toyId=${idToy}`, {
-//         method: "DELETE",
-//         headers: {
-//             "Content-Type": "application/json",
-//         },
-//         credentials: "include",
-//     });
+export const removeFromCart = async (idCart: string, idToy: string) => {
+  try {
+    await adminAPI.delete(
+      `/AdminCart/RemoveItemFromCart?cartId=${idCart}&toyId=${idToy}`
+    );
+  } catch (err) {
+    console.error("Ошибка при удалении товара из корзины", err);
+    throw err;
+  }
+};

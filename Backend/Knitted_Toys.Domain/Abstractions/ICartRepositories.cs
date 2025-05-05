@@ -11,6 +11,6 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
         Task<List<Cart>> GetAllCartsAsync();
         Task RemoveItemFromCartAsync(Guid cartId, Guid toyId);
         Task<Guid> UpdateAsync(Cart cart);
-        //Task UpdateItemQuantityAsync(Guid cartId, Guid toyId, int newQuantity);
+        Task ReduceQuantityItemAsync(Guid cartId, Guid toyId);
     }
 }

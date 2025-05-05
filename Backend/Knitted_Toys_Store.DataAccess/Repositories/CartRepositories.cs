@@ -166,39 +166,55 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             }
         }
 
-        //public async Task UpdateItemQuantityAsync(Guid cartId, Guid toyId, int newQuantity)
-        //{
-        //    if (newQuantity <= 0)
-        //        throw new ArgumentException("Quantity must be greater than zero");
+        public async Task ReduceQuantityItemAsync(Guid cartId, Guid toyId)
+        {
+            var cartWithItems = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.Id == cartId);
 
-        //    // Очищаем ChangeTracker перед началом операции
-        //    _context.ChangeTracker.Clear();
+            if (cartWithItems == null)
+                throw new InvalidOperationException("Cart not found");
 
-        //    var cart = await _context.Carts
-        //        .Include(c => c.CartItems)
-        //        .FirstOrDefaultAsync(c => c.Id == cartId);
+            var toy = await _context.Toys
+                .FirstOrDefaultAsync(t => t.Id == toyId);
 
-        //    if (cart == null)
-        //        throw new InvalidOperationException("Cart not found");
+            if (toy == null)
+                throw new InvalidOperationException("Toy not found");
 
-        //    var cartItem = cart.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
-        //    if (cartItem == null)
-        //        throw new InvalidOperationException("Item not found in cart");
+            var existingItem = cartWithItems.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            if (existingItem != null)
+            {
+                if (existingItem.Quantity > 1)
+                {
+                    existingItem.Quantity -= 1;
+                }
+                else
+                {
+                    //удаляем поцизию в корзине если осталась 1 шт.
+                    _context.CartItems.Remove(existingItem);
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("Товар не найден в корзине");
+            }
 
-        //    cartItem.Quantity = newQuantity;
-        //    cart.LastUpdate = DateTime.UtcNow;
+            // Обновляем общую сумму корзины
+            cartWithItems.LastUpdate = DateTime.UtcNow;
+            cartWithItems.TotalAmount = cartWithItems.CartItems
+                .Sum(ci => ci.Quantity * (ci.Toy != null ? ci.Toy.Price : 0));
 
-        //    // Загружаем цены товаров для расчета общей суммы
-        //    var toyIds = cart.CartItems.Select(ci => ci.ToyId).ToList();
-        //    var toys = await _context.Toys
-        //        .Where(t => toyIds.Contains(t.Id))
-        //        .ToDictionaryAsync(t => t.Id, t => t.Price);
+            try
+            {
+                await _context.SaveChangesAsync();
+                return; // Успех, выходим из метода
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                Console.WriteLine("Concurrency conflict, retrying...");
+            }
+        }
 
-        //    // Рассчитываем общую сумму
-        //    cart.TotalAmount = cart.CartItems.Sum(ci => ci.Quantity * (toys.ContainsKey(ci.ToyId) ? toys[ci.ToyId] : 0));
-
-        //    await _context.SaveChangesAsync();
-        //}
         public async Task RemoveItemFromCartAsync(Guid cartId, Guid toyId)
         {
             // Очищаем ChangeTracker перед началом операции

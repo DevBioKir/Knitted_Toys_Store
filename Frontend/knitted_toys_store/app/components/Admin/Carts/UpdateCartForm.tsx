@@ -3,14 +3,14 @@
 import { Button, Form, Input, InputNumber, message, Select, Space } from "antd";
 import { useEffect, useState } from "react";
 import { CartRequest } from "@/app/types/Cart/CartRequest";
-import { Cart } from "@/app/Models/Cart";
-import { updateCartAdmin } from "@/app/services/Admin/serviceCartsAdmin";
+import { removeFromCart, updateCartAdmin } from "@/app/services/Admin/serviceCartsAdmin";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { getAllToysAdmin } from "@/app/services/Admin/serviceToysAdmin";
 import { ToyResponse } from "@/app/types/Toy/ToyResponse";
+import { CartResponse } from "@/app/types/Cart/CartResponse";
 
 interface Props {
-  cart: Cart;
+  cart: CartResponse;
   onSuccess: () => void;
 }
 
@@ -21,23 +21,19 @@ export const UpdateCartForm = ({ cart, onSuccess }: Props) => {
   useEffect(() => {
     console.log("Получена корзина:", cart);
     console.log("Состав корзины (cartItems):", cart.cartItems);
-  
+
     getAllToysAdmin()
       .then((toys) => {
         const sorted = [...toys].sort((a, b) => a.name.localeCompare(b.name));
         setToys(sorted);
       })
       .catch(() => message.error("Не удалось загрузить игрушки"));
-  
+
     form.setFieldsValue({
       createAt: cart.createAt,
       lastUpdate: cart.lastUpdate,
       totalAmount: cart.totalAmount,
-      cartItemsRequest:
-        cart.cartItems?.map((item) => ({
-          toyId: item.toyId,
-          quantity: item.quantity,
-        })) || [],
+      cartItemsRequest: [],
       rowVersion: cart.rowVersion,
     });
   }, [cart, form]);
@@ -55,6 +51,30 @@ export const UpdateCartForm = ({ cart, onSuccess }: Props) => {
     } catch (err) {
       console.error(err);
       message.error("Ошибка при обновлении корзины");
+    }
+  };
+
+  const handleAddExistingItem = (toyId: string) => {
+    const existingItems = form.getFieldValue("cartItemsRequest") || [];
+    form.setFieldsValue({
+      cartItemsRequest: [...existingItems, { toyId, quantity: 1 }],
+    });
+  };
+
+  const handleRemoveExistingItem = async (toyId: string) => {
+    if (!cart.id) {
+      message.error("ID корзины не найден");
+      return;
+    }
+  
+    try {
+      await removeFromCart(cart.id, toyId);
+      const updatedItems = cart.cartItemsResponses?.filter(item => item.toyId !== toyId) || [];
+      cart.cartItemsResponses = updatedItems;
+  
+      message.success("Товар удалён из корзины");
+    } catch {
+      message.error("Не удалось удалить товар");
     }
   };
 
@@ -81,14 +101,33 @@ export const UpdateCartForm = ({ cart, onSuccess }: Props) => {
         <h3>Текущие товары в корзине:</h3>
 
         {toys ? (
-          cart.cartItems?.length > 0 ? (
-            cart.cartItems.map((item, index) => {
+          cart.cartItemsResponses?.length > 0 ? (
+            cart.cartItemsResponses.map((item, index) => {
               const toyName =
                 toys.find((toy) => toy.id === item.toyId)?.name ||
                 "Неизвестная игрушка";
               return (
                 <div key={index}>
                   🧸 <strong>{toyName}</strong> — {item.quantity} шт.
+                  <Button
+                    size="small"
+                    onClick={() => handleAddExistingItem(item.toyId)}
+                  >
+                    +
+                  </Button>
+                  <Button
+                    size="small"
+                    onClick={() => handleRemoveExistingItem(item.toyId)}
+                  >
+                    −
+                  </Button>
+                  <Button
+                    type="link"
+                    danger
+                    onClick={() => handleRemoveExistingItem(item.toyId)}
+                  >
+                    Удалить позицию товара
+                  </Button>
                 </div>
               );
             })

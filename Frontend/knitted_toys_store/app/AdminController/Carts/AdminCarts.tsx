@@ -5,8 +5,7 @@ import { useCart } from "@/app/context/CartProvider";
 import { Cart } from "@/app/Models/Cart";
 import {
   deleteCartAdmin,
-  getAllCartsAdmin,
-  updateCartAdmin,
+  getAllCartsAdmin
 } from "@/app/services/Admin/serviceCartsAdmin";
 import { Button, List, message } from "antd";
 import { useEffect, useState } from "react";

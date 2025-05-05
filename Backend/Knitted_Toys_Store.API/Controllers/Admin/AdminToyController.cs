@@ -82,14 +82,6 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
         public async Task<ActionResult> DeleteToyAsync(Guid id)
         {
             return Ok(await _toyService.DeleteToysAsync(id));
-
-            //var toys = await _toyService.GetToyByIdAsync(id);
-            //if (toys == null)
-            //{
-            //    return NotFound($"Toy with ID {id} not found.");
-            //}
-            //await _toyService.DeleteToysAsync(id);
-            //return NoContent();
         }
     }
 }
