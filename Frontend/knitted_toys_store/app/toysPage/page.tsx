@@ -42,13 +42,13 @@ export default function ToysPage() {
     fetchData();
   }, []);
 
-  const handleAddToyToCart = async (idToy: string) => {
+  const handleAddToyToCart = async (toyId: string) => {
     if (!cart) {
       message.error("Корзина не найдена");
       return;
     }
     try {
-      await addToCart(cart.id, idToy, 1); // по умолчанию quantity = 1
+      await addToCart(cart.id, toyId, 1); // по умолчанию quantity = 1
       message.success("Товар добавлен в корзину");
     } catch (error) {
       console.error("Ошибка при добавлении в корзину:", error);

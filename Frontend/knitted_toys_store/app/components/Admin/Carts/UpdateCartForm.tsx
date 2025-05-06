@@ -3,11 +3,16 @@
 import { Button, Form, Input, InputNumber, message, Select, Space } from "antd";
 import { useEffect, useState } from "react";
 import { CartRequest } from "@/app/types/Cart/CartRequest";
-import { removeFromCart, updateCartAdmin } from "@/app/services/Admin/serviceCartsAdmin";
+import {
+  reduceQuantityItem,
+  removeFromCart,
+  updateCartAdmin,
+} from "@/app/services/Admin/serviceCartsAdmin";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { getAllToysAdmin } from "@/app/services/Admin/serviceToysAdmin";
 import { ToyResponse } from "@/app/types/Toy/ToyResponse";
 import { CartResponse } from "@/app/types/Cart/CartResponse";
+import { addToCart } from "@/app/services/carts";
 
 interface Props {
   cart: CartResponse;
@@ -28,6 +33,8 @@ export const UpdateCartForm = ({ cart, onSuccess }: Props) => {
         setToys(sorted);
       })
       .catch(() => message.error("Не удалось загрузить игрушки"));
+
+    if (!cart || !cart.id) return;
 
     form.setFieldsValue({
       createAt: cart.createAt,
@@ -54,11 +61,33 @@ export const UpdateCartForm = ({ cart, onSuccess }: Props) => {
     }
   };
 
-  const handleAddExistingItem = (toyId: string) => {
-    const existingItems = form.getFieldValue("cartItemsRequest") || [];
-    form.setFieldsValue({
-      cartItemsRequest: [...existingItems, { toyId, quantity: 1 }],
-    });
+  const handleAddExistingItem = async (toyId: string) => {
+    if (!cart) {
+      message.error("Корзина не найдена");
+      return;
+    }
+    try {
+      await addToCart(cart.id, toyId, 1); // по умолчанию quantity = 1
+      message.success("Товар добавлен в корзину");
+    } catch (error) {
+      console.error("Ошибка при добавлении в корзину:", error);
+      message.error("Не удалось добавить товар в корзину");
+    }
+  };
+
+  const handleReduceQuantityItem = async (toyId: string) => {
+    if (!cart.id) {
+      message.error("ID корзины не найден");
+      return;
+    }
+
+    try {
+      await reduceQuantityItem(cart.id, toyId);
+      message.success("Количество товара уменьшено");
+    } catch (error) {
+      console.error("Ошибка при уменьшении количества товара:", error);
+      message.error("Не удалось уменьшить количество товара");
+    }
   };
 
   const handleRemoveExistingItem = async (toyId: string) => {
@@ -66,12 +95,13 @@ export const UpdateCartForm = ({ cart, onSuccess }: Props) => {
       message.error("ID корзины не найден");
       return;
     }
-  
+
     try {
       await removeFromCart(cart.id, toyId);
-      const updatedItems = cart.cartItemsResponses?.filter(item => item.toyId !== toyId) || [];
+      const updatedItems =
+        cart.cartItemsResponses?.filter((item) => item.toyId !== toyId) || [];
       cart.cartItemsResponses = updatedItems;
-  
+
       message.success("Товар удалён из корзины");
     } catch {
       message.error("Не удалось удалить товар");
@@ -117,7 +147,7 @@ export const UpdateCartForm = ({ cart, onSuccess }: Props) => {
                   </Button>
                   <Button
                     size="small"
-                    onClick={() => handleRemoveExistingItem(item.toyId)}
+                    onClick={() => handleReduceQuantityItem(item.toyId)}
                   >
                     −
                   </Button>

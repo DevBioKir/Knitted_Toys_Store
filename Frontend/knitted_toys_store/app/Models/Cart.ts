@@ -1,4 +1,6 @@
+import { CartItemsResponse } from "../types/CartItems/CartItemsResponse";
 import { CartItems } from "./CartItems";
+
 
 export interface Cart {
     id?: string;
@@ -7,4 +9,6 @@ export interface Cart {
     totalAmount: number;
     cartItems: CartItems[];
     rowVersion: string; // base64 строка
+
+    cartItemsResponses?: CartItemsResponse[];
 }

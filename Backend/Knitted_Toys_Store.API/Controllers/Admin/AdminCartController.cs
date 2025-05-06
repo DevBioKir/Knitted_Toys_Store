@@ -52,7 +52,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
             return Ok(responceForCarts);
         }
 
-        [HttpPut]
+        [HttpPut("UpdateCartAsync")]
         public async Task<ActionResult<CartResponse>> UpdateCartAsync(Guid cartId, [FromBody] CartRequest request)
         {
             try
@@ -87,7 +87,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
             }
         }
 
-        [HttpPut]
+        [HttpPut("UpdateItemFromCartAsync")]
         public async Task<ActionResult<CartResponse>> UpdateItemFromCartAsync(Guid cartId, [FromBody] CartRequest request)
         {
             try
@@ -150,7 +150,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
             return Ok(cartItem);
         }
 
-        [HttpDelete("RemoveItemFromCart")]
+        [HttpDelete("RemoveItemFromCart")] //удаление позиции в корзине полностью
         public async Task<ActionResult<Cart>> RemoveItemFromCart(Guid cartId, Guid toyId)
         {
             var cart = await _cartService.GetCartByIdAsync(cartId);
@@ -159,7 +159,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
             return Ok(await _cartService.RemoveItemFromCartAsync(cartId, toyId));
         }
 
-        [HttpDelete("ReduceQuantityItemAsync")]
+        [HttpDelete("ReduceQuantityItemAsync")] //уменьшить количество товара в позиции
         public async Task<ActionResult<Cart>> ReduceQuantityItemAsync(Guid cartId, Guid toyId)
         {
             var cart = await _cartService.GetCartByIdAsync(cartId);
@@ -168,7 +168,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
             return Ok(await _cartService.ReduceQuantityItemAsync(cartId, toyId));
         }
 
-        [HttpDelete("DeleteCartAsync")]
+        [HttpDelete("DeleteCartAsync")] 
         public async Task<ActionResult<Cart>> DeleteCartAsync(Guid id)
         {
             var cart = await _cartService.GetCartByIdAsync(id);

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Knitted_Toys_Store.Infrastructure.Middleware;
 using Microsoft.AspNetCore.Authorization;
+using Knitted_Toys_Store.Domain.Models.Domain;
 
 namespace Knitted_Toys_Store.API.Controllers
 {
@@ -89,6 +90,15 @@ namespace Knitted_Toys_Store.API.Controllers
                 var cartItem = await _cartService.AddToCartAsync(cartId, toyId, quantity);
 
                 return Ok(cartItem);
+        }
+
+        [HttpDelete("ReduceQuantityItemAsync")] //уменьшить количество товара в позиции
+        public async Task<ActionResult<Cart>> ReduceQuantityItemAsync(Guid cartId, Guid toyId)
+        {
+            var cart = await _cartService.GetCartByIdAsync(cartId);
+            if (cart == null) return NotFound($"Cart with ID {cartId} not found.");
+
+            return Ok(await _cartService.ReduceQuantityItemAsync(cartId, toyId));
         }
     }
 }

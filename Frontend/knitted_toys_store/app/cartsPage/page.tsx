@@ -12,7 +12,7 @@ import {
   Spin,
   Avatar,
 } from "antd";
-import { updateCart } from "../services/carts";
+import { addToCart, reduceQuantityItem, updateCart } from "../services/carts";
 import { CartRequest } from "../types/Cart/CartRequest";
 import { CartItemsRequest } from "../types/CartItems/CartItemsRequest";
 import { useCart } from "../context/CartProvider";
@@ -70,35 +70,34 @@ export default function CartPage() {
     }
   };
 
-  const handleChangeQuantity = (toyId: string, delta: number) => {
-    if (!cart) return;
-    const updatedItems: CartItemsRequest[] = CartItemsResponses.map((item) => ({
-      id: item.id,
-      cartId: item.cartId,
-      toyId: item.toyId,
-      quantity: Math.max(1, item.quantity + (item.toyId === toyId ? delta : 0)),
-      addedAt: item.addedAt,
-      toyName: item.toyName,
-      toyImageUrl: item.toyImageUrl,
-    }));
-    handleUpdateCart(updatedItems);
-  };
+  const handleAddExistingItem = async (toyId: string) => {
+      if (!cart) {
+        message.error("Корзина не найдена");
+        return;
+      }
+      try {
+        await addToCart(cart.id, toyId, 1); // по умолчанию quantity = 1
+        message.success("Товар добавлен в корзину");
+      } catch (error) {
+        console.error("Ошибка при добавлении в корзину:", error);
+        message.error("Не удалось добавить товар в корзину");
+      }
+    };
 
-  const handleRemoveItem = (toyId: string) => {
-    if (!cart) return;
-    const updatedItems: CartItemsRequest[] = CartItemsResponses
-      .filter((item) => item.toyId !== toyId)
-      .map((item) => ({
-        id: item.id,
-        cartId: item.cartId,
-        toyId: item.toyId,
-        quantity: item.quantity,
-        addedAt: item.addedAt,
-        toyName: item.toyName,
-        toyImageUrl: item.toyImageUrl,
-      }));
-    handleUpdateCart(updatedItems);
-  };
+  const handleReduceQuantityItem = async (toyId: string) => {
+      if (!cart) {
+        message.error("ID корзины не найден");
+        return;
+      }
+  
+      try {
+        await reduceQuantityItem(cart.id, toyId);
+        message.success("Количество товара уменьшено");
+      } catch (error) {
+        console.error("Ошибка при уменьшении количества товара:", error);
+        message.error("Не удалось уменьшить количество товара");
+      }
+    };
 
   const handleClearCart = () => {
     if (!cart) return;
@@ -127,19 +126,7 @@ export default function CartPage() {
             dataSource={CartItemsResponses}
             renderItem={(item) => (
               <Card className="mb-4">
-                <List.Item
-                  actions={[
-                    <Popconfirm
-                      title="Удалить товар?"
-                      onConfirm={() => handleRemoveItem(item.toyId)}
-                      okText="Да"
-                      cancelText="Нет"
-                      key="delete"
-                    >
-                      <Button danger>Удалить</Button>
-                    </Popconfirm>,
-                  ]}
-                >
+                <List.Item>
                   <List.Item.Meta
                     avatar={
                       <Avatar
@@ -159,13 +146,13 @@ export default function CartPage() {
                         <Text>Количество: {item.quantity}</Text>
                         <Space>
                           <Button
-                            onClick={() => handleChangeQuantity(item.toyId, -1)}
+                            onClick={() => handleReduceQuantityItem(item.toyId)}
                           >
                             -
                           </Button>
                           <Text>{item.quantity}</Text>
                           <Button
-                            onClick={() => handleChangeQuantity(item.toyId, 1)}
+                            onClick={() => handleAddExistingItem(item.toyId)}
                           >
                             +
                           </Button>

@@ -20,23 +20,6 @@ export const getAllCartsAdmin = async (): Promise<CartResponse[]> => {
   }
 };
 
-// export const getAllCartsAdmin = async (): Promise<CartResponse[]> => {
-//     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/GetAllCartsAsyn`, {
-//         method: "GET",
-//         headers: {
-//             "Content-Type": "application/json",
-//         },
-//         credentials: "include",
-//     });
-
-//     if (!response.ok) {
-//         throw new Error("Failed to fetch carts");
-//     }
-
-//     const data: CartResponse[] = await response.json(); // Преобразуем ответ в массив объектов Cartresponse
-//     return data; // Возвращаем данные
-// };
-
 export const getCartByIdAdmin = async (id: string): Promise<CartResponse> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/${id}`,
@@ -148,7 +131,7 @@ export const updateCartAdmin = async (
 ): Promise<CartResponse> => {
   try {
     const response = await adminAPI.put(
-      `/AdminCart?cartId=${cartId}`,
+      `/AdminCart/UpdateCartAsync?cartId=${cartId}`,
       cartRequest
     );
     return response.data;
@@ -180,6 +163,17 @@ export const addToCart = async (
   }
 
   return await response.json();
+};
+
+export const reduceQuantityItem = async(cartId: string, idToy: string) => {
+  try {
+    await adminAPI.delete(
+      `/AdminCart/ReduceQuantityItemAsync?cartId=${cartId}&toyId=${idToy}`
+    );
+  } catch (err) {
+    console.error("Ошибка при удалении игрушки", err);
+    throw err;
+  }
 };
 
 export const deleteCartAdmin = async (idCart: string) => {

@@ -22,7 +22,15 @@ export default function AdminCartsPage() {
   const fetchCart = async () => {
     try {
       const data = await getAllCartsAdmin();
-      setCarts(data);
+      console.log("API вернуло корзины:", data);
+
+      // Убедимся, что каждая корзина имеет cartItemsResponses
+    const updatedCarts = data.map(cart => ({
+      ...cart,
+      cartItemsResponses: cart.cartItemsResponses || [] // Если нет cartItemsResponses, делаем его пустым массивом
+    }));
+
+      setCarts(updatedCarts);
     } catch (err) {
       console.error(err);
       message.error("Произошла ошибка при загрузке корзин");
@@ -72,15 +80,14 @@ export default function AdminCartsPage() {
                 <p>
                   <strong>{cart.id}</strong>
                 </p>
-                <p>Дата и время создания: {cart.createAt.toString()}</p>
+                <p>Дата и время создания: {new Date(cart.createAt).toLocaleString()}</p>
                 <p>
-                  Дата и время последнего изменения:{" "}
-                  {cart.lastUpdate.toString()}
+                  Дата и время последнего изменения: {new Date(cart.lastUpdate).toLocaleString()}
                 </p>
                 <p>Общая сумма корзины: {cart.totalAmount}р</p>
                 <List
                   itemLayout="horizontal"
-                  dataSource={CartItemsResponses}
+                  dataSource={cart.cartItemsResponses || []} // Используем cartItemsResponses
                   renderItem={(item) => (
                     <List.Item>
                       <List.Item.Meta
@@ -102,27 +109,27 @@ export default function AdminCartsPage() {
                     </List.Item>
                   )}
                 />
-
+  
                 {/* Кнопки */}
                 <Button
-                      onClick={() => setEditingCart(cart)}
-                      style={{ marginRight: 8 }}
-                    >
-                      Редактировать
-                    </Button>
+                  onClick={() => setEditingCart(cart)}
+                  style={{ marginRight: 8 }}
+                >
+                  Редактировать
+                </Button>
                 <Button onClick={() => handleDelete(cart.id!)}>Удалить</Button>
               </div>
             </div>
           ))}
         </>
       )}
-
+  
       {editingCart && (
         <UpdateCartForm
           cart={editingCart}
           onSuccess={() => {
             setEditingCart(null);
-            fetchCart();
+            fetchCart(); // Перезагружаем корзины после редактирования
           }}
         />
       )}

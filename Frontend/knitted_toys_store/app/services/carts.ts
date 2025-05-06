@@ -121,8 +121,8 @@ export const updateCart = async (cartId: string, cartRequest: CartRequest): Prom
     return await response.json();
 };
 
-export const addToCart = async (idCart: string, idToy: string, quantity: number) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/AddToys?cartId=${idCart}&toyId=${idToy}&quantity=${quantity}`, {
+export const addToCart = async (cartId: string, idToy: string, quantity: number) => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/AddToys?cartId=${cartId}&toyId=${idToy}&quantity=${quantity}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -138,11 +138,17 @@ export const addToCart = async (idCart: string, idToy: string, quantity: number)
     return await response.json();
 };
 
-// export const removeFromCart = async (idCart: string, idToy: string) => {
-//     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/RemoveToy?cartId=${idCart}&toyId=${idToy}`, {
-//         method: "DELETE",
-//         headers: {
-//             "Content-Type": "application/json",
-//         },
-//         credentials: "include",
-//     });
+export const reduceQuantityItem = async (cartId: string, toyId: string) => {
+  try {
+    return await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Cart/ReduceQuantityItemAsync?cartId=${cartId}&toyId=${toyId}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",
+    });
+  } catch (err) {
+    console.error("Ошибка при удалении игрушки", err);
+    throw err;
+  }
+};

@@ -57,6 +57,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             // Загружаем корзину с включенными CartItems
             var entityCart = await _context.Carts
                 .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Toy)
                 .FirstOrDefaultAsync(c => c.Id == cart.Id);
 
             if (entityCart == null)
@@ -121,29 +122,59 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
         public async Task AddToCartAsync(Guid cartId, Guid toyId, int quantity) //добавить товар к уже существующему
         {
-            var entityCart = await _context.Carts
+            var cartWithItems = await _context.Carts
+                .AsNoTracking()
                 .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.Id == cartId);
 
-            if (entityCart == null)
+            if (cartWithItems == null)
                 throw new InvalidOperationException("Cart not found");
 
-            var toy = await _context.Toys.FirstOrDefaultAsync(t => t.Id == toyId);
+            var toy = await _context.Toys
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.Id == toyId);
+
             if (toy == null)
                 throw new InvalidOperationException("Toy not found");
 
-            var cart = _mapper.Map<Cart>(entityCart);
+            // Очищаем ChangeTracker для избежания конфликтов отслеживания
+            _context.ChangeTracker.Clear();
 
-            cart.UpdateItemQuantity(toyId, quantity);
+            // Загружаем корзину ещё раз, для редактирования
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.Id == cartId);
 
-            // Обновляем сущность из модели и сохраняем
-            var updatedEntity = _mapper.Map<CartEntity>(cart);
-            _context.Entry(entityCart).CurrentValues.SetValues(updatedEntity);
+            if (cart == null)
+                throw new InvalidOperationException("Cart not found after clearing context");
 
-            // Обновляем коллекцию CartItems вручную
-            entityCart.CartItems = updatedEntity.CartItems;
+            // Проверяем, есть ли уже эта игрушка в корзине
+            var existingItem = cart.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            if (existingItem != null)
+            {
+                existingItem.Quantity += quantity;
+            }
+            else
+            {
+                var newCartItems = CartItems.Create(cartId, toyId, quantity);
 
-            await _context.SaveChangesAsync();
+                var newCartItemsEntity = _mapper.Map<CartItemsEntity>(newCartItems);
+                _context.CartItems.Add(newCartItemsEntity);
+            }
+
+            // Обновляем общую сумму корзины
+            cart.LastUpdate = DateTime.UtcNow;
+            cart.TotalAmount = cart.CartItems.Sum(ci => ci.Quantity * (toy.Id == ci.ToyId ? toy.Price : 0));
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return; // Успех, выходим из метода
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                Console.WriteLine("Concurrency conflict, retrying...");
+            }
         }
 
         //public async Task AddToCartAsync(Guid cartId, Guid toyId, int quantity)
@@ -205,6 +236,12 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
             var updatedEntity = _mapper.Map<CartEntity>(cart);
             _context.Entry(entityCart).CurrentValues.SetValues(updatedEntity);
+
+            foreach (var item in updatedEntity.CartItems)
+            {
+                item.Toy = null;
+            }
+
             entityCart.CartItems = updatedEntity.CartItems;
 
             await _context.SaveChangesAsync();

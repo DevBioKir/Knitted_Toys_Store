@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Knitted_Toys_Store.Domain.Models.Domain
+﻿namespace Knitted_Toys_Store.Domain.Models.Domain
 {
     public class Cart
     {
@@ -51,39 +49,65 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
             TotalAmountUpdate();
         }
 
-        public void ReduceItemQuantity(Guid toyId)
+        public void ReduceItemQuantity(Guid toyId) //уменьшение количество товара в позиции на единицу
         {
             var item = CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
             if (item == null)
-                throw new InvalidOperationException("Item not found");
+                throw new InvalidOperationException
+                    ($"When you reduce the quantity of the item {toyId} you are looking for, the item itself was not found in the cart");
 
             if (item.Quantity > 1)
-            {
                 item.UpdateQuantity(item.Quantity - 1);
-            }
-            else
-            {
-                CartItems.Remove(item);
-            }
+            else CartItems.Remove(item);
 
             CartLastUpdate();
             TotalAmountUpdate();
         }
 
-        public void UpdateItemQuantity(Guid toyId, int quantityToAdd)// добавить к уже существующему
+        public void IncreaseItemQuantity(Guid toyId) //увеличение количества товара в позиции на единицу
         {
-            if(quantityToAdd < 0)
-                throw new ArgumentException("The number must be greater than 0");
-
-            var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId || ci.ToyId == toyId);
-
+            var item = CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
             if (item == null)
-                throw new InvalidOperationException("The toy was not found in the cart");
+                throw new InvalidOperationException
+                    ($"When you increace the quantity of the item{toyId} you are looking for, the item itself was not found in the cart");
 
-            item.UpdateQuantity(item.Quantity + quantityToAdd);
+            item.UpdateQuantity(item.Quantity + 1);
+
             CartLastUpdate();
             TotalAmountUpdate();
         }
+
+        public void UpdateItemQuantity(Guid toyId, int newQuantity)
+        {
+            var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId);
+
+            if (item == null) throw new InvalidOperationException("The toy was not found in the cart");
+
+            item.UpdateQuantity(item.Quantity + newQuantity);
+            CartLastUpdate();
+            TotalAmountUpdate();
+        }
+
+        //public void AddToItemQuantity(Guid cartId, Guid toyId, int quantityToAdd)// добавить к уже существующему
+        //{
+        //    if(quantityToAdd < 0)
+        //        throw new ArgumentException("The number must be greater than 0");
+
+        //    var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId || ci.ToyId == toyId);
+
+        //    if (item == null)
+        //    {
+        //        var newItem = CartItems.Create(cartId, toyId, quantityToAdd);
+        //        CartItems.Add(newItem);
+        //    }
+        //    else
+        //    {
+        //        item.UpdateQuantity(item.Quantity + quantityToAdd);
+        //    }
+
+        //    CartLastUpdate();
+        //    TotalAmountUpdate();
+        //}
 
         public void RemoveItem(Guid toyId)
         {

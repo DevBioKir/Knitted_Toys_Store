@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Knitted_Toys_Store.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class Knitted_Toys_StoreDB : Migration
+    public partial class Knitted_Toys_Store_DB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

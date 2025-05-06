@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Knitted_Toys_Store.DataAccess.Migrations
 {
     [DbContext(typeof(Knitted_Toys_StoreDBContext))]
-    [Migration("20250423095124_Knitted_Toys_Store.DB")]
-    partial class Knitted_Toys_StoreDB
+    [Migration("20250506140034_Knitted_Toys_Store_DB")]
+    partial class Knitted_Toys_Store_DB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
