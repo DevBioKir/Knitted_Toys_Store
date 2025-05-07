@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Knitted_Toys_Store.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize(Policy = "AdminOnly")]
     public class ImageUploadController : ControllerBase
     {
         private readonly ILogger<ImageUploadController> _logger;

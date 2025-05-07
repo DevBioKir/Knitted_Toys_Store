@@ -12,9 +12,11 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
     public class AdminToyController : ControllerBase
     {
         private readonly IToyService _toyService;
-        public AdminToyController(IToyService toyService)
+        private readonly IWebHostEnvironment _env;
+        public AdminToyController(IToyService toyService, IWebHostEnvironment env)
         {
             _toyService = toyService;
+            _env = env;
         }
 
         [HttpGet("{id:guid}")]
@@ -81,7 +83,20 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> DeleteToyAsync(Guid id)
         {
-            return Ok(await _toyService.DeleteToysAsync(id));
+            var toy = await _toyService.GetToyByIdAsync(id);
+            if (toy == null) return NotFound("Игрушка не найдена");
+
+            var imagePath = Path.Combine(_env.WebRootPath, toy.ImageUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+
+            await _toyService.DeleteToysAsync(id);
+
+            if (System.IO.File.Exists(imagePath))
+            {
+                System.IO.File.Delete(imagePath);
+            }
+
+            return Ok(new { message = "Игрушка и её изображение удалены." });
+
         }
     }
 }

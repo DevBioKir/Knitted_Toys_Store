@@ -1,15 +1,18 @@
 ﻿using Knitted_Toys_Store.Domain.Models.Domain;
 using Knitted_Toys_Store.DataAccess.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace Knitted_Toys_Store.App.Services
 {
     public class ToyService : IToyService
     {
         private readonly IToysRepositories _toyRepository;
+        private readonly ILogger<ToyService> _logger;
 
-        public ToyService(IToysRepositories toyRepository)
+        public ToyService(IToysRepositories toyRepository,ILogger<ToyService> logger)
         {
             _toyRepository = toyRepository;
+            _logger = logger;
         }
 
         public async Task<List<Toy>> GetAllToysAsync() //получение списка всех игрушек

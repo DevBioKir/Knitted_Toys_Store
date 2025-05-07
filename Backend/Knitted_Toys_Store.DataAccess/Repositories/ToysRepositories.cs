@@ -68,10 +68,6 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
                 .Where(t => t.Id == id)
                 .ExecuteDeleteAsync();
 
-            if (toy == null)
-            {
-                throw new ArgumentException("Toy not found.");
-            }
             await _context.SaveChangesAsync();
             return id;
         }
