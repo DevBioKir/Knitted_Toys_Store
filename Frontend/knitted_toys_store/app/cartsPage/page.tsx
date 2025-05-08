@@ -172,7 +172,7 @@ export default function CartPage() {
               okText="Да"
               cancelText="Нет"
             >
-              <Button danger>Оформить заказ</Button>
+              <Button>Оформить заказ</Button>
             </Popconfirm>
           </div>
         </>

@@ -35,10 +35,8 @@ export const ToyUploadPage = () => {
 
   return (
     <div className="container">
-      <h2>Загрузка игрушек</h2>
 
       <div className="upload-instructions">
-        <div className="left-side">
           <h3>Инструкция по загрузке</h3>
           <p>1. Создать папку с расширением .zip.</p>
           <p>
@@ -70,10 +68,10 @@ export const ToyUploadPage = () => {
             столбце Excel-файла «ImageFileName» указаны точные имена файлов с
             расширениями для каждого изображения игрушки.
           </p>
-          <p>5. Загружайте ZIP файл с игрушками и изображениями.</p>
+          <p>5. Загрузите ZIP файл с игрушками и изображениями.</p>
         </div>
 
-        <div className="right-side">
+        <div className="file-upload-section" style={{ marginTop: "0.3rem" }}>
           <h3>Загрузить ZIP файл</h3>
           <input type="file" accept=".zip" onChange={handleFileChange} />
           <button onClick={handleFileUpload} disabled={loading}>
@@ -82,8 +80,7 @@ export const ToyUploadPage = () => {
 
           {errorMessage && <p className="error-message">{errorMessage}</p>}
         </div>
-      </div>
-    </div>
+        </div>
   );
 };
 

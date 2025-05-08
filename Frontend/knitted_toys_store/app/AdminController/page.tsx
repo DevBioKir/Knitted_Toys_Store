@@ -41,7 +41,6 @@ export default function AdminPage() {
             children: (
               <div className="admin-add-container">
                 <div className="admin-add-left">
-                  <h2>Добавить вручную</h2>
                   <AddToyPage
                     onToyCreated={() => {
                       message.success("Игрушка успешно добавлена");

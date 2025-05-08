@@ -50,9 +50,12 @@ builder.Services.AddScoped<ICartRepositories, CartRepositories>();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AlowFrontend", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins(
+            "http://localhost:3000",
+            "http://192.168.251.61:3000"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -104,7 +107,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseCors("AlowFrontend");
+app.UseCors("AllowFrontend");
 
 
 app.UseHttpsRedirection();

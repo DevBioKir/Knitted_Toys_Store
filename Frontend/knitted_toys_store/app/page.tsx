@@ -1,8 +1,6 @@
-export default function Home() {
+import HomePage from "./components/Admin/Home/HomePage";
 
-  return (
-    <div>
-      <h1> Мягкие игрушки для всех</h1>
-    </div>
-  );
+
+export default function Page() {
+  return <HomePage />;
 }
