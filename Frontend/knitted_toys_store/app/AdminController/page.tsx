@@ -65,6 +65,11 @@ export default function AdminPage() {
             label: "Корзина",
             children: <AdminCartsPage />,
           },
+          {
+            key: "oreders",
+            label: "Заказы",
+            children: ,
+          }
         ]}
       />
     </div>

@@ -21,22 +21,13 @@ export const getAllCartsAdmin = async (): Promise<CartResponse[]> => {
 };
 
 export const getCartByIdAdmin = async (id: string): Promise<CartResponse> => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/${id}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(`Ошибка при получении корзины с ID ${id}`);
+  try{
+    const response = await adminAPI.get(`/AdminCart/${id}`);
+    return response.data;
+  } catch (err) {
+    console.error("Ошибка при поиске корзины с ID", err);
+    throw err;
   }
-
-  return response.json();
 };
 
 // Переменная для кэширования ID корзины
