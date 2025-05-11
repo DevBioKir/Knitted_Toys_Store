@@ -3,7 +3,6 @@ import { ToyRequest } from "../types/Toy/ToyRequest";
 import { Toy } from "../Models/Toy";
 import { Input, InputNumber, Upload, Button, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import type { UploadChangeParam } from "antd/es/upload";
 
 interface ToyFormProp {
   initialValues?: Toy;
@@ -27,17 +26,6 @@ export const ToyForm = ({ initialValues, onSubmit }: ToyFormProp) => {
     }
   }, [initialValues]);
 
-  // const handleUploadChange = (info: UploadChangeParam) => {
-  //   if (info.file.status === "done") {
-  //     const url = info.file.response?.filePath;
-  //     if (url) {
-  //       setImageUrl(url);
-  //       message.success("Изображение успешно загружено");
-  //     }
-  //   } else if (info.file.status === "error") {
-  //     message.error("Ошибка загрузки изображения");
-  //   }
-  // };
 
   const handleSubmit = () => {
     if (!imageUrl) {

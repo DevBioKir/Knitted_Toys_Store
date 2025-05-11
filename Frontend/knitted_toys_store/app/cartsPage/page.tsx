@@ -11,17 +11,20 @@ import {
   Space,
   Spin,
   Avatar,
+  Modal,
 } from "antd";
 import { addToCart, reduceQuantityItem, updateCart } from "../services/carts";
 import { CartRequest } from "../types/Cart/CartRequest";
 import { CartItemsRequest } from "../types/CartItems/CartItemsRequest";
 import { useCart } from "../context/CartProvider";
+import OrderCreateForm from "../components/OrderCreateForm";
 
 const { Title, Text } = Typography;
 
 export default function CartPage() {
   const { cart, refreshCart, isLoading } = useCart();
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Используем правильное поле из интерфейса CartResponse
   const CartItemsResponses = cart?.cartItemsResponses || [];
@@ -71,33 +74,33 @@ export default function CartPage() {
   };
 
   const handleAddExistingItem = async (toyId: string) => {
-      if (!cart) {
-        message.error("Корзина не найдена");
-        return;
-      }
-      try {
-        await addToCart(cart.id, toyId, 1); // по умолчанию quantity = 1
-        message.success("Товар добавлен в корзину");
-      } catch (error) {
-        console.error("Ошибка при добавлении в корзину:", error);
-        message.error("Не удалось добавить товар в корзину");
-      }
-    };
+    if (!cart) {
+      message.error("Корзина не найдена");
+      return;
+    }
+    try {
+      await addToCart(cart.id, toyId, 1); // по умолчанию quantity = 1
+      message.success("Товар добавлен в корзину");
+    } catch (error) {
+      console.error("Ошибка при добавлении в корзину:", error);
+      message.error("Не удалось добавить товар в корзину");
+    }
+  };
 
   const handleReduceQuantityItem = async (toyId: string) => {
-      if (!cart) {
-        message.error("ID корзины не найден");
-        return;
-      }
-  
-      try {
-        await reduceQuantityItem(cart.id, toyId);
-        message.success("Количество товара уменьшено");
-      } catch (error) {
-        console.error("Ошибка при уменьшении количества товара:", error);
-        message.error("Не удалось уменьшить количество товара");
-      }
-    };
+    if (!cart) {
+      message.error("ID корзины не найден");
+      return;
+    }
+
+    try {
+      await reduceQuantityItem(cart.id, toyId);
+      message.success("Количество товара уменьшено");
+    } catch (error) {
+      console.error("Ошибка при уменьшении количества товара:", error);
+      message.error("Не удалось уменьшить количество товара");
+    }
+  };
 
   const handleClearCart = () => {
     if (!cart) return;
@@ -135,8 +138,8 @@ export default function CartPage() {
                         size={300}
                         shape="square"
                         style={{
-                          border: '1px solid #f0f0f0', // лёгкая рамка
-                          objectFit: 'cover',
+                          border: "1px solid #f0f0f0", // лёгкая рамка
+                          objectFit: "cover",
                         }}
                       />
                     }
@@ -166,14 +169,25 @@ export default function CartPage() {
           />
           <div className="flex justify-between items-center mt-4">
             <Text strong>Итого: {cart?.totalAmount} ₽</Text>
-            <Popconfirm
-              title="Оформить заказ"
-              onConfirm={handleClearCart}
-              okText="Да"
-              cancelText="Нет"
+            <Button type="primary" onClick={() => setIsModalOpen(true)}>
+              Оформить заказ
+            </Button>
+
+            <Modal
+              title="Оформление заказа"
+              open={isModalOpen}
+              onCancel={() => setIsModalOpen(false)}
+              footer={null}
             >
-              <Button>Оформить заказ</Button>
-            </Popconfirm>
+              <OrderCreateForm
+                onOrderCreated={() => {
+                  message.success("Заказ создан");
+                  setIsModalOpen(false);
+                  refreshCart();
+                  handleClearCart(); // если хочешь очищать корзину после заказа
+                }}
+              />
+            </Modal>
           </div>
         </>
       ) : (

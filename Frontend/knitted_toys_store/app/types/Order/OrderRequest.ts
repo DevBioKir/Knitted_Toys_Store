@@ -3,9 +3,9 @@ import { OrderItemsRequest } from "../OrderItems/OrderItemsRequest";
 
 export interface OrderRequest{
     id?: string;
-    odredDate: string;
-    totalAmount: string;
-    status: OrderStatus;
+    odredDate?: Date;
+    totalAmount?: number;
+    status?: OrderStatus;
     surnameCustomer: string;
     nameCustomer: string;
     phoneNumber: string;

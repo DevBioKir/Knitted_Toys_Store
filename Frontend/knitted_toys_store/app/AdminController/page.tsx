@@ -1,7 +1,7 @@
 "use client";
 
 import { message, Tabs } from "antd";
-import AddToyPage from "../components/Admin/Toys/AddToys";
+import AddToyPageForm from "../components/Admin/Toys/AddToysForm";
 import { useEffect, useState } from "react";
 import AdminToysPage from "./Toys/AdminToys";
 import AdminCartsPage from "./Carts/AdminCarts";
@@ -41,7 +41,7 @@ export default function AdminPage() {
             children: (
               <div className="admin-add-container">
                 <div className="admin-add-left">
-                  <AddToyPage
+                  <AddToyPageForm
                     onToyCreated={() => {
                       message.success("Игрушка успешно добавлена");
                       setActiveTable("toys");
@@ -65,11 +65,11 @@ export default function AdminPage() {
             label: "Корзина",
             children: <AdminCartsPage />,
           },
-          {
-            key: "oreders",
-            label: "Заказы",
-            children: ,
-          }
+          // {
+          //   key: "oreders",
+          //   label: "Заказы",
+          //   children: ,
+          // }
         ]}
       />
     </div>

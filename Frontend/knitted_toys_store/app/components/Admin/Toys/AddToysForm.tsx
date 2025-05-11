@@ -9,11 +9,11 @@ import { useRouter } from "next/navigation";
 import { createToyAdmin, uploadImage } from "@/app/services/Admin/serviceToysAdmin";
 
 
-interface AddToyPageProp {
+interface Prop {
   onToyCreated?: () => void; 
 }
 
-export default function AddToyPage({ onToyCreated } : AddToyPageProp) {
+export default function AddToyPageForm({ onToyCreated } : Prop) {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [uploading, setUploading] = useState(false);
   const router = useRouter();
@@ -26,7 +26,7 @@ export default function AddToyPage({ onToyCreated } : AddToyPageProp) {
       if(onToyCreated){
         onToyCreated();
       }else{
-        router.push("/toys");
+        router.push("/toys");///тут он перенаправляет на страницу игрушек а не в админку
       }
     } catch (error) {
       console.error(error);
