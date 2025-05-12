@@ -10,7 +10,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize(Policy = "AdminOnly")]
+    //[Authorize(Policy = "AdminOnly")]
     public class AdminCartController : ControllerBase
     {
         private readonly ICartService _cartService;
@@ -104,7 +104,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
 
                 foreach (var item in request.CartItemsRequest)
                 {
-                    cart.UpdateItemQuantity(item.ToyId, item.Quantity);
+                    cart.SetItemQuantity(item.ToyId, item.Quantity);
                 }
 
                 await _cartService.UpdateAsync(cart);

@@ -7,6 +7,7 @@ import {
   deleteCartAdmin,
   getAllCartsAdmin
 } from "@/app/services/Admin/serviceCartsAdmin";
+import { CartResponse } from "@/app/types/Cart/CartResponse";
 import { Button, List, message } from "antd";
 import { useEffect, useState } from "react";
 
@@ -14,7 +15,7 @@ export default function AdminCartsPage() {
   const [carts, setCarts] = useState<Cart[]>([]);
   const [loading, setLoading] = useState(true);
   const { cart, refreshCart, isLoading } = useCart();
-  const [editingCart, setEditingCart] = useState<Cart | null>(null);
+  const [editingCart, setEditingCart] = useState<CartResponse | null>(null);
   //const [removedCart, setRemovedCart] = useState<Cart | null>(null);
 
   const CartItemsResponses = cart?.cartItemsResponses || [];

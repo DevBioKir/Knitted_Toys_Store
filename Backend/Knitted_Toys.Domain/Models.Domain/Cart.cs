@@ -79,7 +79,10 @@
 
         public void UpdateItemQuantity(Guid toyId, int newQuantity)
         {
-            var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId);
+            if (newQuantity < 0)
+                throw new ArgumentException("Quantity cannot be negative.");
+
+            var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId || ci.ToyId == toyId);
 
             if (item == null) throw new InvalidOperationException("The toy was not found in the cart");
 
