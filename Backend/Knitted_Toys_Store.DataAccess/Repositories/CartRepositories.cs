@@ -67,11 +67,11 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
             // Обновляем время и общую сумму корзины
             cart.CartLastUpdate();
-            cart.TotalAmountUpdate();
+            //cart.TotalAmountUpdate();
 
-            // Обновляем основные свойства корзины
-            entityCart.LastUpdate = cart.LastUpdate;
-            entityCart.TotalAmount = cart.TotalAmount;
+            //// Обновляем основные свойства корзины
+            //entityCart.LastUpdate = cart.LastUpdate;
+            //entityCart.TotalAmount = cart.TotalAmount;
 
             // Обрабатываем элементы корзины
             // 1. Удаляем элементы, которых нет в обновленной корзине
@@ -103,11 +103,78 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
                 }
             }
 
+            // Пересчитываем общую сумму после обработки всех элементов
+            cart.TotalAmountUpdate();
+
+            // Обновляем основные свойства корзины
+            entityCart.TotalAmount = cart.TotalAmount;
+            entityCart.LastUpdate = cart.LastUpdate;
+
             // Сохраняем изменения
             await _context.SaveChangesAsync();
 
             return entityCart.Id;
         }
+
+        //public async Task<Guid> UpdateAsync(Cart cart)
+        //{
+        //    // Очищаем ChangeTracker перед началом операции
+        //    _context.ChangeTracker.Clear();
+
+        //    // Загружаем корзину с включенными CartItems
+        //    var entityCart = await _context.Carts
+        //        .Include(c => c.CartItems)
+        //        .ThenInclude(ci => ci.Toy)
+        //        .FirstOrDefaultAsync(c => c.Id == cart.Id);
+
+        //    if (entityCart == null)
+        //    {
+        //        throw new InvalidOperationException($"Cart with ID {cart.Id} not found.");
+        //    }
+
+        //    // Обновляем время и общую сумму корзины
+        //    cart.CartLastUpdate();
+        //    cart.TotalAmountUpdate();
+
+        //    // Обновляем основные свойства корзины
+        //    entityCart.LastUpdate = cart.LastUpdate;
+        //    entityCart.TotalAmount = cart.TotalAmount;
+
+        //    // Обрабатываем элементы корзины
+        //    // 1. Удаляем элементы, которых нет в обновленной корзине
+        //    var itemsToRemove = entityCart.CartItems
+        //        .Where(existingItem => !cart.CartItems.Any(newItem => newItem.Id == existingItem.Id))
+        //        .ToList();
+
+        //    foreach (var itemToRemove in itemsToRemove)
+        //    {
+        //        _context.CartItems.Remove(itemToRemove);
+        //    }
+
+        //    // 2. Обновляем существующие элементы и добавляем новые
+        //    foreach (var newItem in cart.CartItems)
+        //    {
+        //        var existingItem = entityCart.CartItems.FirstOrDefault(ci => ci.Id == newItem.Id);
+
+        //        if (existingItem != null)
+        //        {
+        //            // Обновляем существующий элемент
+        //            existingItem.Quantity = newItem.Quantity;
+        //        }
+        //        else
+        //        {
+        //            // Добавляем новый элемент
+        //            var cartItems = CartItems.Create(cart.Id, newItem.ToyId, newItem.Quantity);
+        //            var entityCartItemsEntity = _mapper.Map<CartItemsEntity>(cartItems);
+        //            entityCart.CartItems.Add(entityCartItemsEntity);
+        //        }
+        //    }
+
+        //    // Сохраняем изменения
+        //    await _context.SaveChangesAsync();
+
+        //    return entityCart.Id;
+        //}
 
         public async Task<Guid> DeleteAsync(Guid cartId)
         {

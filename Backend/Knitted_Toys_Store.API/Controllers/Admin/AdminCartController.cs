@@ -83,6 +83,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Ошибка при обновлении корзины с ID {CartId}: {Message}", cartId, ex.Message);
                 return StatusCode(500, $"An error occurred while updating the cart: {ex.Message}");
             }
         }

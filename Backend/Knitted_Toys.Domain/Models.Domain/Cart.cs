@@ -82,35 +82,21 @@
             if (newQuantity < 0)
                 throw new ArgumentException("Quantity cannot be negative.");
 
-            var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId || ci.ToyId == toyId);
+            var item = CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
 
-            if (item == null) throw new InvalidOperationException("The toy was not found in the cart");
+            if (item == null)
+            {
+                var newItem = Domain.CartItems.Create(Id, toyId, newQuantity);
+                CartItems.Add(newItem);
+            }
+            else
+            {
+                item.UpdateQuantity(item.Quantity + newQuantity);
+            }
 
-            item.UpdateQuantity(item.Quantity + newQuantity);
             CartLastUpdate();
             TotalAmountUpdate();
         }
-
-        //public void AddToItemQuantity(Guid cartId, Guid toyId, int quantityToAdd)// добавить к уже существующему
-        //{
-        //    if(quantityToAdd < 0)
-        //        throw new ArgumentException("The number must be greater than 0");
-
-        //    var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId || ci.ToyId == toyId);
-
-        //    if (item == null)
-        //    {
-        //        var newItem = CartItems.Create(cartId, toyId, quantityToAdd);
-        //        CartItems.Add(newItem);
-        //    }
-        //    else
-        //    {
-        //        item.UpdateQuantity(item.Quantity + quantityToAdd);
-        //    }
-
-        //    CartLastUpdate();
-        //    TotalAmountUpdate();
-        //}
 
         public void RemoveItem(Guid toyId)
         {
