@@ -1,0 +1,129 @@
+﻿[TestClass]
+public class CartServiceTests : TestBase
+{
+    private ICartRepositories _cartRepositories;
+    private IMapper _mapper;
+    private ILogger<CartIdentifierMiddleware> _logger;
+    private CartService _cartService;
+
+    [TestInitialize]
+    public void Setup()
+    {
+        // Настраиваем InMemory Database через TestBase
+        _cartRepositories = new CartRepositories(_context);
+
+        // Настройка Mapster через TypeAdapterConfig
+        var config = TypeAdapterConfig.GlobalSettings;
+        config.NewConfig<CartItems, CartItemsEntity>()
+              .Map(dest => dest.Id, src => src.Id)
+              .Map(dest => dest.CartId, src => src.CartId)
+              .Map(dest => dest.ToyId, src => src.ToyId)
+              .Map(dest => dest.Quantity, src => src.Quantity)
+              .Map(dest => dest.Toy, src => src.Toy == null ? null : new ToyEntity
+              {
+                  Id = src.Toy.Id,
+                  Name = src.Toy.Name,
+                  Description = src.Toy.Description,
+                  Size = src.Toy.Size,
+                  Price = src.Toy.Price,
+                  ImageUrl = src.Toy.ImageUrl
+              });
+
+        _mapper = new MapsterMapper.Mapper(config);
+
+        // Создаем реальный CartService
+        _logger = Mock.Of<ILogger<CartIdentifierMiddleware>>();
+        _cartService = new CartService(_cartRepositories, _mapper, _logger);
+    }
+
+    [TestMethod]
+    public async Task UpdateCart_Should_UpdateCartItems_And_TotalAmount()
+    {
+        // Arrange
+        var cart = Cart.Create();
+        var toy1 = Toy.Create("Toy 1", "Description 1", "Small", 10.0m, "url1");
+        var toy2 = Toy.Create("Toy 2", "Description 2", "Medium", 20.0m, "url2");
+
+        _context.Toys.AddRange(toy1, toy2);
+        _context.SaveChanges();
+
+        cart.CartItems.Add(CartItems.Create(cart.Id, toy1.Id, 2));
+        _context.Carts.Add(cart);
+        _context.SaveChanges();
+
+        // Act
+        cart.CartItems.Add(CartItems.Create(cart.Id, toy2.Id, 3)); // Добавляем новый товар
+        await _cartService.UpdateAsync(cart);
+
+        // Assert
+        var updatedCart = await _context.Carts
+            .Include(c => c.CartItems)
+            .ThenInclude(ci => ci.Toy)
+            .FirstOrDefaultAsync(c => c.Id == cart.Id);
+
+        Assert.IsNotNull(updatedCart);
+        Assert.AreEqual(2, updatedCart.CartItems.Count);
+        Assert.AreEqual(2 * toy1.Price + 3 * toy2.Price, updatedCart.TotalAmount);
+    }
+}
+
+
+
+
+using Moq;
+using Microsoft.Extensions.Logging;
+using Xunit;
+using System;
+using System.Threading.Tasks;
+using Knitted_Toys_Store.Services;
+using Knitted_Toys_Store.Models;
+using Knitted_Toys_Store.Interfaces;
+using MapsterMapper;
+
+public class CartServiceTests
+{
+    private readonly Mock<ICartRepositories> _mockCartRepository;
+    private readonly Mock<IMapper> _mockMapper;
+    private readonly Mock<ILogger<CartIdentifierMiddleware>> _mockLogger;
+    private readonly CartService _cartService;
+
+    public CartServiceTests()
+    {
+        _mockCartRepository = new Mock<ICartRepositories>();
+        _mockMapper = new Mock<IMapper>();
+        _mockLogger = new Mock<ILogger<CartIdentifierMiddleware>>();
+
+        _cartService = new CartService(_mockCartRepository.Object, _mockMapper.Object, _mockLogger.Object);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldUpdateCartCorrectly()
+    {
+        // Arrange
+        var cart = Cart.Create();
+        var updatedCart = Cart.Create();
+
+        _mockCartRepository.Setup(r => r.UpdateAsync(It.IsAny<Cart>())).ReturnsAsync(updatedCart.Id);
+        _mockMapper.Setup(m => m.Map<Cart>(It.IsAny<Cart>())).Returns(updatedCart);
+
+        // Act
+        var result = await _cartService.UpdateAsync(cart);
+
+        // Assert
+        _mockCartRepository.Verify(r => r.UpdateAsync(It.IsAny<Cart>()), Times.Once);
+        Assert.Equal(updatedCart.Id, result);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldThrowException_WhenCartNotFound()
+    {
+        // Arrange
+        _mockCartRepository.Setup(r => r.UpdateAsync(It.IsAny<Cart>())).ThrowsAsync(new InvalidOperationException("Cart not found."));
+
+        var cart = Cart.Create();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _cartService.UpdateAsync(cart));
+        _mockCartRepository.Verify(r => r.UpdateAsync(It.IsAny<Cart>()), Times.Once);
+    }
+}

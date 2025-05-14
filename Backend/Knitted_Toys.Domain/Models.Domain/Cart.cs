@@ -26,13 +26,21 @@
         {
             LastUpdate = DateTime.UtcNow;
         }
+        
         public void TotalAmountUpdate()
         {
-            if (CartItems.Any(item => item.Toy == null))
-                throw new InvalidOperationException("The toys are not loaded!");
-
-            TotalAmount = CartItems.Sum(item => item.Quantity * item.Toy.Price);
+            TotalAmount = CartItems
+                .Where(item => item.Toy != null)
+                .Sum(item => item.Quantity * item.Toy.Price);
         }
+        
+        //public void TotalAmountUpdate()
+        //{
+        //    if (CartItems.Any(item => item.Toy == null))
+        //        throw new InvalidOperationException("The toys are not loaded!");
+
+        //    TotalAmount = CartItems.Sum(item => item.Quantity * item.Toy.Price);
+        //}
 
         public void SetItemQuantity(Guid toyId, int quantity) //если надо полностью обновить корзину точным значением
         {

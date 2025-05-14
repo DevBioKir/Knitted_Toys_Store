@@ -67,11 +67,6 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
             // Обновляем время и общую сумму корзины
             cart.CartLastUpdate();
-            //cart.TotalAmountUpdate();
-
-            //// Обновляем основные свойства корзины
-            //entityCart.LastUpdate = cart.LastUpdate;
-            //entityCart.TotalAmount = cart.TotalAmount;
 
             // Обрабатываем элементы корзины
             // 1. Удаляем элементы, которых нет в обновленной корзине
@@ -99,12 +94,20 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
                     // Добавляем новый элемент
                     var cartItems = CartItems.Create(cart.Id, newItem.ToyId, newItem.Quantity);
                     var entityCartItemsEntity = _mapper.Map<CartItemsEntity>(cartItems);
+
+                    var toy = await _context.Toys.FindAsync(newItem.ToyId);
+                    if (toy == null)
+                        throw new InvalidOperationException("Toy not found!");
+
+                    entityCartItemsEntity.Toy = toy;
                     entityCart.CartItems.Add(entityCartItemsEntity);
                 }
             }
 
             // Пересчитываем общую сумму после обработки всех элементов
-            cart.TotalAmountUpdate();
+            entityCart.TotalAmount = entityCart.CartItems
+               .Where(item => item.Toy != null)
+               .Sum(item => item.Quantity * item.Toy.Price);
 
             // Обновляем основные свойства корзины
             entityCart.TotalAmount = cart.TotalAmount;
@@ -417,6 +420,14 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
                 .Sum(ci => ci.Quantity * (toys.ContainsKey(ci.ToyId) ? toys[ci.ToyId] : 0));
 
             await _context.SaveChangesAsync();
+        }
+
+        private async Task<CartEntity?> LoadCartWithItems(Guid cartId)
+        {
+            return await _context.Carts
+                .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Toy)
+                .FirstOrDefaultAsync(c => c.Id == cartId);
         }
     }
 }
