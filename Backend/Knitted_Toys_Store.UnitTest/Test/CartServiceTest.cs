@@ -32,13 +32,5 @@ namespace Knitted_Toys_Store.UnitTest.Test
             _CartService = new CartService(_mockCartRepository.Object, _mockMapper.Object, _mockLogger.Object);
 
         }
-
-        protected override void SeedData()
-        {
-            var cart = Cart.Create();
-            var entityCart = _mockMapper.Map<CartEntity>(cart);
-            _dbContext.Carts.Add(cart);
-        }
-
     }
 }

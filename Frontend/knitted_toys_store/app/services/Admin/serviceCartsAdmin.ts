@@ -20,9 +20,9 @@ export const getAllCartsAdmin = async (): Promise<CartResponse[]> => {
   }
 };
 
-export const getCartByIdAdmin = async (id: string): Promise<CartResponse> => {
+export const getCartByIdAdmin = async (cartId: string): Promise<CartResponse> => {
   try{
-    const response = await adminAPI.get(`/AdminCart/${id}`);
+    const response = await adminAPI.get(`/AdminCart/${cartId}`);
     return response.data;
   } catch (err) {
     console.error("Ошибка при поиске корзины с ID", err);
@@ -60,13 +60,6 @@ export const getCurrentCartAdmin = async (): Promise<CartResponse> => {
         t: Date.now(), // обходим кеширование через URL
       },
     });
-
-    // const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/Current`, {
-    //     method: "GET",
-    //     headers: { "Content-Type": "application/json" },
-    //     credentials: "include",
-    //     cache: "no-store"
-    // });
 
     // Получаем сырые данные
     const rawData = response.data;
@@ -133,12 +126,12 @@ export const updateCartAdmin = async (
 };
 
 export const addToCart = async (
-  idCart: string,
-  idToy: string,
+  cartId: string,
+  toyId: string,
   quantity: number
 ) => {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/AddToys?cartId=${idCart}&toyId=${idToy}&quantity=${quantity}`,
+    `${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/AddToys?cartId=${cartId}&toyId=${toyId}&quantity=${quantity}`,
     {
       method: "POST",
       headers: {
@@ -156,10 +149,10 @@ export const addToCart = async (
   return await response.json();
 };
 
-export const reduceQuantityItem = async(cartId: string, idToy: string) => {
+export const reduceQuantityItem = async(cartId: string, toyId: string) => {
   try {
     await adminAPI.delete(
-      `/AdminCart/ReduceQuantityItemAsync?cartId=${cartId}&toyId=${idToy}`
+      `/AdminCart/ReduceQuantityItemAsync?cartId=${cartId}&toyId=${toyId}`
     );
   } catch (err) {
     console.error("Ошибка при удалении игрушки", err);
@@ -167,19 +160,19 @@ export const reduceQuantityItem = async(cartId: string, idToy: string) => {
   }
 };
 
-export const deleteCartAdmin = async (idCart: string) => {
+export const deleteCartAdmin = async (cartId: string) => {
   try {
-    await adminAPI.delete(`/AdminCart/DeleteCartAsync?id=${idCart}`);
+    await adminAPI.delete(`/AdminCart/DeleteCartAsync?id=${cartId}`);
   } catch (err) {
     console.error("Ошибка при удалении игрушки", err);
     throw err;
   }
 };
 
-export const removeFromCart = async (idCart: string, idToy: string) => {
+export const removeFromCart = async (cartId: string, toyId: string) => {
   try {
     await adminAPI.delete(
-      `/AdminCart/RemoveItemFromCart?cartId=${idCart}&toyId=${idToy}`
+      `/AdminCart/RemoveItemFromCart?cartId=${cartId}&toyId=${toyId}`
     );
   } catch (err) {
     console.error("Ошибка при удалении товара из корзины", err);

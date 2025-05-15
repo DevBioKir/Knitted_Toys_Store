@@ -1,0 +1,24 @@
+﻿public async Task ReduceQuantityItemAsync(Guid cartId, Guid toyId) //уменьшение товара на единицу
+        {
+            var entityCart = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.Id == cartId);
+
+            if (entityCart == null)
+                throw new InvalidOperationException("Cart not found");
+
+            var cart = _mapper.Map<Cart>(entityCart);
+            cart.ReduceItemQuantity(toyId);
+
+            var updatedEntity = _mapper.Map<CartEntity>(cart);
+            _context.Entry(entityCart).CurrentValues.SetValues(updatedEntity);
+
+            foreach (var item in updatedEntity.CartItems)
+            {
+                item.Toy = null;
+            }
+
+            entityCart.CartItems = updatedEntity.CartItems;
+
+            await _context.SaveChangesAsync();
+        }

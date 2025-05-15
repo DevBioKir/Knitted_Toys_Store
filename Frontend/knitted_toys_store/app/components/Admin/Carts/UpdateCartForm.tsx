@@ -3,11 +3,10 @@
 import { Button, Form, Input, InputNumber, message, Select, Space, Divider, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { CartRequest } from "@/app/types/Cart/CartRequest";
-import { reduceQuantityItem, removeFromCart, updateCartAdmin } from "@/app/services/Admin/serviceCartsAdmin";
+import { addToCart, reduceQuantityItem, removeFromCart, updateCartAdmin } from "@/app/services/Admin/serviceCartsAdmin";
 import { getAllToysAdmin } from "@/app/services/Admin/serviceToysAdmin";
 import { ToyResponse } from "@/app/types/Toy/ToyResponse";
 import { CartResponse } from "@/app/types/Cart/CartResponse";
-import { addToCart } from "@/app/services/carts";
 
 interface Props {
   cart: CartResponse;
