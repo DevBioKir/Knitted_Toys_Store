@@ -49,8 +49,6 @@ namespace Knitted_Toys_Store.Infrastructure.Middleware
                 {
                     _logger.LogWarning($"CartIdentifierMiddleware: Корзина с ID {cartId} не найдена в базе данных");
 
-                    // ВАЖНОЕ ИЗМЕНЕНИЕ: Не создаем новую корзину здесь, если это запрос /Cart/Current
-                    // Пусть контроллер создаст корзину
                     if (!isGetCartRequest)
                     {
                         _logger.LogInformation("CartIdentifierMiddleware: Это не запрос /Cart/Current, создаем новую корзину");
@@ -59,7 +57,7 @@ namespace Knitted_Toys_Store.Infrastructure.Middleware
                     }
                 }
             }
-            else if (!isGetCartRequest) // Создаем корзину только если это НЕ запрос /Cart/Current
+            else if (!isGetCartRequest)
             {
                 _logger.LogInformation("CartIdentifierMiddleware: ID корзины не найден в cookie, создаем новую корзину");
                 var newCartId = await CreateNewCartAsync(cartService, context);

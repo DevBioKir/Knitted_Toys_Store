@@ -265,56 +265,39 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
         public async Task AddToCartAsync(Guid cartId, Guid toyId, int quantity)
         {
-            // Очищаем ChangeTracker
-            _context.ChangeTracker.Clear();
-
-            // Загружаем корзину и ВСЕ связанные CartItems и Toys
             var cartEntity = await _context.Carts
                 .Include(c => c.CartItems)
-                .ThenInclude(ci => ci.Toy)
                 .FirstOrDefaultAsync(c => c.Id == cartId);
 
             if (cartEntity == null)
                 throw new InvalidOperationException("Cart not found");
 
-            // Пытаемся найти нужный CartItem (уже с Toy, если он был загружен)
-            var cartItemEntity = cartEntity.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            var toyEntity = await _context.Toys.FirstOrDefaultAsync(t => t.Id == toyId);
 
-            ToyEntity toyEntity;
+            if (toyEntity == null)
+                throw new InvalidOperationException("Toy not found");
 
-            if (cartItemEntity != null && cartItemEntity.Toy != null)
-            {
-                toyEntity = cartItemEntity.Toy;
-            }
-            else
-            {
-                toyEntity = await _context.Toys.FindAsync(toyId);
-                if (toyEntity == null)
-                    throw new InvalidOperationException("Toy not found");
-            }
-
-            // Маппинг Entity -> Domain
             var cart = _mapper.Map<Cart>(cartEntity);
-            var toy = _mapper.Map<Toy>(toyEntity);
 
-            // Добавляем или обновляем позицию
             var existingItem = cart.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
             if (existingItem != null)
             {
-                existingItem.UpdateQuantity(existingItem.Quantity + quantity);
+                existingItem.UpdateQuantity(/*existingItem.Quantity +*/ quantity);
             }
             else
             {
                 var newCartItem = CartItems.Create(cart.Id, toyId, quantity);
-                //newCartItem.SetToy(toy);
-                cart.CartItems.Add(newCartItem);
+                var newCartItemsEntity = _mapper.Map<CartItemsEntity>(newCartItem);
+                _context.CartItems.Add(newCartItemsEntity);
             }
 
-            cart.CartLastUpdate();
             cart.TotalAmountUpdate();
+            cart.CartLastUpdate();
 
-            // Обратный маппинг
-            _mapper.Map(cart, cartEntity);
+            var updatedCartEntity = _mapper.Map<CartEntity>(cart);
+
+            _context.Entry(cartEntity).CurrentValues.SetValues(updatedCartEntity);
+            _context.Entry(cartEntity).Collection(c => c.CartItems).IsModified = true;
 
             await _context.SaveChangesAsync();
         }
