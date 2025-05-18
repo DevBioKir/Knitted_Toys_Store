@@ -141,14 +141,21 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
         public async Task<ActionResult<CartItemsResponse>> AddToCartAsync(Guid cartId, Guid toyId,
             int quantity)
         {
-            var cart = await _cartService.GetCartByIdAsync(cartId);
-            Console.WriteLine(cart.RowVersion);
+            try
+            {
+                var cart = await _cartService.GetCartByIdAsync(cartId);
 
-            if (cart == null) return NotFound($"Cart with ID {cartId} not found.");
+                if (cart == null) return NotFound($"Cart with ID {cartId} not found.");
 
-            var cartItem = await _cartService.AddToCartAsync(cartId, toyId, quantity);
+                var cartItem = await _cartService.AddToCartAsync(cartId, toyId, quantity);
 
-            return Ok(cartItem);
+
+                return Ok(cartItem);
+            }
+            catch (Exception err)
+            {
+                return BadRequest(err.ToString());
+            }
         }
 
         [HttpDelete("RemoveItemFromCart")] //удаление позиции в корзине полностью

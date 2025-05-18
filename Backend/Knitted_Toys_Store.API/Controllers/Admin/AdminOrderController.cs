@@ -54,5 +54,14 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
 
             return Ok(order);
         }
+
+        //[HttpDelete]
+        //public async Task<ActionResult<OrderResponse>> RemoveOrderAsync(Guid orderId)
+        //{
+        //    try
+        //    {
+        //        v
+        //    }
+        //}
     }
 }

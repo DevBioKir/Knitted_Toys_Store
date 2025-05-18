@@ -21,7 +21,8 @@ namespace Knitted_Toys_Store.DataAccess.Configurations
             
             builder.HasMany(o => o.OrderItems)
                 .WithOne(oi => oi.Order)
-                .HasForeignKey(oi => oi.OrderId);
+                .HasForeignKey(oi => oi.OrderId)
+                .OnDelete(DeleteBehavior.Cascade); //если удален заказ, то удаляются OrderItems
         }
     }
 }

@@ -41,5 +41,13 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
         {
             Toy = toy ?? throw new ArgumentNullException(nameof(toy), "Toy cannot be null");
         }
+
+        //public void RecalculateCartTotalAmount()
+        //{
+        //    if (Cart == null)
+        //        throw new InvalidOperationException("Cart is not assigned to this CartItem.");
+
+        //    Cart.TotalAmountUpdate();
+        //}
     }
 }

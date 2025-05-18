@@ -6,6 +6,8 @@ namespace Knitted_Toys_Store.App.Services
     public interface ICartService
     {
         Task<Guid> AddToCartAsync(Guid cartId, Guid toyId, int quantity);
+        //Task<Guid> AddToCartAsync(Guid cartId, Guid toyId, int quantity);
+        //Task<Guid> CreateToysInCartItems(Guid cartId, Guid toyId, int quantity);
         Task<Cart> CreateCartAsync();
         Task<Guid> DeleteCartAsync(Guid id);
         Task<List<Cart>> GetAllCarts();

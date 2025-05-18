@@ -67,3 +67,73 @@
 
             return entityCart.Id;
         }
+
+
+
+
+
+        public async Task ReduceQuantityItemAsync(Guid cartId, Guid toyId) //уменьшение товара на единицу
+        {
+            var entityCart = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.Id == cartId);
+
+            if (entityCart == null)
+                throw new InvalidOperationException("Cart not found");
+
+            var cart = _mapper.Map<Cart>(entityCart);
+            cart.ReduceItemQuantity(toyId);
+
+            var updatedEntity = _mapper.Map<CartEntity>(cart);
+            _context.Entry(entityCart).CurrentValues.SetValues(updatedEntity);
+
+            foreach (var item in updatedEntity.CartItems)
+            {
+                item.Toy = null;
+            }
+
+            entityCart.CartItems = updatedEntity.CartItems;
+
+            await _context.SaveChangesAsync();
+        }
+
+
+
+        public async Task AddToCartAsync(Guid cartId, Guid toyId, int quantity)
+        {
+            var cartEntity = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.Id == cartId);
+
+            if (cartEntity == null)
+                throw new InvalidOperationException("Cart not found");
+
+            var toyEntity = await _context.Toys.FirstOrDefaultAsync(t => t.Id == toyId);
+
+            if (toyEntity == null)
+                throw new InvalidOperationException("Toy not found");
+
+            var cart = _mapper.Map<Cart>(cartEntity);
+
+            var existingItem = cart.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            if (existingItem != null)
+            {
+                existingItem.UpdateQuantity(/*existingItem.Quantity +*/ quantity);
+            }
+            else
+            {
+                var newCartItem = CartItems.Create(cart.Id, toyId, quantity);
+                var newCartItemsEntity = _mapper.Map<CartItemsEntity>(newCartItem);
+                _context.CartItems.Add(newCartItemsEntity);
+            }
+
+            cart.TotalAmountUpdate();
+            cart.CartLastUpdate();
+
+            var updatedCartEntity = _mapper.Map<CartEntity>(cart);
+
+            _context.Entry(cartEntity).CurrentValues.SetValues(updatedCartEntity);
+            _context.Entry(cartEntity).Collection(c => c.CartItems).IsModified = true;
+
+            await _context.SaveChangesAsync();
+        }

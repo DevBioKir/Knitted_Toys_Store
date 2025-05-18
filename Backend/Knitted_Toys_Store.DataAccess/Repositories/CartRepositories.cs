@@ -265,41 +265,73 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
         public async Task AddToCartAsync(Guid cartId, Guid toyId, int quantity)
         {
-            var cartEntity = await _context.Carts
+            var entityCart = await _context.Carts
+                .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Toy)
+                .FirstOrDefaultAsync(c => c.Id == cartId);
+
+            var existingItem = entityCart.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            if (existingItem != null)
+            {
+                await AddToyAsync(cartId, toyId, quantity);
+            }
+            else if (existingItem == null)
+            {
+                await CreateToysInCartItems(cartId, toyId, quantity);
+            }
+        }
+        
+        
+        private async Task AddToyAsync(Guid cartId, Guid toyId, int quantity)
+        {
+            try
+            {
+                var entityCart = await _context.Carts
                 .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.Id == cartId);
 
-            if (cartEntity == null)
-                throw new InvalidOperationException("Cart not found");
+                var cart = _mapper.Map<Cart>(entityCart);
+                cart.IncreaseItemQuantity(toyId);
 
-            var toyEntity = await _context.Toys.FirstOrDefaultAsync(t => t.Id == toyId);
+                var updatedEntity = _mapper.Map<CartEntity>(cart);
+                _context.Entry(entityCart).CurrentValues.SetValues(updatedEntity);
 
-            if (toyEntity == null)
-                throw new InvalidOperationException("Toy not found");
+                foreach (var item in updatedEntity.CartItems)
+                {
+                    item.Toy = null;
+                }
+                entityCart.CartItems = updatedEntity.CartItems;
 
-            var cart = _mapper.Map<Cart>(cartEntity);
-
-            var existingItem = cart.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
-            if (existingItem != null)
-            {
-                existingItem.UpdateQuantity(/*existingItem.Quantity +*/ quantity);
+                await _context.SaveChangesAsync();
             }
-            else
+            catch (Exception err)
             {
-                var newCartItem = CartItems.Create(cart.Id, toyId, quantity);
-                var newCartItemsEntity = _mapper.Map<CartItemsEntity>(newCartItem);
-                _context.CartItems.Add(newCartItemsEntity);
+                throw new Exception($"Ошибка при добавлении игрушки в позицию в корзине: {err.Message}", err);
             }
+        }
 
-            cart.TotalAmountUpdate();
-            cart.CartLastUpdate();
+        private async Task CreateToysInCartItems(Guid cartId, Guid toyId, int quantity)
+        {
+            try
+            {
+                var entityCart = await _context.Carts
+                    .Include(c => c.CartItems)
+                    .FirstOrDefaultAsync(c => c.Id == cartId);
+                var cart = _mapper.Map<Cart>(entityCart);
 
-            var updatedCartEntity = _mapper.Map<CartEntity>(cart);
+                var newCartItem = CartItems.Create(cartId, toyId, quantity);
+                var newCartItemEntity = _mapper.Map<CartItemsEntity>(newCartItem);
+                _context.CartItems.Add(newCartItemEntity);
 
-            _context.Entry(cartEntity).CurrentValues.SetValues(updatedCartEntity);
-            _context.Entry(cartEntity).Collection(c => c.CartItems).IsModified = true;
+                cart.CartLastUpdate();
+                cart.TotalAmountUpdate();
 
-            await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception err)
+            {
+                throw new Exception($"Ошибка при создании позиции в корзине: {err.Message}", err);
+            }
         }
 
 
