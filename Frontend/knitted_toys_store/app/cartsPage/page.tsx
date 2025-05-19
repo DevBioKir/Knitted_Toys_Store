@@ -79,6 +79,7 @@ export default function CartPage() {
     }
     try {
       await addToCart(cart.id, toyId, 1); // по умолчанию quantity = 1
+      refreshCart();
       message.success("Товар добавлен в корзину");
     } catch (error) {
       console.error("Ошибка при добавлении в корзину:", error);
@@ -94,6 +95,7 @@ export default function CartPage() {
 
     try {
       await reduceQuantityItem(cart.id, toyId);
+      refreshCart();
       message.success("Количество товара уменьшено");
     } catch (error) {
       console.error("Ошибка при уменьшении количества товара:", error);

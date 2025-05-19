@@ -20,8 +20,10 @@ export const getAllCartsAdmin = async (): Promise<CartResponse[]> => {
   }
 };
 
-export const getCartByIdAdmin = async (cartId: string): Promise<CartResponse> => {
-  try{
+export const getCartByIdAdmin = async (
+  cartId: string
+): Promise<CartResponse> => {
+  try {
     const response = await adminAPI.get(`/AdminCart/${cartId}`);
     return response.data;
   } catch (err) {
@@ -130,26 +132,17 @@ export const addToCart = async (
   toyId: string,
   quantity: number
 ) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/AdminCart/AddToys?cartId=${cartId}&toyId=${toyId}&quantity=${quantity}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    }
-  );
-
-  if (!response.ok) {
-    await response.text();
-    throw new Error("Ошибка при добавлении игрушки в корзину");
+  try {
+    const response = await adminAPI.post(
+      `/AdminCart/AddToys?cartId=${cartId}&toyId=${toyId}&quantity=${quantity}`
+    );
+  } catch (err) {
+    console.error("Ошибка при удалении игрушки", err);
+    throw err;
   }
-
-  return await response.json();
 };
 
-export const reduceQuantityItem = async(cartId: string, toyId: string) => {
+export const reduceQuantityItem = async (cartId: string, toyId: string) => {
   try {
     await adminAPI.delete(
       `/AdminCart/ReduceQuantityItemAsync?cartId=${cartId}&toyId=${toyId}`

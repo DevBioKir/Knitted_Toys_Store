@@ -81,14 +81,20 @@ namespace Knitted_Toys_Store.API.Controllers
         public async Task<ActionResult<CartItemsResponse>> AddToCartAsync(Guid cartId, Guid toyId, 
             int quantity)
         {
+            try
+            {
                 var cart = await _cartService.GetCartByIdAsync(cartId);
-                Console.WriteLine(cart.RowVersion);
 
                 if (cart == null) return NotFound($"Cart with ID {cartId} not found.");
 
                 var cartItem = await _cartService.AddToCartAsync(cartId, toyId, quantity);
 
                 return Ok(cartItem);
+            }
+            catch (Exception err)
+            {
+                return BadRequest(err.ToString());
+            }
         }
 
         [HttpDelete("ReduceQuantityItemAsync")] //уменьшить количество товара в позиции

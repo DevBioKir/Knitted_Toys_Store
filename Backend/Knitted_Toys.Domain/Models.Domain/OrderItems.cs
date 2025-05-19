@@ -1,4 +1,6 @@
-﻿namespace Knitted_Toys_Store.Domain.Models.Domain
+﻿using System.Security.Cryptography.X509Certificates;
+
+namespace Knitted_Toys_Store.Domain.Models.Domain
 {
     public class OrderItems
     {
@@ -11,17 +13,6 @@
         public Order Order { get; private set; } //ссылка на Orders
         public Toy Toy { get; private set; } //ссылка на Toy
         //добавить дату создания заказа
-
-        //private OrderItems() { } // пустой конструктор для EF Core
-
-        //private OrderItems(Guid orderId, Guid toyId, int quantity, decimal priceAtTime)
-        //{
-        //    Id = Guid.NewGuid();
-        //    OrderId = orderId;
-        //    ToyId = toyId;
-        //    Quantity = quantity;
-        //    PriceAtTime = priceAtTime;
-        //}
 
         public static OrderItems Create(Guid orderId, Guid toyId, int quantity, decimal priceAtTime)
         {
@@ -39,6 +30,13 @@
                 Quantity = quantity,
                 PriceAtTime = priceAtTime
             };
+        }
+        public void UpdateQuantity(int newQuantity)
+        {
+            if(newQuantity <= 0) 
+                throw new ArgumentException("The number must be greater than 0");
+
+            Quantity = newQuantity;
         }
     }
 }

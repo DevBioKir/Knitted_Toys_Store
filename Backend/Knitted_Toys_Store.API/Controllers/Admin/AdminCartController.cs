@@ -10,7 +10,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
 {
     [ApiController]
     [Route("[controller]")]
-    //[Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "AdminOnly")]
     public class AdminCartController : ControllerBase
     {
         private readonly ICartService _cartService;
@@ -148,7 +148,6 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
                 if (cart == null) return NotFound($"Cart with ID {cartId} not found.");
 
                 var cartItem = await _cartService.AddToCartAsync(cartId, toyId, quantity);
-
 
                 return Ok(cartItem);
             }

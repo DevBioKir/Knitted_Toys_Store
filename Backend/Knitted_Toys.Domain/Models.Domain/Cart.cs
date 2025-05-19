@@ -56,6 +56,18 @@
             CartLastUpdate();
             TotalAmountUpdate();
         }
+        public void IncreaseItemQuantity(Guid toyId) //увеличение количества товара в позиции на единицу
+        {
+            var item = CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            if (item == null)
+                throw new InvalidOperationException
+                    ($"When you increace the quantity of the item{toyId} you are looking for, the item itself was not found in the cart");
+
+            item.UpdateQuantity(item.Quantity + 1);
+            
+            CartLastUpdate();
+            TotalAmountUpdate();
+        }
 
         public void ReduceItemQuantity(Guid toyId) //уменьшение количество товара в позиции на единицу
         {
@@ -67,19 +79,6 @@
             if (item.Quantity > 1)
                 item.UpdateQuantity(item.Quantity - 1);
             else CartItems.Remove(item);
-
-            CartLastUpdate();
-            TotalAmountUpdate();
-        }
-
-        public void IncreaseItemQuantity(Guid toyId) //увеличение количества товара в позиции на единицу
-        {
-            var item = CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
-            if (item == null)
-                throw new InvalidOperationException
-                    ($"When you increace the quantity of the item{toyId} you are looking for, the item itself was not found in the cart");
-
-            item.UpdateQuantity(item.Quantity + 1);
 
             CartLastUpdate();
             TotalAmountUpdate();

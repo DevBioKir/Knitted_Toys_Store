@@ -26,7 +26,6 @@
 
         public List<OrderItems> OrderItems { get; private set; } = []; //у одного заказа может быть много товаров
 
-        //private Order() { }
         public static Order Create(
             string surname, string name, string phone, string email, string deliveryAddress,
             string deliveryNotes, List<OrderItems> orderItems)
@@ -60,6 +59,46 @@
         public void UpdateStatus(OrderStatus newStatus)
         {
             Status = newStatus;
+        }
+
+        public void TotalAmountUpdate()
+        {
+            TotalAmount = OrderItems
+                .Where(item => item.Toy != null)
+                .Sum(item => item.Quantity + item.Toy.Price);
+        }
+
+        public void IncreaseItemQuantity(Guid toyId)
+        {
+            var item = OrderItems.FirstOrDefault(oi => oi.ToyId == toyId);
+
+            if (item == null)
+                throw new InvalidOperationException
+                        ($"When you increace the quantity of the item{toyId} you are looking for, the item itself was not found in the order");
+
+            item.UpdateQuantity(item.Quantity + 1);
+
+            TotalAmountUpdate();
+        }
+
+        public void ReduceItemQuantity(Guid toyId)
+        {
+            var item = OrderItems.FirstOrDefault(oi => oi.ToyId == toyId);
+
+            if (item == null)
+                throw new InvalidOperationException
+                        ($"When you reduce the quantity of the item{toyId} you are looking for, the item itself was not found in the order");
+
+            if(item.Quantity > 1)
+                item.UpdateQuantity(item.Quantity - 1);
+            else OrderItems.Remove(item);
+
+            TotalAmountUpdate();
+        }
+
+        public void RemoveItem(Guid toyId)
+        {
+            var item = 
         }
     }
 }
