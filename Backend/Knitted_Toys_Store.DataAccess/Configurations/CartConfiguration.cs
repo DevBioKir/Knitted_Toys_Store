@@ -23,8 +23,6 @@ namespace Knitted_Toys_Store.DataAccess.Configurations
                 .IsRowVersion() // Используем для оптимистичной блокировки
                 .IsConcurrencyToken(); // Это поле будет использоваться для контроля конкурентных изменений
 
-            //builder.HasIndex(c => c.SessionId); //индекс на SessionId для быстрого поиска
-
             builder.HasMany(c => c.CartItems)
                 .WithOne(ci => ci.Cart)
                 .HasForeignKey(ci => ci.CartId)

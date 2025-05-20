@@ -1,0 +1,82 @@
+﻿public async Task AddToCartAsync(Guid cartId, Guid toyId, int quantity)
+        {
+            var entityCart = await _context.Carts
+                .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Toy)
+                .FirstOrDefaultAsync(c => c.Id == cartId);
+
+            var existingItem = entityCart.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            if (existingItem != null)
+            {
+                await AddToyAsync(cartId, toyId, quantity);
+            }
+            else if (existingItem == null)
+            {
+                await CreateToysInCartItems(cartId, toyId, quantity);
+            }
+        }
+        
+        private async Task AddToyAsync(Guid cartId, Guid toyId, int quantity)
+        {
+            try
+            {
+                var entityCart = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.Id == cartId);
+
+                var cart = _mapper.Map<Cart>(entityCart);
+                cart.IncreaseItemQuantity(toyId);
+
+                var updatedEntityCart = _mapper.Map<CartEntity>(cart);
+                _context.Entry(entityCart).CurrentValues.SetValues(updatedEntityCart);
+
+                foreach (var item in updatedEntityCart.CartItems)
+                {
+                    item.Toy = null;
+                }
+                entityCart.CartItems = updatedEntityCart.CartItems;
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception err)
+            {
+                throw new Exception($"Ошибка при добавлении игрушки в позицию в корзине: {err.Message}", err);
+            }
+        }
+
+        private async Task CreateToysInCartItems(Guid cartId, Guid toyId, int quantity)
+        {
+            try
+            {
+                var entityCart = await _context.Carts
+                    .Include(c => c.CartItems)
+                    .FirstOrDefaultAsync(c => c.Id == cartId);
+
+                var entityToy = await _context.Toys
+                    .FirstOrDefaultAsync(t => t.Id == toyId);
+
+                var cart = _mapper.Map<Cart>(entityCart);
+
+                var newCartItem = CartItems.Create(cartId, toyId, quantity);
+                newCartItem.SetToy(_mapper.Map<Toy>(entityToy));
+
+                cart.CartItems.Add(newCartItem);
+                cart.CartLastUpdate();
+                cart.TotalAmountUpdate();
+
+                var updatedEntityCart = _mapper.Map<CartEntity>(cart);
+                _context.Entry(entityCart).CurrentValues.SetValues(updatedEntityCart);
+
+                foreach (var item in updatedEntityCart.CartItems)
+                {
+                    item.Toy = null;
+                }
+                entityCart.CartItems = updatedEntityCart.CartItems;
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception err)
+            {
+                throw new Exception($"Ошибка при создании позиции в корзине: {err.Message}", err);
+            }
+        }

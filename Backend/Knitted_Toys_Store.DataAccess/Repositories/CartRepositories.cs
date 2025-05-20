@@ -137,40 +137,41 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
         {
             var entityCart = await _context.Carts
                 .Include(c => c.CartItems)
-                .ThenInclude(ci => ci.Toy)
-                .FirstOrDefaultAsync(c => c.Id == cartId);
+                //.ThenInclude(ci => ci.Toy)
+                .FirstOrDefaultAsync(c => c.Id == cartId)
+                ?? throw new Exception($"Cart with ID {cartId} not found.");
+
+            var entityToy = await _context.Toys
+                //.AsNoTracking()
+                .FirstOrDefaultAsync(t => t.Id == toyId)
+            ?? throw new Exception($"Toy with ID {toyId} not found.");
 
             var existingItem = entityCart.CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
             if (existingItem != null)
             {
-                await AddToyAsync(cartId, toyId, quantity);
+                await AddToyAsync(entityCart, entityToy, quantity);
             }
             else if (existingItem == null)
             {
-                await CreateToysInCartItems(cartId, toyId, quantity);
+                await CreateToysInCartItems(entityCart, entityToy, quantity);
             }
         }
         
-        
-        private async Task AddToyAsync(Guid cartId, Guid toyId, int quantity)
+        private async Task AddToyAsync(CartEntity entityCart, ToyEntity entityToy, int quantity)
         {
             try
             {
-                var entityCart = await _context.Carts
-                .Include(c => c.CartItems)
-                .FirstOrDefaultAsync(c => c.Id == cartId);
-
                 var cart = _mapper.Map<Cart>(entityCart);
-                cart.IncreaseItemQuantity(toyId);
+                cart.IncreaseItemQuantity(entityToy.Id);
 
-                var updatedEntity = _mapper.Map<CartEntity>(cart);
-                _context.Entry(entityCart).CurrentValues.SetValues(updatedEntity);
+                var updatedEntityCart = _mapper.Map<CartEntity>(cart);
+                _context.Entry(entityCart).CurrentValues.SetValues(updatedEntityCart);
 
-                foreach (var item in updatedEntity.CartItems)
+                foreach (var item in updatedEntityCart.CartItems)
                 {
                     item.Toy = null;
                 }
-                entityCart.CartItems = updatedEntity.CartItems;
+                entityCart.CartItems = updatedEntityCart.CartItems;
 
                 await _context.SaveChangesAsync();
             }
@@ -180,23 +181,64 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             }
         }
 
-        private async Task CreateToysInCartItems(Guid cartId, Guid toyId, int quantity)
+        private async Task CreateToysInCartItems(CartEntity entityCart, ToyEntity entityToy, int quantity)
         {
             try
             {
-                var entityCart = await _context.Carts
-                    .Include(c => c.CartItems)
-                    .FirstOrDefaultAsync(c => c.Id == cartId);
                 var cart = _mapper.Map<Cart>(entityCart);
 
-                var newCartItem = CartItems.Create(cartId, toyId, quantity);
-                var newCartItemEntity = _mapper.Map<CartItemsEntity>(newCartItem);
-                _context.CartItems.Add(newCartItemEntity);
+                var newCartItems = CartItems.Create(entityCart.Id, entityToy.Id, quantity);
+                var newCartItemsEntity = _mapper.Map<CartItemsEntity>(newCartItems);
+                _context.CartItems.Add(newCartItemsEntity);
 
-                cart.CartLastUpdate();
-                cart.TotalAmountUpdate();
+                entityCart.LastUpdate = DateTime.UtcNow;
+                entityCart.TotalAmount = entityCart.CartItems.Sum(ci => ci.Quantity * (ci.ToyId == entityToy.Id ? entityToy.Price :
+                        (ci.Toy != null ? ci.Toy.Price : 0)));
 
                 await _context.SaveChangesAsync();
+
+
+
+
+
+
+
+
+                //// Преобразуем в доменные объекты
+                //var cart = _mapper.Map<Cart>(entityCart);
+                //var toy = _mapper.Map<Toy>(entityToy);
+
+                //// Создаем новый CartItems через доменную модель
+                //var newCartItem = CartItems.Create(entityCart.Id, entityToy.Id, quantity);
+
+                //// Устанавливаем ссылку на игрушку с помощью метода SetToy
+                //newCartItem.SetToy(toy);
+
+                //// Добавляем элемент в корзину
+                //cart.CartItems.Add(newCartItem);
+
+                //// Обновляем время последнего изменения
+                //cart.CartLastUpdate();
+
+                //// Пересчитываем общую сумму корзины
+                //cart.TotalAmountUpdate();
+
+                //// Обновляем сущность корзины
+                //entityCart.LastUpdate = cart.LastUpdate;
+                //entityCart.TotalAmount = cart.TotalAmount;
+
+                //// Создаем новый элемент корзины для базы данных
+                //var newCartItemEntity = _mapper.Map<CartItemsEntity>(newCartItem);
+
+                //// Добавляем в контекст
+                //_context.CartItems.Add(newCartItemEntity);
+
+                //// Сохраняем изменения
+                //await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new Exception("Ошибка при обновлении корзины: данные были изменены другим пользователем.");
             }
             catch (Exception err)
             {

@@ -22,6 +22,10 @@
                 LastUpdate = DateTime.UtcNow
             };
         }
+        private CartItems FindCartItemsByToyId(Guid toyId)
+        {
+            return CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+        }
         public void CartLastUpdate() //обновление времени последнего изменения
         {
             LastUpdate = DateTime.UtcNow;
@@ -33,13 +37,19 @@
                 .Where(item => item.Toy != null)
                 .Sum(item => item.Quantity * item.Toy.Price);
         }
-        
-        //public void TotalAmountUpdate()
-        //{
-        //    if (CartItems.Any(item => item.Toy == null))
-        //        throw new InvalidOperationException("The toys are not loaded!");
 
-        //    TotalAmount = CartItems.Sum(item => item.Quantity * item.Toy.Price);
+        //public CartItems CreateCartItems(Guid cartId, Guid toyId, int quantity)
+        //{
+        //    if (quantity <= 0)
+        //        throw new ArgumentException("Quantity must be greater than zero");
+
+        //    var newCartItem = Domain.CartItems.Create(cartId, toyId, quantity);
+        //    CartItems.Add(newCartItem);
+
+        //    CartLastUpdate();
+        //    TotalAmountUpdate();
+
+        //    return newCartItem;
         //}
 
         public void SetItemQuantity(Guid toyId, int quantity) //если надо полностью обновить корзину точным значением
@@ -58,7 +68,8 @@
         }
         public void IncreaseItemQuantity(Guid toyId) //увеличение количества товара в позиции на единицу
         {
-            var item = CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            var item = FindCartItemsByToyId(toyId);
+
             if (item == null)
                 throw new InvalidOperationException
                     ($"When you increace the quantity of the item{toyId} you are looking for, the item itself was not found in the cart");
@@ -71,7 +82,7 @@
 
         public void ReduceItemQuantity(Guid toyId) //уменьшение количество товара в позиции на единицу
         {
-            var item = CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            var item = FindCartItemsByToyId(toyId);
             if (item == null)
                 throw new InvalidOperationException
                     ($"When you reduce the quantity of the item {toyId} you are looking for, the item itself was not found in the cart");
@@ -89,7 +100,7 @@
             if (newQuantity < 0)
                 throw new ArgumentException("Quantity cannot be negative.");
 
-            var item = CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            var item = FindCartItemsByToyId(toyId);
 
             if (item == null)
             {
@@ -107,9 +118,10 @@
 
         public void RemoveItem(Guid toyId)
         {
-            var item = CartItems.FirstOrDefault(ci => ci.ToyId == toyId || ci.Toy?.Id == toyId);
+            var item = FindCartItemsByToyId(toyId);
+            //var item = CartItems.FirstOrDefault(ci => ci.ToyId == toyId || ci.Toy?.Id == toyId);
 
-            if(item == null) throw new InvalidOperationException("The toy was not found in the cart");
+            if (item == null) throw new InvalidOperationException("The toy was not found in the cart");
 
             CartItems.Remove(item);
             CartLastUpdate();

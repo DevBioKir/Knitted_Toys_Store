@@ -62,20 +62,20 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Guid> UpdateAsync(Order order)
-        {
-            var entityOrder = await _context.Orders
-                .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Toy)
-                .FirstOrDefaultAsync(o => o.Id == order.Id);
+        //public async Task<Guid> UpdateAsync(Order order)
+        //{
+        //    var entityOrder = await _context.Orders
+        //        .Include(o => o.OrderItems)
+        //        .ThenInclude(oi => oi.Toy)
+        //        .FirstOrDefaultAsync(o => o.Id == order.Id);
 
-            if (entityOrder == null)
-            {
-                throw new InvalidOperationException($"Order with ID {order.Id} not found.");
-            }
+        //    if (entityOrder == null)
+        //    {
+        //        throw new InvalidOperationException($"Order with ID {order.Id} not found.");
+        //    }
 
-            var
-        }
+        //    var
+        //}
 
         public async Task<Guid> RemoveOrderAsync(Guid orderId)
         {

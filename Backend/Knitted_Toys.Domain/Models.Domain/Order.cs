@@ -1,4 +1,6 @@
-﻿namespace Knitted_Toys_Store.Domain.Models.Domain
+﻿using System.Runtime.CompilerServices;
+
+namespace Knitted_Toys_Store.Domain.Models.Domain
 {
     
     public enum OrderStatus
@@ -56,6 +58,11 @@
                 OrderItems = orderItems
             };
         }
+
+        private OrderItems FindOrderItemsByToyId(Guid toyId)
+        {
+            return OrderItems.FirstOrDefault(oi => oi.ToyId == toyId);
+        }
         public void UpdateStatus(OrderStatus newStatus)
         {
             Status = newStatus;
@@ -98,7 +105,11 @@
 
         public void RemoveItem(Guid toyId)
         {
-            var item = 
+            var item = FindOrderItemsByToyId(toyId);
+            if(item == null) throw new InvalidOperationException("The toy was not found in the order");
+
+            OrderItems.Remove(item);
+            TotalAmountUpdate();
         }
     }
 }
