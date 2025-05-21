@@ -24,7 +24,24 @@
         }
         private CartItems FindCartItemsByToyId(Guid toyId)
         {
-            return CartItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            return CartItems
+                .Where(ci => ci.ToyId == toyId)
+                .FirstOrDefault();
+        }
+
+        public void AddItem(Guid cartId, Guid toyId, int quantity)
+        {
+            var existingItem = FindCartItemsByToyId(toyId);
+            if (existingItem != null)
+            {
+                existingItem.UpdateQuantity(existingItem.Quantity + quantity);
+            }
+            else
+            {
+                CartItems.Add(Domain.CartItems.Create(cartId, toyId, quantity));
+            }
+            TotalAmountUpdate();
+            CartLastUpdate();
         }
         public void CartLastUpdate() //обновление времени последнего изменения
         {
@@ -38,26 +55,12 @@
                 .Sum(item => item.Quantity * item.Toy.Price);
         }
 
-        //public CartItems CreateCartItems(Guid cartId, Guid toyId, int quantity)
-        //{
-        //    if (quantity <= 0)
-        //        throw new ArgumentException("Quantity must be greater than zero");
-
-        //    var newCartItem = Domain.CartItems.Create(cartId, toyId, quantity);
-        //    CartItems.Add(newCartItem);
-
-        //    CartLastUpdate();
-        //    TotalAmountUpdate();
-
-        //    return newCartItem;
-        //}
-
         public void SetItemQuantity(Guid toyId, int quantity) //если надо полностью обновить корзину точным значением
         {
             if (quantity < 0)
                 throw new ArgumentException("The number must be greater than 0");
 
-            var item = CartItems.FirstOrDefault(ci => ci.Toy?.Id == toyId || ci.ToyId == toyId);
+            var item = FindCartItemsByToyId(toyId);
 
             if (item == null)
                 throw new InvalidOperationException("The toy was not found in the cart");

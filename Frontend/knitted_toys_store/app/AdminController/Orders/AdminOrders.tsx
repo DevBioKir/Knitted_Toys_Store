@@ -1,17 +1,28 @@
 "use client";
 
+import { useOrder } from "@/app/context/OrderProvider";
 import { Order } from "@/app/Models/Order";
-import { getAllOrders } from "@/app/services/orders";
+import { getAllOrders } from "@/app/services/Admin/serviceOrdersAdmin";
+import { OrderResponse } from "@/app/types/Order/OrderResponce";
 import { useState } from "react";
 
-export default function AdminToysPage() {
+export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
+  const [ order ] = useOrder();
+  const [editingOrder, setEditingOrder] = useState<OrderResponse | null>(null);
 
-  const fetchToys = async () => {
+const OrderItemsResponses = order?.orderItemsResponses || [];
+  
+  const fetchOrders = async () => {
     try {
       const data = await getAllOrders();
+
+      const updateOrders = data.map(order => ({
+        ...order,
+        orderItemsResponses: order.orderItemsResponses || []
+      }));
+      
       setOrders(data);
     } catch (err) {
       console.error(err);

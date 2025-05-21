@@ -16,7 +16,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             _mapper = mapper;
         }
 
-        public async Task<List<Order>> GetAllOrdersAsync()
+        public async Task<IEnumerable<Order>> GetAllOrdersAsync()
         {
             var entitiesOrders = await _context.Orders
                 .Include(o => o.OrderItems)
@@ -52,6 +52,56 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             return order;
         }
 
+        public async Task<IEnumerable<Order>> SearchOrderAsync(
+            string? surnameCustomer = null,
+            string? nameCustomer = null,
+            string? phoneNumber = null,
+            string? email = null,
+            string? deliveryAddress = null,
+            OrderStatus? status = null)
+        {
+            var query = _context.Orders
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Toy)
+                .AsQueryable();
+
+            query = query
+                .Where(o => 
+                (string.IsNullOrWhiteSpace(surnameCustomer) || o.SurnameCustomer.Contains(surnameCustomer)) &&
+                (string.IsNullOrWhiteSpace(nameCustomer) || o.NameCustomer.Contains(nameCustomer)) &&
+                (string.IsNullOrWhiteSpace(phoneNumber) || o.PhoneNumber.Contains(phoneNumber)) &&
+                (string.IsNullOrWhiteSpace(email) || o.Email.Contains(email)) &&
+                (string.IsNullOrWhiteSpace(deliveryAddress) || o.DeliveryAddress.Contains(deliveryAddress)) &&
+                (!status.HasValue || o.Status == status));
+
+            var resultQuery = await query
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
+
+            return _mapper.Map<List<Order>>(resultQuery);
+        }
+
+        public async Task<decimal> GetTotalRevenueAsync()
+        {
+            return await _context.Orders
+                .Include(o => o.OrderItems)
+                .Where(o => o.Status == OrderStatus.Paid)
+                .SumAsync(o => o.TotalAmount);
+        }
+
+        public async Task<int> GetOrderCountAsync()
+        {
+            return await _context.Orders.CountAsync();
+        }
+
+        //public async Task<IEnumerable<Order>> GetOrderByStatusAsync(OrderStatus status)
+        //{
+        //    var ordersByStatus = await _context.Orders
+        //        .Where(o => o.Status == status).ToListAsync();
+
+        //    return _mapper.Map<List<Cart>>(ordersByStatus);
+        //}
+
         public async Task UpdateOrderStatusAsync(Guid orderId, OrderStatus newStatus)
         {
             var entityOrder = await _context.Orders.FindAsync(orderId);
@@ -61,21 +111,6 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             entityOrder.Status = newStatus;
             await _context.SaveChangesAsync();
         }
-
-        //public async Task<Guid> UpdateAsync(Order order)
-        //{
-        //    var entityOrder = await _context.Orders
-        //        .Include(o => o.OrderItems)
-        //        .ThenInclude(oi => oi.Toy)
-        //        .FirstOrDefaultAsync(o => o.Id == order.Id);
-
-        //    if (entityOrder == null)
-        //    {
-        //        throw new InvalidOperationException($"Order with ID {order.Id} not found.");
-        //    }
-
-        //    var
-        //}
 
         public async Task<Guid> RemoveOrderAsync(Guid orderId)
         {

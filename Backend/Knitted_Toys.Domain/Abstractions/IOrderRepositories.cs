@@ -8,6 +8,13 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
         Task<Order?> GetOrderByIdAsync(Guid orderId);
         Task<Guid> RemoveOrderAsync(Guid orderId);
         Task<List<Order>> GetAllOrdersAsync();
-        Task UpdateOrderStatusAsync(Guid orderId, OrderStatus newStatus); 
+        Task UpdateOrderStatusAsync(Guid orderId, OrderStatus newStatus);
+        Task<IEnumerable<Order>> SearchOrderAsync(
+            string? surnameCustomer = null,
+            string? nameCustomer = null,
+            string? phoneNumber = null,
+            string? email = null,
+            string? deliveryAddress = null,
+            OrderStatus? status = null);
     }
 }

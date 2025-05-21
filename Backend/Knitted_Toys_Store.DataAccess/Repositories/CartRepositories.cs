@@ -156,7 +156,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
                 await CreateToysInCartItems(entityCart, entityToy, quantity);
             }
         }
-        
+
         private async Task AddToyAsync(CartEntity entityCart, ToyEntity entityToy, int quantity)
         {
             try
@@ -196,45 +196,6 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
                         (ci.Toy != null ? ci.Toy.Price : 0)));
 
                 await _context.SaveChangesAsync();
-
-
-
-
-
-
-
-
-                //// Преобразуем в доменные объекты
-                //var cart = _mapper.Map<Cart>(entityCart);
-                //var toy = _mapper.Map<Toy>(entityToy);
-
-                //// Создаем новый CartItems через доменную модель
-                //var newCartItem = CartItems.Create(entityCart.Id, entityToy.Id, quantity);
-
-                //// Устанавливаем ссылку на игрушку с помощью метода SetToy
-                //newCartItem.SetToy(toy);
-
-                //// Добавляем элемент в корзину
-                //cart.CartItems.Add(newCartItem);
-
-                //// Обновляем время последнего изменения
-                //cart.CartLastUpdate();
-
-                //// Пересчитываем общую сумму корзины
-                //cart.TotalAmountUpdate();
-
-                //// Обновляем сущность корзины
-                //entityCart.LastUpdate = cart.LastUpdate;
-                //entityCart.TotalAmount = cart.TotalAmount;
-
-                //// Создаем новый элемент корзины для базы данных
-                //var newCartItemEntity = _mapper.Map<CartItemsEntity>(newCartItem);
-
-                //// Добавляем в контекст
-                //_context.CartItems.Add(newCartItemEntity);
-
-                //// Сохраняем изменения
-                //await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -271,25 +232,25 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task SetItemQuantityAsync(Guid cartId, Guid toyId, int quantity)//добавить точное количество
-        {
-            var entityCart = await _context.Carts
-                .Include(c => c.CartItems)
-                .FirstOrDefaultAsync(c => c.Id == cartId);
+        //public async Task SetItemQuantityAsync(Guid cartId, Guid toyId, int quantity)//добавить точное количество
+        //{
+        //    var entityCart = await _context.Carts
+        //        .Include(c => c.CartItems)
+        //        .FirstOrDefaultAsync(c => c.Id == cartId);
 
-            if (entityCart == null)
-                throw new InvalidOperationException("Cart not found");
+        //    if (entityCart == null)
+        //        throw new InvalidOperationException("Cart not found");
 
-            var cart = _mapper.Map<Cart>(entityCart);
+        //    var cart = _mapper.Map<Cart>(entityCart);
 
-            cart.SetItemQuantity(toyId, quantity);
+        //    cart.SetItemQuantity(toyId, quantity);
 
-            var updatedEntity = _mapper.Map<CartEntity>(cart);
-            _context.Entry(entityCart).CurrentValues.SetValues(updatedEntity);
-            entityCart.CartItems = updatedEntity.CartItems;
+        //    var updatedEntity = _mapper.Map<CartEntity>(cart);
+        //    _context.Entry(entityCart).CurrentValues.SetValues(updatedEntity);
+        //    entityCart.CartItems = updatedEntity.CartItems;
 
-            await _context.SaveChangesAsync();
-        }
+        //    await _context.SaveChangesAsync();
+        //}
 
         public async Task RemoveItemFromCartAsync(Guid cartId, Guid toyId)//удаление позиции товара из корзины полностью
         {
@@ -327,7 +288,12 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
             await _context.SaveChangesAsync();
         }
-
+        private async Task UpdateCartAsync(Cart cart)
+        {
+            var cartEntity = _mapper.Map<CartEntity>(cart);
+            _context.Carts.Update(cartEntity);
+            await _context.SaveChangesAsync();
+        }
         private async Task<CartEntity?> LoadCartWithItems(Guid cartId)
         {
             return await _context.Carts

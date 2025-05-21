@@ -1,7 +1,6 @@
 "use client";
 
 import { UpdateCartForm } from "@/app/components/Admin/Carts/UpdateCartForm";
-import { useCart } from "@/app/context/CartProvider";
 import { Cart } from "@/app/Models/Cart";
 import {
   deleteCartAdmin,
@@ -14,11 +13,7 @@ import { useEffect, useState } from "react";
 export default function AdminCartsPage() {
   const [carts, setCarts] = useState<Cart[]>([]);
   const [loading, setLoading] = useState(true);
-  const { cart, refreshCart, isLoading } = useCart();
   const [editingCart, setEditingCart] = useState<CartResponse | null>(null);
-  //const [removedCart, setRemovedCart] = useState<Cart | null>(null);
-
-  const CartItemsResponses = cart?.cartItemsResponses || [];
 
   const fetchCart = async () => {
     try {
@@ -26,8 +21,8 @@ export default function AdminCartsPage() {
       console.log("API вернуло корзины:", data);
 
       // Убедимся, что каждая корзина имеет cartItemsResponses
-    const updatedCarts = data.map(cart => ({
-      ...cart,
+      const updatedCarts = data.map(cart => ({
+        ...cart,
       cartItemsResponses: cart.cartItemsResponses || [] // Если нет cartItemsResponses, делаем его пустым массивом
     }));
 

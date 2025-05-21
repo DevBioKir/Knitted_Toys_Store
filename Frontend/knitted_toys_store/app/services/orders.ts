@@ -1,4 +1,5 @@
 import { OrderRequest } from "../types/Order/OrderRequest";
+import { OrderResponse } from "../types/Order/OrderResponce";
 
 export const getOrderById = async (id: string) => {
   const response = await fetch(
@@ -17,7 +18,7 @@ export const getOrderById = async (id: string) => {
   response.json();
 };
 
-export const getAllOrders = async () => {
+export const getAllOrders = async (): Promise<OrderResponse[]> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Order`,
     {
@@ -31,7 +32,8 @@ export const getAllOrders = async () => {
   if (!response.ok) {
     throw new Error("Не удалось найти заказы");
   }
-  response.json();
+  const data = await response.json();
+  return data;
 };
 
 export const createOrder = async (orderRequest: OrderRequest) => {

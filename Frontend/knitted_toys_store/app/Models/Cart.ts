@@ -10,5 +10,5 @@ export interface Cart {
     cartItems: CartItems[];
     rowVersion: string; // base64 строка
 
-    cartItemsResponses?: CartItemsResponse[];
+    cartItemsResponses: CartItemsResponse[];
 }
