@@ -51,6 +51,7 @@ namespace Knitted_Toys_Store.API.Controllers
             var cart = await _cartService.GetCurrentCartAsync(HttpContext, Response);
             var order = await _orderService.CreateOrderAsync(cart, surname, name, phone, email,
                     deliveryAddress, deliveryNotes);
+            await _cartService.ClearCartAsync(cart.Id);
 
             return Ok(order);
         }

@@ -6,8 +6,18 @@ namespace Knitted_Toys_Store.App.Services
     {
         Task<Order> CreateOrderAsync(Cart cart, string surname, string name, string phone, string email, string deliveryAddress, string deliveryNotes);
         Task<Order?> GetOrderByIdAsync(Guid orderId);
-        Task<Guid> RemoveOrderAsync(Guid id);
-        Task<List<Order>> GetAllOrdersAsync();
+        Task<Guid> DeleteOrderAsync(Guid id);
+        Task<IEnumerable<Order>> GetAllOrdersAsync();
         Task<OrderStatus> UpdateOrderStatusAsync(Guid orderId, OrderStatus newStatus);
+        Task<int> GetOrderCountAsync();
+        Task<decimal> GetTotalRevenueAsync();
+        Task<IEnumerable<Order>> SearchOrderAsync(
+            string? surnameCustomer = null,
+            string? nameCustomer = null,
+            string? phoneNumber = null,
+            string? email = null,
+            string? deliveryAddress = null,
+            OrderStatus? status = null);
+        Task<IEnumerable<Order>> GetOrderByStatusAsync(OrderStatus status);
     }
 }

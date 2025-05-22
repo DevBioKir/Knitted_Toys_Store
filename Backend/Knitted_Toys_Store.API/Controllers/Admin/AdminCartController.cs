@@ -44,7 +44,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
         }
 
         [HttpGet("GetAllCartsAsyn")]
-        public async Task<ActionResult<List<CartResponse>>> GetAllCartsAsyn()
+        public async Task<ActionResult<IEnumerable<CartResponse>>> GetAllCartsAsyn()
         {
             var carts = await _cartService.GetAllCarts();
 
@@ -182,6 +182,16 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
             if (cart == null) return NotFound($"Cart with ID {id} not found.");
 
             return Ok(await _cartService.DeleteCartAsync(id));
+        }
+
+        [HttpDelete("ClearCartAsync")]
+        public async Task<ActionResult<Guid>> ClearCartAsync(Guid id)
+        {
+            var cart = await _cartService.GetCartByIdAsync(id);
+            await _cartService.ClearCartAsync(id);
+
+
+            return Ok(id);
         }
     }
 }

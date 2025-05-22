@@ -1,62 +1,65 @@
 "use client";
 
-import { useOrder } from "@/app/context/OrderProvider";
 import { Order } from "@/app/Models/Order";
-import { getAllOrders } from "@/app/services/Admin/serviceOrdersAdmin";
+import {
+  deleteOrderAdmin,
+  getAllOrdersAdmin,
+} from "@/app/services/Admin/serviceOrdersAdmin";
 import { OrderResponse } from "@/app/types/Order/OrderResponce";
-import { useState } from "react";
+import { Button, List, message } from "antd";
+import { useEffect, useState } from "react";
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [ order ] = useOrder();
   const [editingOrder, setEditingOrder] = useState<OrderResponse | null>(null);
 
-const OrderItemsResponses = order?.orderItemsResponses || [];
-  
+  // const OrderItemsResponses = order?.orderItemsResponses || [];
+
   const fetchOrders = async () => {
     try {
-      const data = await getAllOrders();
+      const data = await getAllOrdersAdmin();
+      console.log("API вернуло заказы:", data);
 
       const updateOrders = data.map(order => ({
         ...order,
         orderItemsResponses: order.orderItemsResponses || []
       }));
-      
-      setOrders(data);
+
+      setOrders(updateOrders);
     } catch (err) {
       console.error(err);
-      message.error("Ошибка при загрузке игрушек");
+      message.error("Ошибка при загрузке заказов");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchToys();
+    fetchOrders();
   }, []);
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteToyAdmin(id);
-      message.success("Игрушка удалена");
-      fetchToys();
+      await deleteOrderAdmin(id);
+      message.success("Заказ удалён");
+      fetchOrders();
     } catch (err) {
       console.error(err);
-      message.error("Не удалось удалить игрушку");
+      message.error("Не удалось удалить заказ");
     }
   };
-  
+
   return (
     <div style={{ padding: "24px" }}>
-      <h2>Игрушки</h2>
+      <h2>Заказы</h2>
       {loading ? (
         <p>Загрузка...</p>
       ) : (
         <>
-          {toys.map((toy) => (
+          {orders.map((order) => (
             <div
-              key={toy.id}
+              key={order.id}
               style={{
                 marginBottom: "20px",
                 border: "1px solid #ddd",
@@ -67,60 +70,66 @@ const OrderItemsResponses = order?.orderItemsResponses || [];
                 alignItems: "flex-start",
               }}
             >
-              {/* Картинка */}
-              {toy.imageUrl ? (
-                <img
-                  src={`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}${toy.imageUrl}`}
-                  alt={toy.name}
-                  style={{ width: "120px", height: "120px", objectFit: "cover", borderRadius: "8px" }}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: "120px",
-                    height: "120px",
-                    background: "#f0f0f0",
-                    borderRadius: "8px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#999",
-                    fontSize: "12px",
-                  }}
-                >
-                  Нет изображения
-                </div>
-              )}
-
               {/* Описание */}
               <div style={{ flexGrow: 1 }}>
-                <p><strong>{toy.name}</strong></p>
-                <p>Цена: {toy.price}₽</p>
-                <p>Описание: {toy.description}</p>
-                <p>Размер: {toy.size}мм</p>
+                <p>
+                  <strong>Id заказа: {order.id}</strong>
+                </p>
+                <p>Дата создания заказа: {order.orderDate}₽</p>
+                <p>Сумма заказа: {order.totalAmount}</p>
+                <p>Статус заказа: {order.status}</p>
+                <p>Фамилия заказчика: {order.surnameCustomer}</p>
+                <p>Имя заказчика: {order.nameCustomer}</p>
+                <p>Телефон заказчика: {order.phoneNumber}</p>
+                <p>Email заказчика: {order.email}</p>
+                <p>Адрес доставки: {order.deliveryAddress}</p>
+                <p>Примечание к заказу: {order.deliveryNotes}</p>
+
+                <List
+                  itemLayout="horizontal"
+                  dataSource={order.orderItemsResponses || []} // Используем cartItemsResponses
+                  renderItem={(item) => (
+                    <List.Item>
+                      <List.Item.Meta
+                        avatar={
+                          <img
+                            src={`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}${item.toyImageUrl}`}
+                            alt={item.toyName}
+                            style={{
+                              width: 40,
+                              height: 40,
+                              objectFit: "cover",
+                              borderRadius: 4,
+                            }}
+                          />
+                        }
+                        title={item.toyName}
+                        description={`Количество: ${item.quantity}`}
+                      />
+                    </List.Item>
+                  )}
+                />
 
                 {/* Кнопки */}
                 <Button
-                  onClick={() => setEditingToy(toy)}
+                  onClick={() => setEditingOrder(order)}
                   style={{ marginRight: 8 }}
                 >
                   Редактировать
                 </Button>
-                <Button onClick={() => handleDelete(toy.id!)}>
-                  Удалить
-                </Button>
+                <Button onClick={() => handleDelete(order.id!)}>Удалить</Button>
               </div>
             </div>
           ))}
         </>
       )}
 
-      {editingToy && (
-        <UpdateToyForm
-          toy={editingToy}
+      {editingOrder && (
+        <UpdateOrderForm
+          order={editingOrder}
           onSuccess={() => {
-            setEditingToy(null);
-            fetchToys();
+            setEditingOrder(null);
+            fetchOrders(); // Перезагружаем корзины после редактирования
           }}
         />
       )}

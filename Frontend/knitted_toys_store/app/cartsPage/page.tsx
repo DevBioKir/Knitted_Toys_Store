@@ -103,10 +103,10 @@ export default function CartPage() {
     }
   };
 
-  const handleClearCart = () => {
-    if (!cart) return;
-    handleUpdateCart([]);
-  };
+  // const handleClearCart = () => {
+  //   if (!cart) return;
+  //   handleUpdateCart([]);
+  // };
 
   if (isLoading || isUpdating) {
     return (
@@ -185,7 +185,7 @@ export default function CartPage() {
                   message.success("Заказ создан");
                   setIsModalOpen(false);
                   refreshCart();
-                  handleClearCart(); // если хочешь очищать корзину после заказа
+                  //handleClearCart(); // если хочешь очищать корзину после заказа
                 }}
               />
             </Modal>

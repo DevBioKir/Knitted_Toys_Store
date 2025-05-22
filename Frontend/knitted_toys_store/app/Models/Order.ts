@@ -1,3 +1,4 @@
+import { OrderItemsResponse } from "../types/OrderItems/OrderItemsResponse";
 import {OrderItems} from "./OrderItems"
 
 export enum OrderStatus {
@@ -20,4 +21,6 @@ export interface Order {
     deliveryAddress: string;
     deliveryNotes: string;
     orderItems: OrderItems;
+
+    orderItemsResponses: OrderItemsResponse[];
 }

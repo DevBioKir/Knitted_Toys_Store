@@ -301,5 +301,27 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
                 .ThenInclude(ci => ci.Toy)
                 .FirstOrDefaultAsync(c => c.Id == cartId);
         }
+
+        public async Task ClearCartAsync(Guid cartId)
+        {
+            var entityCart = await _context.Carts
+                .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Toy)
+                .FirstOrDefaultAsync(c => c.Id == cartId);
+
+            var entityCartItems = await _context.CartItems
+                .Where(ci => ci.CartId == cartId)
+                .ToListAsync();
+
+            if (entityCartItems == null)
+                throw new InvalidOperationException("CartItems not found");
+
+            _context.CartItems.RemoveRange(entityCartItems);
+
+            entityCart.TotalAmount = 0;
+            entityCart.LastUpdate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+        }
     }
 }

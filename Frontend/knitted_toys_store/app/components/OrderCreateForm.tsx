@@ -1,4 +1,3 @@
-//import { useRouter } from "next/router";
 import { useState } from "react";
 import { OrderRequest } from "../types/Order/OrderRequest";
 import { createOrder } from "../services/orders";
@@ -10,7 +9,6 @@ interface Prop {
 
 export default function OrderCreateForm({ onOrderCreated }: Prop) {
   const [uploading, setUploading] = useState(false);
-  //const router = useRouter();
 
   const onFinish = async (values: OrderRequest) => {
     try {

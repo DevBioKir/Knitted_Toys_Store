@@ -6,8 +6,8 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
     {
         Task<Order> CreateOrderAsync(Cart cart, string surname, string name, string phone, string email, string deliveryAddress, string deliveryNotes);
         Task<Order?> GetOrderByIdAsync(Guid orderId);
-        Task<Guid> RemoveOrderAsync(Guid orderId);
-        Task<List<Order>> GetAllOrdersAsync();
+        Task<Guid> DeleteOrderAsync(Guid orderId);
+        Task<IEnumerable<Order>> GetAllOrdersAsync();
         Task UpdateOrderStatusAsync(Guid orderId, OrderStatus newStatus);
         Task<IEnumerable<Order>> SearchOrderAsync(
             string? surnameCustomer = null,
@@ -16,5 +16,8 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             string? email = null,
             string? deliveryAddress = null,
             OrderStatus? status = null);
+        Task<decimal> GetTotalRevenueAsync();
+        Task<int> GetOrderCountAsync();
+        Task<IEnumerable<Order>> GetOrderByStatusAsync(OrderStatus status);
     }
 }

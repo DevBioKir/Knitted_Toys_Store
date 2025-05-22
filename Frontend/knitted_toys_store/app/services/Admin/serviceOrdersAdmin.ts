@@ -12,9 +12,9 @@ export const getOrderById = async (id: string): Promise<OrderResponse> => {
   }
 };
 
-export const getAllOrders = async (): Promise<OrderResponse[]> => {
+export const getAllOrdersAdmin = async (): Promise<OrderResponse[]> => {
   try {
-    const response = await adminAPI.get("/AdminOrder");
+    const response = await adminAPI.get("/AdminOrder/GetAllOrdersAsync");
     return response.data;
   } catch (err) {
     console.error("Ошибка при получении заказов", err);
@@ -22,7 +22,7 @@ export const getAllOrders = async (): Promise<OrderResponse[]> => {
   }
 };
 
-export const createOrder = async (orderRequest: OrderRequest) => {
+export const createOrderAdmin = async (orderRequest: OrderRequest) => {
   try {
     await adminAPI.post(`/AdminOrder?surname=${orderRequest.surnameCustomer}
           &name=${orderRequest.nameCustomer}&phone=${orderRequest.phoneNumber}&email=${orderRequest.email}&deliveryAddress=${orderRequest.deliveryAddress}
@@ -32,3 +32,12 @@ export const createOrder = async (orderRequest: OrderRequest) => {
     throw err;
   }
 };
+
+export const deleteOrderAdmin = async (opderId: string) => {
+  try{
+    await adminAPI.delete(`/AdminOrder?id=${opderId}}`)
+  } catch (err) {
+    console.error("Ошибка при удалении заказа", err);
+    throw err;
+  }
+}

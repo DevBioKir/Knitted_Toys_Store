@@ -8,6 +8,7 @@ import AdminCartsPage from "./Carts/AdminCarts";
 import ToyUploadPage from "../components/Admin/Toys/UploadToy";
 import { useRouter } from "next/navigation";
 import "./../components/Admin/Toys/AdminAddToyPage.css";
+import AdminOrdersPage from "./Orders/AdminOrders";
 
 export default function AdminPage() {
   const [activeTable, setActiveTable] = useState("toys");
@@ -65,11 +66,11 @@ export default function AdminPage() {
             label: "Корзина",
             children: <AdminCartsPage />,
           },
-          // {
-          //   key: "oreders",
-          //   label: "Заказы",
-          //   children: ,
-          // }
+          {
+            key: "oreders",
+            label: "Заказы",
+            children: <AdminOrdersPage />,
+          }
         ]}
       />
     </div>

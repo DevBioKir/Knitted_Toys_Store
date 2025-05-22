@@ -94,13 +94,13 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             return await _context.Orders.CountAsync();
         }
 
-        //public async Task<IEnumerable<Order>> GetOrderByStatusAsync(OrderStatus status)
-        //{
-        //    var ordersByStatus = await _context.Orders
-        //        .Where(o => o.Status == status).ToListAsync();
+        public async Task<IEnumerable<Order>> GetOrderByStatusAsync(OrderStatus status)
+        {
+            var ordersByStatus = await _context.Orders
+                .Where(o => o.Status == status).ToListAsync();
 
-        //    return _mapper.Map<List<Cart>>(ordersByStatus);
-        //}
+            return _mapper.Map<List<Order>>(ordersByStatus);
+        }
 
         public async Task UpdateOrderStatusAsync(Guid orderId, OrderStatus newStatus)
         {
@@ -112,7 +112,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Guid> RemoveOrderAsync(Guid orderId)
+        public async Task<Guid> DeleteOrderAsync(Guid orderId)
         {
             var entityOrder = await _context.Orders
                 .Include(o => o.OrderItems)

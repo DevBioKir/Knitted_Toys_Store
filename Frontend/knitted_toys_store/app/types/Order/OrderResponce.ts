@@ -1,5 +1,5 @@
 import { OrderStatus } from "../../Models/Order";
-import { OrderItemsResponse } from "../OrderItems/OrderItemsResponce";
+import { OrderItemsResponse } from "../OrderItems/OrderItemsResponse";
 
 
 export interface OrderResponse{
