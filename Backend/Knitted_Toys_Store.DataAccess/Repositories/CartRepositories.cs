@@ -323,5 +323,31 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task<Cart?> CloneCartAsync(Guid cartId)
+        {
+            // Загрузка оригинальной корзины вместе с игрушками
+            var entityCart = await GetCartByIdAsync(cartId);
+
+            if (entityCart == null) 
+                throw new InvalidOperationException("Cart not found");
+
+            // Клонируем корзину
+            var clonedCart = Cart.Create(); // новый cart со своим ID
+
+            foreach (var item in entityCart.CartItems)
+            {
+                var newItem = CartItems.Create(clonedCart.Id, item.ToyId, item.Quantity);
+                newItem.SetToy(item.Toy); // если у тебя доменная модель требует игрушку
+                clonedCart.CartItems.Add(newItem);
+            }
+            clonedCart.TotalAmountUpdate();
+
+            var clonedCartEntity = _mapper.Map<CartEntity>(clonedCart);
+            await _context.Carts.AddAsync(clonedCartEntity);
+            await _context.SaveChangesAsync();
+
+            return clonedCart;
+        }
     }
 }

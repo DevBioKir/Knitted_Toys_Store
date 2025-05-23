@@ -126,6 +126,11 @@ namespace Knitted_Toys_Store.App.Services
             await _cartRepositories.ClearCartAsync(cartId);
         }
 
+        public async Task<Cart?> CloneCartAsync(Guid cartId)
+        {
+            return await _cartRepositories.CloneCartAsync(cartId);  
+        }
+
         //public async Task<Guid> SetItemQuantityAsync(Guid cartId, Guid toyId, int quantity)
         //{
         //    await _cartRepositories.SetItemQuantityAsync(cartId, toyId, quantity);

@@ -17,6 +17,7 @@ namespace Knitted_Toys_Store.App.Services
         Task<Guid> UpdateAsync(Cart cart);
         Task<Guid> ReduceQuantityItemAsync(Guid cartId, Guid toyId);
         Task ClearCartAsync(Guid cartId);
+        Task<Cart?> CloneCartAsync(Guid cartId);
         //Task<Guid> SetItemQuantityAsync(Guid cartId, Guid toyId, int quantity);
     }
 }

@@ -19,5 +19,6 @@ namespace Knitted_Toys_Store.App.Services
             string? deliveryAddress = null,
             OrderStatus? status = null);
         Task<IEnumerable<Order>> GetOrderByStatusAsync(OrderStatus status);
+        Task<Guid> CloneOrderToCartAsync(Guid orderId);
     }
 }

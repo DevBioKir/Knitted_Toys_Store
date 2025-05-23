@@ -102,6 +102,33 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             return _mapper.Map<List<Order>>(ordersByStatus);
         }
 
+        public async Task UpdateOrderFromCartAsync(Guid orderId, Guid cartId)
+        {
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null) throw new InvalidOperationException("Order not found");
+
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Toy)
+                .FirstOrDefaultAsync(c => c.Id == cartId);
+
+            if (cart == null) throw new InvalidOperationException("Cart not found");
+
+            order.OrderItems.Clear();
+
+            foreach (var ci in cart.CartItems)
+            {
+                order.OrderItems.Add(OrderItems.Create(order.Id, ci.ToyId, ci.Quantity, ci.Toy.Price));
+            }
+
+            order.UpdateTotalAmount();
+            _context.Orders.Update(order);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task UpdateOrderStatusAsync(Guid orderId, OrderStatus newStatus)
         {
             var entityOrder = await _context.Orders.FindAsync(orderId);
@@ -125,6 +152,32 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
             await _context.SaveChangesAsync();
             return orderId;
+        }
+
+        public async Task<Guid> CloneOrderToCartAsync(Guid orderId)
+        {
+            var order = await GetOrderByIdAsync(orderId);
+
+            if (order == null)
+                throw new InvalidOperationException("Order not found");
+
+            // Создаем новую корзину
+            var newCart = Cart.Create();
+
+            foreach (var item in order.OrderItems)
+            {
+                var newCartItem = CartItems.Create(newCart.Id, item.ToyId, item.Quantity);
+                newCartItem.SetToy(item.Toy); // если доменная модель требует игрушку
+                newCart.CartItems.Add(newCartItem);
+            }
+
+            newCart.TotalAmountUpdate();
+
+            var cartEntity = _mapper.Map<CartEntity>(newCart);
+            await _context.Carts.AddAsync(cartEntity);
+            await _context.SaveChangesAsync();
+
+            return newCart.Id;
         }
     }
 }

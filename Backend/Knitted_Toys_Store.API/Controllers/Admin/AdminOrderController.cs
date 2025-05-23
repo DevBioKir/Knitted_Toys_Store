@@ -108,5 +108,20 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
         {
             return Ok(await _orderService.GetOrderByStatusAsync(newStatus));
         }
+
+        [HttpPost("clone-to-cart")]
+        public async Task<ActionResult<OrderResponse>> CloneOrderToCartAsync(Guid orderId)
+        {
+            try
+            {
+                var cart = await _orderService.CloneOrderToCartAsync(orderId);
+                var cartResponse = _mapper.Map<CartResponse>(cart);
+                return Ok(cartResponse);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
     }
 }

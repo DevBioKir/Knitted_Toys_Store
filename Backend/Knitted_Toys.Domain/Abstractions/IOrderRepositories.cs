@@ -19,5 +19,6 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
         Task<decimal> GetTotalRevenueAsync();
         Task<int> GetOrderCountAsync();
         Task<IEnumerable<Order>> GetOrderByStatusAsync(OrderStatus status);
+        Task<Guid> CloneOrderToCartAsync(Guid orderId);
     }
 }

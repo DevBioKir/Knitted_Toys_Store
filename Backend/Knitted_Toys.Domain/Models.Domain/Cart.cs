@@ -130,5 +130,19 @@
             CartLastUpdate();
             TotalAmountUpdate();
         }
+
+        public Cart Clone()
+        {
+            var newCart = Create();
+
+            foreach (var item in CartItems)
+            {
+                newCart.CartItems.Add(Domain.CartItems.Create(newCart.Id, item.ToyId, item.Quantity));
+            }
+
+            newCart.TotalAmountUpdate();
+
+            return newCart;
+        }
     }
 }
