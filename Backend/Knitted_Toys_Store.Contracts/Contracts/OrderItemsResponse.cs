@@ -4,5 +4,7 @@
         Guid OrderId,
         Guid ToyId,
         int Quantity,
-        decimal PriceAtTime);
+        decimal PriceAtTime,
+        string ToyName,
+        string ToyImageUrl);
 }

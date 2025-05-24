@@ -14,23 +14,30 @@ namespace Knitted_Toys_Store.App.Mapping
 
             CreateMap<Cart, CartEntity>().ReverseMap();
 
-            CreateMap<Order, OrderEntity>().ReverseMap();
+            CreateMap<Order, OrderEntity>()
+                .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems));
+            //CreateMap<Order, OrderEntity>().ReverseMap();
+            CreateMap<OrderEntity, Order>()
+                .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems));
 
             CreateMap<CartItems, CartItemsEntity>().ReverseMap();
 
-            CreateMap<OrderItems, OrderItemsEntity>()
+            //CreateMap<OrderItems, OrderItemsEntity>().ReverseMap();
+
+            CreateMap<OrderItemsEntity, OrderItems>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.OrderId))
                 .ForMember(dest => dest.ToyId, opt => opt.MapFrom(src => src.ToyId))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
                 .ForMember(dest => dest.PriceAtTime, opt => opt.MapFrom(src => src.PriceAtTime))
-                .ForMember(dest => dest.Order, opt => opt.Ignore()) // если ты не хочешь вложенное маппить
-                .ForMember(dest => dest.Toy, opt => opt.Ignore());  // тоже можно проигнорировать
+                .ForMember(dest => dest.Toy, opt => opt.MapFrom(src => src.Toy))
+                .ForMember(dest => dest.Order, opt => opt.Ignore());
 
-            CreateMap<OrderItemsEntity, OrderItems>()
-                .ConstructUsing(src =>
-                OrderItems.Create(src.OrderId, src.ToyId, src.Quantity, src.PriceAtTime)
-                );
+            CreateMap<OrderItems, OrderItemsEntity>()
+                .ForMember(dest => dest.Toy, opt => opt.Ignore()) // если не хочешь сохранять Toy как навигационное свойство
+                .ForMember(dest => dest.Order, opt => opt.Ignore()); // чтобы избежать циклической зависимости
+
+
 
             // Маппинг между запросами (DTO) и доменными моделями
 
@@ -47,17 +54,6 @@ namespace Knitted_Toys_Store.App.Mapping
                 .ForCtorParam("CartItemsResponses", opt => opt.MapFrom(src => src.CartItems))
                 .ForCtorParam("RowVersion", opt => opt.MapFrom(src => src.RowVersion));
 
-            //CreateMap<Cart, CartResponce>()
-            //    .ConstructUsing(src => new CartResponce(
-            //            src.Id,
-            //            src.CreateAt,
-            //            src.LastUpdate,
-            //            src.TotalAmount,
-            //            src.CartItems.Select(ci => new CartItemsResponce(
-            //                ci.CartId, ci.ToyId, ci.Quantity, ci.AddedAt)).ToList(),
-            //            src.RowVersion
-            //        ));
-
             // Маппинг CartItemsRequest -> CartItems
             CreateMap<CartItemsRequest, CartItems>()
                 .ForMember(dest => dest.ToyId, opt => opt.MapFrom(src => src.ToyId))
@@ -73,6 +69,9 @@ namespace Knitted_Toys_Store.App.Mapping
                 .ForMember(dect => dect.ToyName, opt => opt.MapFrom(src => src.Toy != null ? src.Toy.Name : string.Empty)) ///
                 .ForMember(dect => dect.ToyImageUrl, opt => opt.MapFrom(src => src.Toy != null ? src.Toy.ImageUrl : string.Empty));///
             
+
+
+
             // Маппинг OrderRequest -> Order
             CreateMap<OrderRequest, Order>()
                 .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItemsRequest));
@@ -89,18 +88,22 @@ namespace Knitted_Toys_Store.App.Mapping
                 .ForCtorParam("Email", opt => opt.MapFrom(src => src.Email!))
                 .ForCtorParam("DeliveryAddress", opt => opt.MapFrom(src => src.DeliveryAddress!))
                 .ForCtorParam("DeliveryNotes", opt => opt.MapFrom(src => src.DeliveryNotes!))
-                .ForCtorParam("OrderItemsResponce", opt => opt.MapFrom(src => src.OrderItems));
+                .ForCtorParam("OrderItemsResponse", opt => opt.MapFrom(src => src.OrderItems));
 
             // Маппинг OrderItemsRequest -> OrderItems
-            CreateMap<OrderItemsResponse, OrderItems>()
+            CreateMap<OrderItemsRequest, OrderItems>()
                 .ForMember(dest => dest.ToyId, opt => opt.MapFrom(src => src.ToyId))
-                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity));
+                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
+                .ForMember(dest => dest.PriceAtTime, opt => opt.MapFrom(src => src.PriceAtTime));///
 
             // Маппинг OrderItems -> OrderItemsResponse
             CreateMap<OrderItems, OrderItemsResponse>()
+                .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.OrderId))
                 .ForMember(dest => dest.ToyId, opt => opt.MapFrom(src => src.ToyId))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
-                .ForMember(dest => dest.PriceAtTime, opt => opt.MapFrom(src => src.PriceAtTime));
+                .ForMember(dest => dest.PriceAtTime, opt => opt.MapFrom(src => src.PriceAtTime))
+                .ForMember(dect => dect.ToyName, opt => opt.MapFrom(src => src.Toy != null ? src.Toy.Name : string.Empty)) ///
+                .ForMember(dect => dect.ToyImageUrl, opt => opt.MapFrom(src => src.Toy != null ? src.Toy.ImageUrl : string.Empty));///
         }
     }
 }

@@ -35,7 +35,7 @@ export const createOrderAdmin = async (orderRequest: OrderRequest) => {
 
 export const deleteOrderAdmin = async (opderId: string) => {
   try{
-    await adminAPI.delete(`/AdminOrder?id=${opderId}}`)
+    await adminAPI.delete(`/AdminOrder?id=${opderId}`)
   } catch (err) {
     console.error("Ошибка при удалении заказа", err);
     throw err;

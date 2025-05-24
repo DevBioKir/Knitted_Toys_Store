@@ -6,9 +6,11 @@ namespace Knitted_Toys_Store.App.Services
     public class OrderService : IOrderService
     {
         private readonly IOrderRepositories _orderRepositories;
-        public OrderService(IOrderRepositories orderRepositories)
+        private readonly ICartRepositories _cartRepositories;
+        public OrderService(IOrderRepositories orderRepositories, ICartRepositories cartRepositories)
         {
             _orderRepositories = orderRepositories;
+            _cartRepositories = cartRepositories;
         }
 
         public async Task<IEnumerable<Order>> GetAllOrdersAsync()

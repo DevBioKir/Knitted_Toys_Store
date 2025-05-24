@@ -21,7 +21,6 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             var entitiesOrders = await _context.Orders
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Toy)
-                .AsNoTracking()
                 .ToListAsync();
             return _mapper.Map<List<Order>>(entitiesOrders);
         }
@@ -36,21 +35,48 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
         }
 
         public async Task<Order> CreateOrderAsync(Cart cart, string surname, string name, string phone, string email, string deliveryAddress,
-            string deliveryNotes)
+    string deliveryNotes)
         {
-            if (cart.CartItems.Count == 0) throw new InvalidOperationException("Cart is empty");
+            if (cart.CartItems.Count == 0)
+                throw new InvalidOperationException("Cart is empty");
 
+            // Сначала создаём заказ с пустым списком товаров
+            var order = Order.Create(surname, name, phone, email, deliveryAddress, deliveryNotes, new List<OrderItems>());
+
+            // Теперь создаём OrderItems с правильным order.Id
             var orderItems = cart.CartItems.Select(ci =>
-                OrderItems.Create(cart.Id, ci.ToyId, ci.Quantity, ci.Toy.Price)).ToList();
+                OrderItems.Create(order.Id, ci.ToyId, ci.Quantity, ci.Toy.Price)).ToList();
 
-            var order = Order.Create(surname, name, phone, email, deliveryAddress, deliveryNotes, orderItems);
+            order.AddOrderItems(orderItems);
+            //order.OrderItems.AddRange(orderItems); // добавляем товары в заказ
 
+            // Пересчёт суммы заказа
+            //order.TotalAmountUpdate();
+
+            // Маппим и сохраняем
             var entityOrder = _mapper.Map<OrderEntity>(order);
             _context.Orders.Add(entityOrder);
             await _context.SaveChangesAsync();
 
             return order;
         }
+
+        //public async Task<Order> CreateOrderAsync(Cart cart, string surname, string name, string phone, string email, string deliveryAddress,
+        //    string deliveryNotes)
+        //{
+        //    if (cart.CartItems.Count == 0) throw new InvalidOperationException("Cart is empty");
+
+        //    var orderItems = cart.CartItems.Select(ci =>
+        //        OrderItems.Create(cart.Id, ci.ToyId, ci.Quantity, ci.Toy.Price)).ToList();
+
+        //    var order = Order.Create(surname, name, phone, email, deliveryAddress, deliveryNotes, orderItems);
+
+        //    var entityOrder = _mapper.Map<OrderEntity>(order);
+        //    _context.Orders.Add(entityOrder);
+        //    await _context.SaveChangesAsync();
+
+        //    return order;
+        //}
 
         public async Task<IEnumerable<Order>> SearchOrderAsync(
             string? surnameCustomer = null,
@@ -102,32 +128,33 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             return _mapper.Map<List<Order>>(ordersByStatus);
         }
 
-        public async Task UpdateOrderFromCartAsync(Guid orderId, Guid cartId)
-        {
-            var order = await _context.Orders
-                .Include(o => o.OrderItems)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
+        //public async Task UpdateOrderFromCartAsync(Guid orderId, Guid cartId)
+        //{
+        //    var entityOrder = await _context.Orders
+        //        .Include(o => o.OrderItems)
+        //        .FirstOrDefaultAsync(o => o.Id == orderId);
 
-            if (order == null) throw new InvalidOperationException("Order not found");
+        //    if (entityOrder == null) throw new InvalidOperationException("Order not found");
+        //    var domainOrder = _mapper.Map<Order>(entityOrder);
 
-            var cart = await _context.Carts
-                .Include(c => c.CartItems)
-                .ThenInclude(ci => ci.Toy)
-                .FirstOrDefaultAsync(c => c.Id == cartId);
+        //    var cart = await _context.Carts
+        //        .Include(c => c.CartItems)
+        //        .ThenInclude(ci => ci.Toy)
+        //        .FirstOrDefaultAsync(c => c.Id == cartId);
 
-            if (cart == null) throw new InvalidOperationException("Cart not found");
+        //    if (cart == null) throw new InvalidOperationException("Cart not found");
 
-            order.OrderItems.Clear();
+        //    domainOrder.OrderItems.Clear();
 
-            foreach (var ci in cart.CartItems)
-            {
-                order.OrderItems.Add(OrderItems.Create(order.Id, ci.ToyId, ci.Quantity, ci.Toy.Price));
-            }
+        //    foreach (var ci in cart.CartItems)
+        //    {
+        //        domainOrder.OrderItems.Add(OrderItems.Create(order.Id, ci.ToyId, ci.Quantity, ci.Toy.Price));
+        //    }
 
-            order.UpdateTotalAmount();
-            _context.Orders.Update(order);
-            await _context.SaveChangesAsync();
-        }
+        //    order.UpdateTotalAmount();
+        //    _context.Orders.Update(order);
+        //    await _context.SaveChangesAsync();
+        //}
 
         public async Task UpdateOrderStatusAsync(Guid orderId, OrderStatus newStatus)
         {

@@ -5,8 +5,8 @@ export interface CartResponse {
   createAt: Date;
   lastUpdate: Date;
   totalAmount: number;
-  cartItemsResponses: CartItemsResponse[];
-  rowVersion: string;
-
   cartItems?: CartItemsResponse[];
+  rowVersion: string;
+  
+  cartItemsResponses: CartItemsResponse[];
 }

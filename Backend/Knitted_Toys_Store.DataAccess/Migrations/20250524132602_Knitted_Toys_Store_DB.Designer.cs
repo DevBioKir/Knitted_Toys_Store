@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Knitted_Toys_Store.DataAccess.Migrations
 {
     [DbContext(typeof(Knitted_Toys_StoreDBContext))]
-    [Migration("20250520100216_Knitted_Toys_Store_DB")]
+    [Migration("20250524132602_Knitted_Toys_Store_DB")]
     partial class Knitted_Toys_Store_DB
     {
         /// <inheritdoc />

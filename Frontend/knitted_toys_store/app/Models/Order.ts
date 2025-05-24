@@ -20,7 +20,7 @@ export interface Order {
     email: string;
     deliveryAddress: string;
     deliveryNotes: string;
-    orderItems: OrderItems;
+    orderItems?: OrderItems[];
 
     orderItemsResponses: OrderItemsResponse[];
 }

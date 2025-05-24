@@ -18,13 +18,13 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
         public async Task<List<Cart>> GetAllCartsAsync()
         {
-            var entitiesCart = await _context.Carts
+            var entitiesCarts = await _context.Carts
                 .Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Toy)
                 .AsNoTracking()
                 .ToListAsync();
 
-            return _mapper.Map<List<Cart>>(entitiesCart);
+            return _mapper.Map<List<Cart>>(entitiesCarts);
         }
 
         public async Task<Cart?> GetCartByIdAsync(Guid cartId)

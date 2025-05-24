@@ -46,7 +46,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
         [HttpGet("GetAllCartsAsyn")]
         public async Task<ActionResult<IEnumerable<CartResponse>>> GetAllCartsAsyn()
         {
-            var carts = await _cartService.GetAllCarts();
+            var carts = await _cartService.GetAllCartsAsync();
 
             var responceForCarts = _mapper.Map<List<CartResponse>>(carts);
             return Ok(responceForCarts);

@@ -10,8 +10,8 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
         public int Quantity { get; private set; } //количество товара
         public decimal PriceAtTime { get; private set; } //цена на момент заказа
 
-        public Order Order { get; private set; } //ссылка на Orders
-        public Toy Toy { get; private set; } //ссылка на Toy
+        public Order? Order { get; private set; } //ссылка на Orders
+        public Toy? Toy { get; private set; } //ссылка на Toy
         //добавить дату создания заказа
 
         public static OrderItems Create(Guid orderId, Guid toyId, int quantity, decimal priceAtTime)

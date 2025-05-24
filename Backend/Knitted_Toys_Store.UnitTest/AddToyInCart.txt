@@ -80,3 +80,36 @@
                 throw new Exception($"Ошибка при создании позиции в корзине: {err.Message}", err);
             }
         }
+
+
+
+
+
+
+          // Маппинг CartRequest -> Cart
+            CreateMap<CartRequest, Cart>()
+                .ForMember(dest => dest.CartItems, opt => opt.MapFrom(src => src.CartItemsRequest));
+
+            // Маппинг Cart -> CartResponse
+            CreateMap<Cart, CartResponse>()
+                .ForCtorParam("Id", opt => opt.MapFrom(src => src.Id))
+                .ForCtorParam("CreateAt", opt => opt.MapFrom(src => src.CreateAt))
+                .ForCtorParam("LastUpdate", opt => opt.MapFrom(src => src.LastUpdate))
+                .ForCtorParam("TotalAmount", opt => opt.MapFrom(src => src.TotalAmount))
+                .ForCtorParam("CartItemsResponses", opt => opt.MapFrom(src => src.CartItems))
+                .ForCtorParam("RowVersion", opt => opt.MapFrom(src => src.RowVersion));
+
+            // Маппинг CartItemsRequest -> CartItems
+            CreateMap<CartItemsRequest, CartItems>()
+                .ForMember(dest => dest.ToyId, opt => opt.MapFrom(src => src.ToyId))
+                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
+                .ForMember(dest => dest.AddedAt, opt => opt.MapFrom(src => src.AddedAt));
+
+            // Маппинг CartItems -> CartItemsResponse
+            CreateMap<CartItems, CartItemsResponse>()
+                .ForMember(dest => dest.CartId, opt => opt.MapFrom(src => src.CartId))
+                .ForMember(dest => dest.ToyId, opt => opt.MapFrom(src => src.ToyId))
+                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
+                .ForMember(dest => dest.AddedAt, opt => opt.MapFrom(src => src.AddedAt))
+                .ForMember(dect => dect.ToyName, opt => opt.MapFrom(src => src.Toy != null ? src.Toy.Name : string.Empty)) ///
+                .ForMember(dect => dect.ToyImageUrl, opt => opt.MapFrom(src => src.Toy != null ? src.Toy.ImageUrl : string.Empty));///

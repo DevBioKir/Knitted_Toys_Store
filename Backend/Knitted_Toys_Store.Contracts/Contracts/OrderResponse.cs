@@ -14,5 +14,5 @@ namespace Knitted_Toys_Store.Contracts
         string Email,
         string DeliveryAddress,
         string DeliveryNotes,
-        List<OrderItemsResponse> OrderItemsResponce);
+        List<OrderItemsResponse> OrderItemsResponse);///
 }

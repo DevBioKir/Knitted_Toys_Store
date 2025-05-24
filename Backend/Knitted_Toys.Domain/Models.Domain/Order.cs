@@ -30,7 +30,7 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
 
         public static Order Create(
             string surname, string name, string phone, string email, string deliveryAddress,
-            string deliveryNotes, List<OrderItems> orderItems)
+            string deliveryNotes, IEnumerable<OrderItems> orderItems)
         {
             if (string.IsNullOrWhiteSpace(surname) || string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Customer name and surname cannot be empty");
@@ -38,24 +38,20 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(deliveryAddress))
                 throw new ArgumentException("The mail and the delivery address cannot be empty");
 
-            if (orderItems == null || orderItems.Count == 0)
-                throw new ArgumentException("Order must contain at least one item");
-
-            //вычисляем сумму
-            decimal totalAmount = orderItems.Sum(item => item.Quantity * item.PriceAtTime);
+            var orderItemsList = orderItems.ToList();
 
             return new Order
             {
                 Id = Guid.NewGuid(),
                 OrderDate = DateTime.UtcNow,
-                TotalAmount = totalAmount, //при создании передаем вычисленную сумму
+                TotalAmount = orderItemsList.Sum(x => x.PriceAtTime * x.Quantity), //при создании передаем вычисленную сумму
                 Status = OrderStatus.Pending,
                 SurnameCustomer = surname,
                 NameCustomer = name,
                 PhoneNumber = phone,
                 Email = email,
                 DeliveryAddress = deliveryAddress,
-                OrderItems = orderItems
+                OrderItems = orderItemsList
             };
         }
 
@@ -72,12 +68,18 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
         {
             TotalAmount = OrderItems
                 .Where(item => item.Toy != null)
-                .Sum(item => item.Quantity + item.Toy.Price);
+                .Sum(item => item.Quantity * item.Toy.Price);
+        }
+
+        public void AddOrderItems(IEnumerable<OrderItems> items)
+        {
+            OrderItems.AddRange(items);
+            TotalAmountUpdate();
         }
 
         public void IncreaseItemQuantity(Guid toyId)
         {
-            var item = OrderItems.FirstOrDefault(oi => oi.ToyId == toyId);
+            var item = FindOrderItemsByToyId(toyId);
 
             if (item == null)
                 throw new InvalidOperationException
@@ -90,7 +92,7 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
 
         public void ReduceItemQuantity(Guid toyId)
         {
-            var item = OrderItems.FirstOrDefault(oi => oi.ToyId == toyId);
+            var item = FindOrderItemsByToyId(toyId);
 
             if (item == null)
                 throw new InvalidOperationException

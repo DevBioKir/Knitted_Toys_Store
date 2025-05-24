@@ -4,4 +4,6 @@ export interface OrderItemsResponse {
     toyId: string;
     quantity: number;
     priceAtTime: number;
+    toyName?: string;
+    toyImageUrl?: string;
 }

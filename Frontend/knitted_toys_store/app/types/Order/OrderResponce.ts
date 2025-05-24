@@ -3,15 +3,17 @@ import { OrderItemsResponse } from "../OrderItems/OrderItemsResponse";
 
 
 export interface OrderResponse{
-    id: string;
-    odredDate: string;
-    totalAmount: string;
-    status: OrderStatus;
+    id?: string;
+    odredDate?: Date;
+    totalAmount?: number;
+    status?: OrderStatus;
     surnameCustomer: string;
     nameCustomer: string;
     phoneNumber: string;
     email: string;
     deliveryAddress: string;
     deliveryNotes: string;
-    orderItemsRequest: OrderItemsResponse;
+    orderItems?: OrderItemsResponse[];
+
+    orderItemsResponses: OrderItemsResponse[];
 }

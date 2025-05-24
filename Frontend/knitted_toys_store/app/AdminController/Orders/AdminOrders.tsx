@@ -124,7 +124,7 @@ export default function AdminOrdersPage() {
         </>
       )}
 
-      {editingOrder && (
+      {/*{editingOrder && (
         <UpdateOrderForm
           order={editingOrder}
           onSuccess={() => {
@@ -132,7 +132,7 @@ export default function AdminOrdersPage() {
             fetchOrders(); // Перезагружаем корзины после редактирования
           }}
         />
-      )}
+      )}*/}
     </div>
   );
 }
