@@ -17,12 +17,18 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
         private readonly IOrderService _orderService;
         private readonly ICartService _cartService;
         private readonly IMapper _mapper;
+        private readonly ILogger<AdminOrderController> _logger;
 
-        public AdminOrderController(IOrderService orderService, IMapper mapper, ICartService cartService)
+        public AdminOrderController(
+            IOrderService orderService, 
+            IMapper mapper,
+            ICartService cartService,
+            ILogger<AdminOrderController> logger)
         {
             _orderService = orderService;
             _cartService = cartService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet("{id:guid}")]
@@ -110,16 +116,20 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
         }
 
         [HttpPost("clone-to-cart")]
-        public async Task<ActionResult<OrderResponse>> CloneOrderToCartAsync(Guid orderId)
+        public async Task<ActionResult<Guid>> CloneOrderToCartAsync(Guid orderId)
         {
             try
             {
-                var cart = await _orderService.CloneOrderToCartAsync(orderId);
-                var cartResponse = _mapper.Map<CartResponse>(cart);
-                return Ok(cartResponse);
+                var cartId = await _orderService.CloneOrderToCartAsync(orderId);
+                var cart = await _cartService.GetCartByIdAsync(cartId); // получи объект корзины
+                var response = _mapper.Map<CartResponse>(cart);
+                return Ok(response);
+                ////var cartResponse = _mapper.Map<CartResponse>(cart);
+                //return Ok(cart);
             }
             catch (InvalidOperationException ex)
             {
+                _logger.LogWarning("Клонирование не удалось: {Message}", ex.Message);
                 return NotFound(new { message = ex.Message });
             }
         }

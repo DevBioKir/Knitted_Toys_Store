@@ -1,5 +1,6 @@
 "use client";
 
+import { UpdateOrderForm } from "@/app/components/Admin/Orders/UpdateOrderForm";
 import { Order } from "@/app/Models/Order";
 import {
   deleteOrderAdmin,
@@ -124,7 +125,7 @@ export default function AdminOrdersPage() {
         </>
       )}
 
-      {/*{editingOrder && (
+      {editingOrder && (
         <UpdateOrderForm
           order={editingOrder}
           onSuccess={() => {
@@ -132,7 +133,7 @@ export default function AdminOrdersPage() {
             fetchOrders(); // Перезагружаем корзины после редактирования
           }}
         />
-      )}*/}
+      )}
     </div>
   );
 }

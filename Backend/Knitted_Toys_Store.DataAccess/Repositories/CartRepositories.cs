@@ -16,7 +16,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             _mapper = mapper;
         }
 
-        public async Task<List<Cart>> GetAllCartsAsync()
+        public async Task<IEnumerable<Cart>> GetAllCartsAsync()
         {
             var entitiesCarts = await _context.Carts
                 .Include(c => c.CartItems)

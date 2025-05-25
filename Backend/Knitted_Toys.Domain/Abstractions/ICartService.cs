@@ -10,7 +10,7 @@ namespace Knitted_Toys_Store.App.Services
         //Task<Guid> CreateToysInCartItems(Guid cartId, Guid toyId, int quantity);
         Task<Cart> CreateCartAsync();
         Task<Guid> DeleteCartAsync(Guid id);
-        Task<List<Cart>> GetAllCartsAsync();
+        Task<IEnumerable<Cart>> GetAllCartsAsync();
         Task<Cart?> GetCartByIdAsync(Guid id);
         Task<Cart> GetCurrentCartAsync(HttpContext httpContext, HttpResponse responce);
         Task<Guid> RemoveItemFromCartAsync(Guid cartId, Guid toyId);

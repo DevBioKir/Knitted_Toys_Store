@@ -14,30 +14,35 @@ namespace Knitted_Toys_Store.App.Mapping
 
             CreateMap<Cart, CartEntity>().ReverseMap();
 
-            CreateMap<Order, OrderEntity>()
-                .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems));
-            //CreateMap<Order, OrderEntity>().ReverseMap();
-            CreateMap<OrderEntity, Order>()
-                .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems));
-
-            CreateMap<CartItems, CartItemsEntity>().ReverseMap();
-
-            //CreateMap<OrderItems, OrderItemsEntity>().ReverseMap();
-
             CreateMap<OrderItemsEntity, OrderItems>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.OrderId))
                 .ForMember(dest => dest.ToyId, opt => opt.MapFrom(src => src.ToyId))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
                 .ForMember(dest => dest.PriceAtTime, opt => opt.MapFrom(src => src.PriceAtTime))
-                .ForMember(dest => dest.Toy, opt => opt.MapFrom(src => src.Toy))
+                .ForMember(dest => dest.Toy, opt =>
+                {
+                    opt.PreCondition(src => src.Toy != null);
+                    opt.MapFrom(src => src.Toy);
+                })
                 .ForMember(dest => dest.Order, opt => opt.Ignore());
+
+            CreateMap<OrderEntity, Order>()
+                .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems));
+
+            CreateMap<Order, OrderEntity>()
+                .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems));
 
             CreateMap<OrderItems, OrderItemsEntity>()
                 .ForMember(dest => dest.Toy, opt => opt.Ignore()) // если не хочешь сохранять Toy как навигационное свойство
                 .ForMember(dest => dest.Order, opt => opt.Ignore()); // чтобы избежать циклической зависимости
 
+            //CreateMap<CartItems, CartItemsEntity>().ReverseMap();
+            CreateMap<CartItemsEntity, CartItems>()
+                 .ForMember(dest => dest.Toy, opt => opt.MapFrom(src => src.Toy));
 
+            CreateMap<CartItems, CartItemsEntity>()
+                 .ForMember(dest => dest.Toy, opt => opt.Ignore());
 
             // Маппинг между запросами (DTO) и доменными моделями
 

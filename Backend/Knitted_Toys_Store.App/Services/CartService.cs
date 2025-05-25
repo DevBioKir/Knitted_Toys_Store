@@ -18,7 +18,7 @@ namespace Knitted_Toys_Store.App.Services
             _mapper = mapper;
             _logger = logger;
         }
-        public async Task<List<Cart>> GetAllCartsAsync()
+        public async Task<IEnumerable<Cart>> GetAllCartsAsync()
         {
             return await _cartRepositories.GetAllCartsAsync();
         }
