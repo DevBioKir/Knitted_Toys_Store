@@ -55,5 +55,20 @@ namespace Knitted_Toys_Store.API.Controllers
 
             return Ok(order);
         }
+
+        [HttpGet("Current")]
+        public async Task<ActionResult<OrderResponse>> GetCurrentOrder()
+        {
+            var currentOrder = await _orderService.GetCurrentOrderAsync(HttpContext, Response);
+
+            if (currentOrder == null)
+            {
+                return NotFound("Текущий заказ не найден.");
+            }
+
+            var response = _mapper.Map<OrderResponse>(currentOrder);
+
+            return Ok(response);
+        }
     }
 }

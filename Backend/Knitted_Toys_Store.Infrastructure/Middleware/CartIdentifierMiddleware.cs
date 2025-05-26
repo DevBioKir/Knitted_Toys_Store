@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Serilog;
 
 namespace Knitted_Toys_Store.Infrastructure.Middleware
 {
@@ -12,7 +11,9 @@ namespace Knitted_Toys_Store.Infrastructure.Middleware
         private readonly RequestDelegate _next; //ссылк на следующий middleware в конвейере
         private readonly ILogger<CartIdentifierMiddleware> _logger;
         
-        public CartIdentifierMiddleware(RequestDelegate next, ILogger<CartIdentifierMiddleware> logger)
+        public CartIdentifierMiddleware(
+            RequestDelegate next, 
+            ILogger<CartIdentifierMiddleware> logger)
         {
             _next = next; //сохраняем ссылку на следующий middleware
             _logger = logger;

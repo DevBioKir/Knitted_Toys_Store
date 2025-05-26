@@ -114,6 +114,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseCartIdentifier();
+app.UseOrderIdentifier();
 
 app.MapControllers();
 

@@ -1,17 +1,30 @@
 "use client";
 
+import {
+  addToCart,
+  reduceQuantityItem,
+  removeFromCart,
+} from "@/app/services/Admin/serviceCartsAdmin";
 import { getAllOrdersAdmin } from "@/app/services/Admin/serviceOrdersAdmin";
 import { getAllToysAdmin } from "@/app/services/Admin/serviceToysAdmin";
 import { OrderRequest } from "@/app/types/Order/OrderRequest";
 import { OrderResponse } from "@/app/types/Order/OrderResponce";
 import { ToyResponse } from "@/app/types/Toy/ToyResponse";
-import { Button, Divider, Form, InputNumber, message, Select, Typography } from "antd";
-import { b } from "framer-motion/client";
+import {
+  Button,
+  Divider,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Select,
+  Typography,
+} from "antd";
 import { useEffect, useState } from "react";
 
 interface Props {
-    order: OrderResponse;
-    onSuccess: () => void;
+  order: OrderResponse;
+  onSuccess: () => void;
 }
 
 export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
@@ -20,9 +33,11 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
   const [selectedToy, setSelectedToy] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<number>(1);
 
-    useEffect(() => {
+  useEffect(() => {
     getAllToysAdmin()
-      .then((toys) => setToys([...toys].sort((a, b) => a.name.localeCompare(b.name))))
+      .then((toys) =>
+        setToys([...toys].sort((a, b) => a.name.localeCompare(b.name)))
+      )
       .catch(() => message.error("Не удалось загрузить игрушки"));
 
     if (order) {
@@ -35,22 +50,69 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
         email: order.email,
         deliveryAddress: order.deliveryAddress,
         deliveryNotes: order.deliveryNotes,
-        
       });
     }
   }, [order, form]);
 
-return (
+  const handleAddItemToCart = async (toyId: string, quantity: number) => {
+    if (!cart) return;
+    try {
+      await addToCart(cart.id, toyId, quantity);
+      message.success(`Игрушка ${toyId} успешно добавлена`);
+      onSuccess();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleAddToy = async () => {
+    if (selectedToy && quantity > 0) {
+      await handleAddItemToCart(selectedToy, quantity);
+      setSelectedToy(null);
+      setQuantity(1);
+    }
+  };
+
+  const handleReduceQuantityItem = async (toyId: string) => {
+    if (!cart) return;
+    try {
+      await reduceQuantityItem(cart.id, toyId);
+      message.success(`Количество игрушек ${toyId} успешно уменьшено`);
+      onSuccess();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleRemoveItemFromCart = async (toyId: string) => {
+    if (!cart) return;
+    await removeFromCart(cart.id, toyId);
+    onSuccess();
+  };
+
+  return (
     <Form layout="vertical" form={form}>
       <Typography.Title level={3}>Характеристики заказа</Typography.Title>
-      <Form.Item name="createAt" label="Дата создания">
+      <Form.Item name="totalAmount" label="Сумма заказа">
         <Input readOnly />
       </Form.Item>
-      <Form.Item name="totalAmount" label="Общая сумма">
-        <InputNumber style={{ width: "100%" }} readOnly />
+      <Form.Item name="surnameCustomer" label="Фамилия заказчика">
+        <Input />
       </Form.Item>
-      <Form.Item name="rowVersion" label="Версия строки">
-        <Input readOnly />
+      <Form.Item name="nameCustomer" label="Имя заказчика">
+        <Input />
+      </Form.Item>
+      <Form.Item name="phoneNumber" label="Мобильный номер заказчика">
+        <Input />
+      </Form.Item>
+      <Form.Item name="email" label="Электронная почта заказчика">
+        <Input />
+      </Form.Item>
+      <Form.Item name="deliveryAddress" label="Адрес доставки">
+        <Input />
+      </Form.Item>
+      <Form.Item name="deliveryNotes" label="Примечание к доставке">
+        <Input />
       </Form.Item>
 
       <Divider />
@@ -58,11 +120,24 @@ return (
       <Typography.Title level={3}>Позиции в заказе</Typography.Title>
       {order.orderItems?.length ? (
         order.orderItems.map((item) => (
-          <div key={item.toyId} style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
-            <span>{toys?.find((toy) => toy.id === item.toyId)?.name || "Неизвестная игрушка"} — {item.quantity} шт.</span>
-            <Button onClick={() => handleAddItem(item.toyId, 1)}>+</Button>
-            <Button onClick={() => handleReduceItem(item.toyId)}>-</Button>
-            <Button type="link" danger onClick={() => handleRemoveItem(item.toyId)}>Удалить</Button>
+          <div
+            key={item.toyId}
+            style={{ display: "flex", alignItems: "center", marginBottom: 8 }}
+          >
+            <span>
+              {toys?.find((toy) => toy.id === item.toyId)?.name ||
+                "Неизвестная игрушка"}{" "}
+              — {item.quantity} шт.
+            </span>
+            <Button onClick={() => handleAddItemToCart(item.toyId, 1)}>+</Button>
+            <Button onClick={() => handleReduceQuantityItem(item.toyId)}>-</Button>
+            <Button
+              type="link"
+              danger
+              onClick={() => handleRemoveItemFromCart(item.toyId)}
+            >
+              Удалить
+            </Button>
           </div>
         ))
       ) : (
@@ -80,11 +155,20 @@ return (
           onChange={(value) => setSelectedToy(value)}
         >
           {toys?.map((toy) => (
-            <Select.Option key={toy.id} value={toy.id}>{toy.name}</Select.Option>
+            <Select.Option key={toy.id} value={toy.id}>
+              {toy.name}
+            </Select.Option>
           ))}
         </Select>
-        <InputNumber min={1} value={quantity} onChange={(value) => setQuantity(value || 1)} style={{ width: "20%" }} />
-        <Button type="primary" onClick={handleAddToy}>Добавить в заказ</Button>
+        <InputNumber
+          min={1}
+          value={quantity}
+          onChange={(value) => setQuantity(value || 1)}
+          style={{ width: "20%" }}
+        />
+        <Button type="primary" onClick={handleAddToy}>
+          Добавить в заказ
+        </Button>
       </Form.Item>
     </Form>
   );
