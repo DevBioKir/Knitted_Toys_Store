@@ -12,9 +12,7 @@ import {
   Avatar,
   Modal,
 } from "antd";
-import { addToCart, reduceQuantityItem, updateCart } from "../services/carts";
-import { CartRequest } from "../types/Cart/CartRequest";
-import { CartItemsRequest } from "../types/CartItems/CartItemsRequest";
+import { addToCart, reduceQuantityItem } from "../services/carts";
 import { useCart } from "../context/CartProvider";
 import OrderCreateForm from "../components/OrderCreateForm";
 
@@ -41,36 +39,6 @@ export default function CartPage() {
   useEffect(() => {
     refreshCart();
   }, []);
-
-  const handleUpdateCart = async (items: CartItemsRequest[]) => {
-    if (!cart) return;
-    setIsUpdating(true);
-
-    const cartRequest: CartRequest = {
-      id: cart.id,
-      createAt: cart.createAt,
-      lastUpdate: cart.lastUpdate,
-      totalAmount: cart.totalAmount,
-      rowVersion: cart.rowVersion,
-      cartItemsRequest: items,
-    };
-
-    try {
-      await updateCart(cart.id, cartRequest);
-      await refreshCart();
-      message.success("Корзина обновлена");
-    } catch (error: any) {
-      if (error.message.includes("409")) {
-        message.warning("Корзина была изменена в другом месте. Обновляем...");
-        refreshCart();
-      } else {
-        message.error("Ошибка при обновлении корзины");
-        console.error(error);
-      }
-    } finally {
-      setIsUpdating(false);
-    }
-  };
 
   const handleAddExistingItem = async (toyId: string) => {
     if (!cart) {
@@ -102,11 +70,6 @@ export default function CartPage() {
       message.error("Не удалось уменьшить количество товара");
     }
   };
-
-  // const handleClearCart = () => {
-  //   if (!cart) return;
-  //   handleUpdateCart([]);
-  // };
 
   if (isLoading || isUpdating) {
     return (

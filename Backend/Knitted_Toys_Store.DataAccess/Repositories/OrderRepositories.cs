@@ -29,6 +29,17 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
                 .ThenInclude(oi => oi.Toy)
                 .ToListAsync();
 
+            foreach (var order in entitiesOrders)
+            {
+                foreach (var item in order.OrderItems)
+                {
+                    if (item == null)
+                        Console.WriteLine($"Null OrderItem в заказе {order.Id}");
+                    else if (item.Toy == null)
+                        Console.WriteLine($"OrderItem без Toy: OrderId={order.Id}, ToyId={item.ToyId}");
+                }
+            }
+
             return _mapper.Map<List<Order>>(entitiesOrders);
         }
         public async Task<Order?> GetOrderByIdAsync(Guid orderId)
@@ -37,6 +48,13 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Toy)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (entityOrder != null)
+            {
+                entityOrder.OrderItems = entityOrder.OrderItems?
+                    .Where(oi => oi != null && oi.Toy != null)
+                    .ToList();
+            }
 
             return entityOrder == null ? null : _mapper.Map<Order>(entityOrder);
         }

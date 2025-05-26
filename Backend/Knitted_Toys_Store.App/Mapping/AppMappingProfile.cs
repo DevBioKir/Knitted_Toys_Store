@@ -28,7 +28,13 @@ namespace Knitted_Toys_Store.App.Mapping
                 .ForMember(dest => dest.Order, opt => opt.Ignore());
 
             CreateMap<OrderEntity, Order>()
-                .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems));
+                    .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src =>
+                        src.OrderItems != null
+                            ? src.OrderItems
+                                .Where(oi => oi != null && oi.Toy != null)
+                                .ToList()
+                            : new List<OrderItemsEntity>()
+                    ));
 
             CreateMap<Order, OrderEntity>()
                 .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems));
