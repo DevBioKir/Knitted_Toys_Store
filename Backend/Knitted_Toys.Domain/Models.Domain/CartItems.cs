@@ -16,6 +16,8 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
         [JsonIgnore]
         public Toy? Toy { get; private set; } //ссылка на Toy
 
+        private CartItems() {}
+
         public static CartItems Create(Guid cartId, Guid toyId, int quantity)
         {
             if (quantity <= 0) throw new ArgumentException("Quantity must be greater than zero");

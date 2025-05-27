@@ -28,6 +28,8 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
 
         public List<OrderItems> OrderItems { get; private set; } = []; //у одного заказа может быть много товаров
 
+        private Order() {}
+
         public static Order Create(
             string surname, string name, string phone, string email, string deliveryAddress,
             string deliveryNotes, IEnumerable<OrderItems> orderItems)

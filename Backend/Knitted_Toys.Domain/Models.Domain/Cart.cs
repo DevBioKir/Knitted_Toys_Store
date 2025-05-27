@@ -13,6 +13,8 @@
         // Для оптимистичной блокировки, используем byte[]
         public byte[] RowVersion { get; set; }
 
+        private Cart() {}
+
         public static Cart Create() //фабричный метод
         {
             return new Cart()
