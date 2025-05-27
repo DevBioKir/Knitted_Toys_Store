@@ -8,6 +8,8 @@ using Knitted_Toys_Store.Infrastructure.Middleware;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Authentication;
+using Mapster;
+using MapsterMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -31,12 +33,18 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddOpenApi();
-builder.Services.AddAutoMapper(typeof(AppMappingProfile)); //регистрация AppMappingProfile
 
 builder.Services.AddDbContext<Knitted_Toys_StoreDBContext>(options =>
 {
     options.UseNpgsql(configuration.GetConnectionString(nameof(Knitted_Toys_StoreDBContext)));
 });
+
+// 1. Сканируем сборку и регистрируем все маппинги из IRegister
+TypeAdapterConfig.GlobalSettings.Scan(typeof(MappingConfig).Assembly);
+
+// 2. Добавляем Mapster как сервис, если используешь IMapper (необязательно, но удобно)
+builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
+builder.Services.AddScoped<IMapper, ServiceMapper>();
 
 //Регистрация сервисов
 builder.Services.AddScoped<IToyService, ToyService>();

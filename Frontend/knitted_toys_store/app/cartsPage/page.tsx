@@ -15,6 +15,7 @@ import {
 import { addToCart, reduceQuantityItem } from "../services/carts";
 import { useCart } from "../context/CartProvider";
 import OrderCreateForm from "../components/OrderCreateForm";
+import { useRouter } from "next/navigation";
 
 const { Title, Text } = Typography;
 
@@ -22,6 +23,7 @@ export default function CartPage() {
   const { cart, refreshCart, isLoading } = useCart();
   const [isUpdating, setIsUpdating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
 
   // Используем правильное поле из интерфейса CartResponse
   const CartItemsResponses = cart?.cartItemsResponses || [];
@@ -84,8 +86,8 @@ export default function CartPage() {
     Array.isArray(CartItemsResponses) && CartItemsResponses.length > 0;
 
   return (
-    <div className="p-4 max-w-2xl mx-auto">
-      <Title level={2}>Корзина</Title>
+    <div className="text-center p-6">
+      <Title level={2}>Моя корзина</Title>
       {hasItems ? (
         <>
           <List
@@ -155,11 +157,19 @@ export default function CartPage() {
           </div>
         </>
       ) : (
-        <div>
-          <Text>Корзина пуста</Text>
-          <Button onClick={refreshCart} className="ml-4">
-            Обновить корзину
-          </Button>
+        <div className="text-center p-6">
+          <Title level={3}>Корзина пуста</Title>
+          <p className="mb-4 text-gray-500">
+            Возможно, вы уже оформили заказ или не добавили товары
+          </p>
+          <div className="flex flex-col items-center">
+            <div className="flex gap-4">
+              <Button onClick={refreshCart}>Обновить</Button>
+              <Button type="primary" onClick={() => router.push("/toysPage")}>
+                Перейти в каталог
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>

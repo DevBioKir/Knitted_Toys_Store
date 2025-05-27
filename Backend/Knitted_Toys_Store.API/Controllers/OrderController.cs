@@ -1,8 +1,10 @@
-﻿using AutoMapper;
+﻿using MapsterMapper;
 using Knitted_Toys_Store.App.Services;
 using Knitted_Toys_Store.Contracts;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Microsoft.AspNetCore.Mvc;
+using Knitted_Toys_Store.Infrastructure.Middleware;
+using Microsoft.AspNetCore.Http;
 
 namespace Knitted_Toys_Store.API.Controllers
 {
@@ -42,14 +44,36 @@ namespace Knitted_Toys_Store.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<OrderResponse>> CreateOrderAsync(string surname,
-            string name, string phone, string email, string deliveryAddress, string deliveryNotes)
+        public async Task<ActionResult<OrderResponse>> CreateOrderAsync(
+            string surname,
+            string name, 
+            string phone, 
+            string email, 
+            string deliveryAddress, 
+            string deliveryNotes)
         {
-
             var cart = await _cartService.GetCurrentCartAsync(HttpContext, Response);
             var order = await _orderService.CreateOrderAsync(cart, surname, name, phone, email,
                     deliveryAddress, deliveryNotes);
             await _cartService.ClearCartAsync(cart.Id);
+
+            //Установим order_id в cookie
+            var isDevelopment = HttpContext.Request.Host.Host.Contains("localhost");
+
+            var cookieOptions = new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(30),
+                HttpOnly = true,  // ставим true, чтобы защитить от доступа из JS
+                IsEssential = true,
+                SameSite = isDevelopment ? SameSiteMode.Lax : SameSiteMode.None,
+                Secure = !isDevelopment,
+                Path = "/"
+            };
+
+            Response.Cookies.Append(
+                OrderIdentifierMiddleware.OrderCookieName,
+                order.Id.ToString(),
+                cookieOptions);
 
             return Ok(order);
         }

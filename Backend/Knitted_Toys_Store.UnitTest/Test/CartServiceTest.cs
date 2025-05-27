@@ -4,7 +4,7 @@ using Knitted_Toys_Store.DataAccess;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Microsoft.EntityFrameworkCore;
 using Knitted_Toys_Store.App;
-using AutoMapper;
+using MapsterMapper;
 using Knitted_Toys_Store.DataAccess.Repositories;
 using Microsoft.Extensions.Logging;
 using Knitted_Toys_Store.Infrastructure.Middleware;

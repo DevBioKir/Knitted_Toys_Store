@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using MapsterMapper;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using Knitted_Toys_Store.App.Services;
 using Knitted_Toys_Store.Contracts;

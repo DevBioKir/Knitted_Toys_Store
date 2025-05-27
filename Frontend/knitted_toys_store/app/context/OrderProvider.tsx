@@ -1,11 +1,44 @@
 "use client";
 
+const DEBUG = true;
+
+function logDebug(...args: any[]) {
+  if (DEBUG) {
+    console.log(`[OrderContext]`, ...args);
+  }
+}
+
 import { OrderResponse } from "../types/Order/OrderResponce";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { getAllOrders } from "../services/orders";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { getCurrentOrder } from "../services/orders";
+
+function waitForOrderCookie(timeoutMs = 2000): Promise<void> {
+  const start = Date.now();
+  return new Promise((resolve) => {
+    const check = () => {
+      const orderId = document.cookie
+        .split("; ")
+        .find(
+          (row) => row.startsWith("orderId=") || row.startsWith("order_id=")
+        );
+      if (orderId || Date.now() - start > timeoutMs) {
+        resolve();
+      } else {
+        setTimeout(check, 50);
+      }
+    };
+    check();
+  });
+}
 
 type OrderContextType = {
-  order: OrderResponse[];
+  order: OrderResponse | null;
   selectedOrder: OrderResponse | null;
   setSelectedOrder: (order: OrderResponse | null) => void;
   refreshOrders: () => Promise<void>;
@@ -13,7 +46,7 @@ type OrderContextType = {
 };
 
 const OrderContext = createContext<OrderContextType>({
-  order: [],
+  order: null,
   selectedOrder: null,
   setSelectedOrder: () => {},
   refreshOrders: async () => {},
@@ -23,23 +56,51 @@ const OrderContext = createContext<OrderContextType>({
 export const useOrder = () => useContext(OrderContext);
 
 export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
-  const [order, setOrders] = useState<OrderResponse[]>([]);
+  const [order, setOrder] = useState<OrderResponse | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<OrderResponse | null>(
     null
   );
   const [isLoading, setIsLoading] = useState(false);
   const hasInitialized = useRef(false);
+  const refreshInProgress = useRef(false);
 
   const refreshOrders = async () => {
+    if (refreshInProgress.current) return;
+    refreshInProgress.current = true;
     setIsLoading(true);
+
     try {
+      await waitForOrderCookie();
       //getAllOrders - тут пользовательский метод
-      const data = await getAllOrders();
-      setOrders(data ?? []);
+      const data = await getCurrentOrder();
+      logDebug("Получены данные корзины:", data);
+
+      if (data) {
+        // Нормализуем данные для фронтенда
+        const normalizedData = { ...data };
+
+        // Если есть cartItems, но нет CartItemsResponses, копируем данные
+        if (!normalizedData.orderItemsResponses && normalizedData.orderItems) {
+          logDebug("Копируем cartItems в CartItemsResponses");
+          normalizedData.orderItemsResponses = normalizedData.orderItems;
+        }
+
+        // Проверяем, что OrderItemsResponses - это массив
+        if (!Array.isArray(normalizedData.orderItemsResponses)) {
+          logDebug(
+            "orderItemsResponses не является массивом, устанавливаем пустой массив"
+          );
+          normalizedData.orderItemsResponses = [];
+        }
+
+        setOrder(normalizedData);
+        setSelectedOrder(normalizedData);
+      }
     } catch (error) {
-      console.error("Ошибка при получении заказов", error);
+      console.error("Ошибка при получении заказа", error);
     } finally {
       setIsLoading(false);
+      refreshInProgress.current = false;
     }
   };
 

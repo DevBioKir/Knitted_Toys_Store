@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using MapsterMapper;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Knitted_Toys_Store.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;

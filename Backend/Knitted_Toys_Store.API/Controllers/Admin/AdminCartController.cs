@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using MapsterMapper;
 using Knitted_Toys_Store.Infrastructure.Middleware;
 using Knitted_Toys_Store.App.Services;
 using Knitted_Toys_Store.Contracts;

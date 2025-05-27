@@ -1,9 +1,10 @@
-﻿using AutoMapper;
+﻿using MapsterMapper;
 using Knitted_Toys_Store.DataAccess.Repositories;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Knitted_Toys_Store.Infrastructure.Middleware;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Knitted_Toys_Store.Contracts;
 
 namespace Knitted_Toys_Store.App.Services
 {
