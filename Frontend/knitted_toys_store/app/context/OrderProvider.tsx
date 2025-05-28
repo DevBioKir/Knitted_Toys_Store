@@ -1,13 +1,5 @@
 "use client";
 
-const DEBUG = true;
-
-function logDebug(...args: any[]) {
-  if (DEBUG) {
-    console.log(`[OrderContext]`, ...args);
-  }
-}
-
 import { OrderResponse } from "../types/Order/OrderResponce";
 import React, {
   createContext,
@@ -17,6 +9,14 @@ import React, {
   useState,
 } from "react";
 import { getCurrentOrder } from "../services/orders";
+
+const DEBUG = true;
+
+function logDebug(...args: any[]) {
+  if (DEBUG) {
+    console.log(`[OrderContext]`, ...args);
+  }
+}
 
 function waitForOrderCookie(timeoutMs = 2000): Promise<void> {
   const start = Date.now();
@@ -80,17 +80,17 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
         const normalizedData = { ...data };
 
         // Если есть cartItems, но нет CartItemsResponses, копируем данные
-        if (!normalizedData.orderItemsResponses && normalizedData.orderItems) {
+        if (!normalizedData.orderItemsResponse && normalizedData.orderItems) {
           logDebug("Копируем cartItems в CartItemsResponses");
-          normalizedData.orderItemsResponses = normalizedData.orderItems;
+          normalizedData.orderItemsResponse = normalizedData.orderItems;
         }
 
-        // Проверяем, что OrderItemsResponses - это массив
-        if (!Array.isArray(normalizedData.orderItemsResponses)) {
+        // Проверяем, что orderItemsResponse - это массив
+        if (!Array.isArray(normalizedData.orderItemsResponse)) {
           logDebug(
-            "orderItemsResponses не является массивом, устанавливаем пустой массив"
+            "orderItemsResponse не является массивом, устанавливаем пустой массив"
           );
-          normalizedData.orderItemsResponses = [];
+          normalizedData.orderItemsResponse = [];
         }
 
         setOrder(normalizedData);

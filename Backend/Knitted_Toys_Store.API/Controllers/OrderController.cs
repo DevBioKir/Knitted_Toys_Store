@@ -92,5 +92,11 @@ namespace Knitted_Toys_Store.API.Controllers
 
             return Ok(response);
         }
+
+        [HttpPut]
+        public async Task<ActionResult<OrderStatus>> UpdateOrderStatusAsync(Guid orderId, OrderStatus newStatus)
+        {
+            return Ok(await _orderService.UpdateOrderStatusAsync(orderId, newStatus));
+        }
     }
 }

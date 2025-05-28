@@ -1,18 +1,25 @@
 "use client";
 
 import { useOrder } from "@/app/context/OrderProvider";
-import { Button, Card, List, Space, Typography, Spin } from "antd";
+import {
+  Button,
+  Card,
+  List,
+  Space,
+  Typography,
+  Spin,
+  Tag,
+  message,
+} from "antd";
 import { useRouter } from "next/navigation";
+import { statusInfo } from "../components/OrderStatusInfo";
+import { updateStatusOrder } from "../services/orders";
+import { OrderStatus } from "../Models/Order";
 
 const { Title, Text } = Typography;
 
 export default function OrderPage() {
-  const {
-    selectedOrder,
-    order,
-    isLoading,
-    refreshOrders,
-  } = useOrder();
+  const { selectedOrder, order, isLoading, refreshOrders } = useOrder();
 
   const router = useRouter();
 
@@ -26,7 +33,7 @@ export default function OrderPage() {
     );
   }
 
-  if (!currentOrder || currentOrder.orderItemsResponses?.length === 0) {
+  if (!currentOrder || currentOrder.orderItemsResponse?.length === 0) {
     return (
       <div className="text-center p-6">
         <Title level={3}>Заказ пуст</Title>
@@ -37,18 +44,30 @@ export default function OrderPage() {
     );
   }
 
+  const handlePayOrder = async () => {
+    if (!currentOrder?.id) return;
+    try {
+      await updateStatusOrder(currentOrder.id, OrderStatus.Paid);
+      await refreshOrders();
+      message.success("Заказ успешно оплачен");
+    } catch (err) {
+      console.error("Произошла ошибка при оплате заказа", err);
+      throw err;
+    }
+  };
+
   return (
     <div className="p-4 max-w-3xl mx-auto">
       <div className="flex justify-between items-center mb-4">
         <Title level={2}>Текущий заказ</Title>
         <Space>
-          <Button onClick={refreshOrders}>Обновить</Button>
           <Button onClick={() => router.back()}>Назад</Button>
+          <Button onClick={refreshOrders}>Обновить</Button>
         </Space>
       </div>
 
       <List
-        dataSource={currentOrder.orderItemsResponses}
+        dataSource={currentOrder.orderItemsResponse}
         renderItem={(item) => (
           <Card className="mb-4" key={item.id}>
             <List.Item>
@@ -76,10 +95,28 @@ export default function OrderPage() {
         )}
       />
 
-      <div className="flex justify-end mt-6">
-        <Text strong style={{ fontSize: "1.2rem" }}>
-          Общая сумма: {currentOrder.totalAmount} ₽
-        </Text>
+      <div className="flex justify-between items-center mt-6">
+        <div className="flex items-center gap-2">
+          <Text strong style={{ fontSize: "1.2rem" }}>
+            Статус:
+          </Text>
+          <Tag
+            color={statusInfo[currentOrder.status]?.color || "default"}
+            className="text-lg px-3 py-1"
+          >
+            {statusInfo[currentOrder.status]?.label || "Неизвестно"}
+          </Tag>
+        </div>
+        <div className="flex items-center gap-4">
+          <Text strong style={{ fontSize: "1.2rem" }}>
+            Общая сумма: {currentOrder.totalAmount} ₽
+          </Text>
+          {currentOrder.status === OrderStatus.Pending && (
+            <Button type="primary" onClick={handlePayOrder}>
+              Оплатить заказ
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

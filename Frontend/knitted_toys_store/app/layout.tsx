@@ -5,6 +5,7 @@ import '@ant-design/v5-patch-for-react-19';
 import "./globals.css";
 import CookieConsent from "react-cookie-consent";
 import { CartProvider } from "./context/CartProvider";
+import { OrderProvider } from "./context/OrderProvider";
 // import { useEffect, useState } from "react";
 
 const {Header, Content, Footer} = Layout;
@@ -25,6 +26,7 @@ export default function RootLayout({
     <html lang="ru">
       <body>
         <CartProvider>
+          <OrderProvider> {/* <-- Оборачиваем весь контент в OrderProvider */}
           <Layout className="min-h-screen">
             <div className="bg-gradient-to-r from-black via-indigo-900 to-black shadow-lg">
               <Header className="bg-transparent">
@@ -62,6 +64,7 @@ export default function RootLayout({
           >
             Мы используем cookies для улучшения вашего опыта на сайте. Продолжая использовать сайт, вы соглашаетесь на использование cookies.
           </CookieConsent>
+          </OrderProvider>
         </CartProvider>
       </body>
     </html>

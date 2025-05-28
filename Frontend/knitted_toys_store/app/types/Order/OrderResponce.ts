@@ -4,7 +4,7 @@ import { OrderItemsResponse } from "../OrderItems/OrderItemsResponse";
 
 export interface OrderResponse{
     id?: string;
-    odredDate?: Date;
+    orderDate?: Date;
     totalAmount?: number;
     status?: OrderStatus;
     surnameCustomer: string;
@@ -15,5 +15,5 @@ export interface OrderResponse{
     deliveryNotes: string;
     orderItems?: OrderItemsResponse[];
 
-    orderItemsResponses: OrderItemsResponse[];
+    orderItemsResponse: OrderItemsResponse[];
 }

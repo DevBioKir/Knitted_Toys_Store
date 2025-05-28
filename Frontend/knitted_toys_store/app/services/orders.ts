@@ -1,3 +1,4 @@
+import { OrderStatus } from "../Models/Order";
 import { OrderRequest } from "../types/Order/OrderRequest";
 import { OrderResponse } from "../types/Order/OrderResponce";
 
@@ -83,10 +84,10 @@ export const getCurrentOrder = async(): Promise<OrderResponse> => {
             orderData = rawData;
         }
         
-        // Нормализуем поля
-        if (!orderData.orderItemsResponses && orderData.orderItems) {
+        //Нормализуем поля
+        if (!orderData.orderItemsResponse && orderData.orderItems) {
             logDebug("Копируем cartItems в CartItemsResponses");
-            orderData.orderItemsResponses = orderData.orderItems;
+            orderData.orderItemsResponse = orderData.orderItems;
         }
         
         return orderData;
@@ -115,7 +116,29 @@ export const createOrder = async (orderRequest: OrderRequest) => {
     throw new Error("Не удалось создать заказ");
   }
 };
-function logDebug(arg0: string) {
-  throw new Error("Function not implemented.");
+
+export const updateStatusOrder = async (id: string, newStatus: OrderStatus ) => {
+ const response = await fetch(
+    `${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Order?orderId=${id}&newStatus=${newStatus}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    }
+  );
+  if (!response.ok) {
+    throw new Error("Не удалось изменить статус заказа");
+  }
+  return response.json();
+}
+
+const DEBUG = true;
+
+function logDebug(...args: any[]) {
+  if (DEBUG) {
+    console.log("[OrderService]", ...args);
+  }
 }
 
