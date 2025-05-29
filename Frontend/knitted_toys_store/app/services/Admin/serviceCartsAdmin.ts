@@ -133,11 +133,11 @@ export const addToCart = async (
   quantity: number
 ) => {
   try {
-    const response = await adminAPI.post(
+    await adminAPI.post(
       `/AdminCart/AddToys?cartId=${cartId}&toyId=${toyId}&quantity=${quantity}`
     );
   } catch (err) {
-    console.error("Ошибка при удалении игрушки", err);
+    console.error("Ошибка при добавлении игрушки", err);
     throw err;
   }
 };

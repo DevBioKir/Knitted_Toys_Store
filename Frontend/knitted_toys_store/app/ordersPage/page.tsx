@@ -163,10 +163,7 @@ export default function OrderPage() {
               Оплатить заказ
             </Button>
           )}
-
-          {currentOrder.status === OrderStatus.Paid && (
             <Button onClick={handleCancelOrder}>Отменить заказ</Button>
-          )}
         </div>
       </div>
     </div>

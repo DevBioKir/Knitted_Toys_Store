@@ -115,7 +115,7 @@ export const createOrder = async (orderRequest: OrderRequest) => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Order?surname=${orderRequest.surnameCustomer}
         &name=${orderRequest.nameCustomer}&phone=${orderRequest.phoneNumber}&email=${orderRequest.email}&deliveryAddress=${orderRequest.deliveryAddress}
-        &deliveryNotes=${orderRequest.deliveryAddress}`,
+        &deliveryNotes=${orderRequest.deliveryNotes}`,
     {
       method: "POST",
       headers: {

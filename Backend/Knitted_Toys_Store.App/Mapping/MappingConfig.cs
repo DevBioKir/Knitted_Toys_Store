@@ -148,7 +148,8 @@ namespace Knitted_Toys_Store.App.Mapping
                        src.OrderItems.Adapt<List<OrderItems>>()));
 
             config.NewConfig<Order, OrderEntity>()
-                .Map(dest => dest.OrderItems, src => src.OrderItems.Adapt<List<OrderItemsEntity>>());
+                .Map(dest => dest.OrderItems, src => src.OrderItems.Adapt<List<OrderItemsEntity>>())
+                .Map(dest => dest.TotalAmount, src => src.TotalAmount);
 
             config.NewConfig<Order, OrderResponse>()
                 .Map(dest => dest.OrderItemsResponse, src => src.OrderItems)
@@ -156,6 +157,14 @@ namespace Knitted_Toys_Store.App.Mapping
 
             config.NewConfig<OrderRequest, Order>()
                   .Map(dest => dest.OrderItems, src => src.OrderItemsRequest)
+                  .Map(dest => dest.OrderDate, src => src.OrderDate)
+                  .Map(dest => dest.Status, src => src.Status)
+                  .Map(dest => dest.SurnameCustomer, src => src.SurnameCustomer)
+                  .Map(dest => dest.NameCustomer, src => src.NameCustomer)
+                  .Map(dest => dest.PhoneNumber, src => src.PhoneNumber)
+                  .Map(dest => dest.Email, src => src.Email)
+                  .Map(dest => dest.DeliveryAddress, src => src.DeliveryAddress)
+                  .Map(dest => dest.DeliveryNotes, src => src.DeliveryNotes)
                   .Ignore(dest => dest.Id)
                   .Ignore(dest => dest.TotalAmount);
         }

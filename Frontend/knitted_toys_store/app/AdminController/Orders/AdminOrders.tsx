@@ -1,7 +1,6 @@
 "use client";
 
 import { UpdateOrderForm } from "@/app/components/Admin/Orders/UpdateOrderForm";
-import { Order } from "@/app/Models/Order";
 import {
   deleteOrderAdmin,
   getAllOrdersAdmin,
@@ -76,7 +75,7 @@ export default function AdminOrdersPage() {
                 <p>
                   <strong>Id заказа: {order.id}</strong>
                 </p>
-                <p>Дата создания заказа: {order.orderDate}₽</p>
+                <p>Дата создания заказа: {new Date(order.orderDate).toLocaleString()}</p>
                 <p>Сумма заказа: {order.totalAmount}</p>
                 <p>Статус заказа: {order.status}</p>
                 <p>Фамилия заказчика: {order.surnameCustomer}</p>

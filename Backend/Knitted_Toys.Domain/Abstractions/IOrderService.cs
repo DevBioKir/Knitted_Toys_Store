@@ -6,6 +6,7 @@ namespace Knitted_Toys_Store.App.Services
     public interface IOrderService
     {
         Task<Order> CreateOrderAsync(Cart cart, string surname, string name, string phone, string email, string deliveryAddress, string deliveryNotes);
+        Task<Guid> ReduceQuantityItemAsync(Guid orderId, Guid toyId);
         Task<Order?> GetCurrentOrderAsync(HttpContext context, HttpResponse response);
         Task<Order?> GetOrderByIdAsync(Guid orderId);
         Task<Guid> DeleteOrderAsync(Guid id);
@@ -23,5 +24,6 @@ namespace Knitted_Toys_Store.App.Services
         Task<IEnumerable<Order>> GetOrderByStatusAsync(OrderStatus status);
         Task<Guid> CloneOrderToCartAsync(Guid orderId);
         Task<Guid> AddToOrderAsync (Guid orderId, Guid toyId, int quantity);
+        Task<Guid> RemoveItemFromOrderAsync(Guid orderId, Guid toyId);
     }
 }

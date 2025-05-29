@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  addToCart,
-  reduceQuantityItem,
-  removeFromCart,
-} from "@/app/services/Admin/serviceCartsAdmin";
-import { getAllOrdersAdmin } from "@/app/services/Admin/serviceOrdersAdmin";
+import { addToOrder, reduceQuantityItem, RemoveItemFromOrder } from "@/app/services/Admin/serviceOrdersAdmin";
 import { getAllToysAdmin } from "@/app/services/Admin/serviceToysAdmin";
 import { OrderRequest } from "@/app/types/Order/OrderRequest";
 import { OrderResponse } from "@/app/types/Order/OrderResponce";
@@ -54,10 +49,10 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
     }
   }, [order, form]);
 
-  const handleAddItemToCart = async (toyId: string, quantity: number) => {
+  const handleAddItemToOrder = async (toyId: string, quantity: number) => {
     if (!order) return;
     try {
-      await addToCart(cart.id, toyId, quantity);
+      await addToOrder(order.id, toyId, quantity);
       message.success(`Игрушка ${toyId} успешно добавлена`);
       onSuccess();
     } catch (err) {
@@ -67,16 +62,16 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
 
   const handleAddToy = async () => {
     if (selectedToy && quantity > 0) {
-      await handleAddItemToCart(selectedToy, quantity);
+      await handleAddItemToOrder(selectedToy, quantity);
       setSelectedToy(null);
       setQuantity(1);
     }
   };
 
   const handleReduceQuantityItem = async (toyId: string) => {
-    if (!cart) return;
+    if (!order) return;
     try {
-      await reduceQuantityItem(cart.id, toyId);
+      await reduceQuantityItem(order.id, toyId);
       message.success(`Количество игрушек ${toyId} успешно уменьшено`);
       onSuccess();
     } catch (err) {
@@ -84,9 +79,9 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
     }
   };
 
-  const handleRemoveItemFromCart = async (toyId: string) => {
-    if (!cart) return;
-    await removeFromCart(cart.id, toyId);
+  const handleRemoveItemFromOrder = async (toyId: string) => {
+    if (!order) return;
+    await RemoveItemFromOrder(order.id, toyId);
     onSuccess();
   };
 
@@ -129,12 +124,12 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
                 "Неизвестная игрушка"}{" "}
               — {item.quantity} шт.
             </span>
-            <Button onClick={() => handleAddItemToCart(item.toyId, 1)}>+</Button>
+            <Button onClick={() => handleAddItemToOrder(item.toyId, 1)}>+</Button>
             <Button onClick={() => handleReduceQuantityItem(item.toyId)}>-</Button>
             <Button
               type="link"
               danger
-              onClick={() => handleRemoveItemFromCart(item.toyId)}
+              onClick={() => handleRemoveItemFromOrder(item.toyId)}
             >
               Удалить
             </Button>

@@ -17,7 +17,7 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
     {
         public Guid Id { get; private set; }
         public DateTime OrderDate { get; private set; } //дата создания заказа
-        public decimal TotalAmount { get; private set; } //общая сумма заказа
+        public decimal TotalAmount { get; set; } //общая сумма заказа
         public OrderStatus Status { get; private set; } //статус заказа
 
         public string? SurnameCustomer { get; private set; } = string.Empty; //Фамилия заказчика
@@ -37,11 +37,12 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
             OrderDate = DateTime.UtcNow;
             TotalAmount = totalAmount;
             Status = OrderStatus.Pending;
-            SurnameCustomer = surname;
-            NameCustomer = name;
-            PhoneNumber = phone;
-            Email = email;
-            DeliveryAddress = deliveryAddress;
+            SurnameCustomer = surname.Trim();
+            NameCustomer = name.Trim();
+            PhoneNumber = phone.Trim();
+            Email = email.Trim();
+            DeliveryAddress = deliveryAddress.Trim();
+            DeliveryNotes = deliveryNotes.Trim();
             OrderItems = orderItems.ToList();
         }
 
@@ -75,7 +76,6 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
         public void TotalAmountUpdate()
         {
             TotalAmount = OrderItems
-                .Where(item => item.Toy != null)
                 .Sum(item => item.Quantity * item.PriceAtTime);
         }
 

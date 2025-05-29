@@ -76,14 +76,40 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             //order.OrderItems.AddRange(orderItems); // добавляем товары в заказ
 
             // Пересчёт суммы заказа
-            //order.TotalAmountUpdate();
+            order.TotalAmountUpdate();
 
+            Console.WriteLine($"TotalAmount before mapping: {order.TotalAmount}");
             // Маппим и сохраняем
             var entityOrder = _mapper.Map<OrderEntity>(order);
             _context.Orders.Add(entityOrder);
             await _context.SaveChangesAsync();
 
             return order;
+        }
+
+        public async Task ReduceQuantityItemAsync(Guid orderId, Guid toyId) //уменьшение товара на единицу
+        {
+            var entityOrder = await _context.Orders
+                .Include(c => c.OrderItems)
+                .FirstOrDefaultAsync(c => c.Id == orderId);
+
+            if (entityOrder == null)
+                throw new InvalidOperationException("Order not found");
+
+            var order = _mapper.Map<Order>(entityOrder);
+            order.ReduceItemQuantity(toyId);
+
+            var updatedEntity = _mapper.Map<OrderEntity>(order);
+            _context.Entry(entityOrder).CurrentValues.SetValues(updatedEntity);
+
+            foreach (var item in updatedEntity.OrderItems)
+            {
+                item.Toy = null;
+            }
+
+            entityOrder.OrderItems = updatedEntity.OrderItems;
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<Order>> SearchOrderAsync(
@@ -312,6 +338,38 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             {
                 throw new Exception($"Ошибка при создании позиции в заказе: {err.Message}", err);
             }
+        }
+
+        public async Task RemoveItemFromOrderAsync(Guid orderId, Guid toyId)
+        {
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null)
+                throw new InvalidOperationException("Order not found");
+
+            var orderItem = order.OrderItems.FirstOrDefault(oi => oi.ToyId == toyId);
+
+            if (orderItem == null)
+                throw new InvalidOperationException("Item not found in order");
+
+            _context.OrderItems.Remove(orderItem);
+
+            var remainingToyId = order.OrderItems
+                .Where(oi => oi.ToyId != toyId)
+                .Select(oi => oi.ToyId)
+                .ToList();
+
+            var toys = await _context.Toys
+                .Where(t => remainingToyId.Contains(t.Id))
+                .ToDictionaryAsync(t => t.Id, t => t.Price);
+
+            order.TotalAmount = order.OrderItems
+                .Where(oi => oi.ToyId != toyId)
+                .Sum(oi => oi.Quantity * (toys.ContainsKey(oi.ToyId) ? toys[oi.ToyId] : 0));
+
+            await _context.SaveChangesAsync();
         }
     }
 }

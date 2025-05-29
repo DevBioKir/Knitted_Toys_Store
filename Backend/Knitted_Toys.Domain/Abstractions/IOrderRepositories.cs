@@ -5,6 +5,7 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
     public interface IOrderRepositories
     {
         Task<Order> CreateOrderAsync(Cart cart, string surname, string name, string phone, string email, string deliveryAddress, string deliveryNotes);
+        Task ReduceQuantityItemAsync(Guid orderId, Guid toyId);
         Task<Order?> GetOrderByIdAsync(Guid orderId);
         Task<Guid> DeleteOrderAsync(Guid orderId);
         Task<IEnumerable<Order>> GetAllOrdersAsync();
@@ -21,5 +22,6 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
         Task<IEnumerable<Order>> GetOrderByStatusAsync(OrderStatus status);
         Task<Guid> CloneOrderToCartAsync(Guid orderId);
         Task AddToOrderAsync(Guid orderId, Guid toyId, int quantity);
+        Task RemoveItemFromOrderAsync(Guid orderId, Guid toyId);
     }
 }

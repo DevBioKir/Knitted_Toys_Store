@@ -37,6 +37,12 @@ namespace Knitted_Toys_Store.App.Services
             return await _orderRepositories.CreateOrderAsync(cart, surname, name, phone, email, deliveryAddress, deliveryNotes);
         }
 
+        public async Task<Guid> ReduceQuantityItemAsync(Guid orderId, Guid toyId) //удаление товара по единице в позиции
+        {
+            await _orderRepositories.ReduceQuantityItemAsync(orderId, toyId);
+            return orderId;
+        }
+
         public async Task<Order?> GetCurrentOrderAsync(HttpContext context, HttpResponse response)
         {
             _logger.LogInformation("Получен запрос на текущий заказ");
@@ -122,6 +128,12 @@ namespace Knitted_Toys_Store.App.Services
         public async Task<Guid> AddToOrderAsync(Guid orderId, Guid toyId, int quantity)
         {
             await _orderRepositories.AddToOrderAsync(orderId, toyId, quantity);
+            return toyId;
+        }
+
+        public async Task<Guid> RemoveItemFromOrderAsync(Guid orderId, Guid toyId)
+        {
+            await _orderRepositories.RemoveItemFromOrderAsync(orderId, toyId);
             return toyId;
         }
     }

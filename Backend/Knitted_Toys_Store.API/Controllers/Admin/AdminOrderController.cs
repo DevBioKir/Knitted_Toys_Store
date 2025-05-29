@@ -154,5 +154,23 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
 
             }
         }
+
+        [HttpDelete("RemoveItemFromCart")]
+        public async Task<ActionResult<Order>> RemoveItemFromOrder(Guid orderId, Guid toyId)
+        {
+            var order = await _orderService.GetOrderByIdAsync(orderId);
+            if (order == null) return NotFound($"Order with ID {orderId} not found.");
+
+            return Ok(await _orderService.RemoveItemFromOrderAsync(orderId, toyId));
+        }
+
+        [HttpDelete("ReduceQuantityItemAsync")] //уменьшить количество товара в позиции
+        public async Task<ActionResult<Cart>> ReduceQuantityItemAsync(Guid orderId, Guid toyId)
+        {
+            var order = await _orderService.GetOrderByIdAsync(orderId);
+            if (order == null) return NotFound($"Order with ID {orderId} not found.");
+
+            return Ok(await _orderService.ReduceQuantityItemAsync(orderId, toyId));
+        }
     }
 }

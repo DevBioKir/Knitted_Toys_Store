@@ -98,18 +98,6 @@ namespace Knitted_Toys_Store.App.Services
             return toyId;
         }
 
-        //public async Task<Guid> AddToCartAsync(Guid cartId, Guid toyId, int quantity) //добавление товара в корзину
-        //{
-        //    await _cartRepositories.AddToCartAsync(cartId, toyId, quantity);
-        //    return toyId;
-        //}
-
-        //public async Task<Guid> CreateToysInCartItems(Guid cartId, Guid toyId, int quantity)
-        //{
-        //    await _cartRepositories.CreateToysInCartItems(cartId, toyId, quantity);
-        //    return toyId;
-        //}
-
         public async Task<Guid> ReduceQuantityItemAsync(Guid cartId, Guid toyId) //удаление товара по единице в позиции
         {
             await _cartRepositories.ReduceQuantityItemAsync(cartId, toyId);
@@ -131,11 +119,5 @@ namespace Knitted_Toys_Store.App.Services
         {
             return await _cartRepositories.CloneCartAsync(cartId);  
         }
-
-        //public async Task<Guid> SetItemQuantityAsync(Guid cartId, Guid toyId, int quantity)
-        //{
-        //    await _cartRepositories.SetItemQuantityAsync(cartId, toyId, quantity);
-        //    return toyId;
-        //}
     }
 }

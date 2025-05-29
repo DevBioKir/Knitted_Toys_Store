@@ -45,6 +45,13 @@
             TotalAmountUpdate();
             CartLastUpdate();
         }
+        public void CreateItems(Guid cartId, Guid toyId, int quantity)
+        {
+            CartItems.Add(Domain.CartItems.Create(cartId, toyId, quantity));
+            TotalAmountUpdate();
+            CartLastUpdate();
+
+        }
         public void CartLastUpdate() //обновление времени последнего изменения
         {
             LastUpdate = DateTime.UtcNow;

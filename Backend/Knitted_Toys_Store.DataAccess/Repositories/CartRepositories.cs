@@ -187,6 +187,8 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             {
                 var cart = _mapper.Map<Cart>(entityCart);
 
+                cart.CreateItems(cart.Id, entityToy.Id, quantity);
+
                 var newCartItems = CartItems.Create(entityCart.Id, entityToy.Id, quantity);
                 var newCartItemsEntity = _mapper.Map<CartItemsEntity>(newCartItems);
                 _context.CartItems.Add(newCartItemsEntity);
@@ -272,13 +274,13 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             cart.LastUpdate = DateTime.UtcNow;
 
             // Загружаем цены товаров для расчета общей суммы
-            var remainingToyIds = cart.CartItems
+            var remainingToyId = cart.CartItems
                 .Where(ci => ci.ToyId != toyId)
                 .Select(ci => ci.ToyId)
                 .ToList();
 
             var toys = await _context.Toys
-                .Where(t => remainingToyIds.Contains(t.Id))
+                .Where(t => remainingToyId.Contains(t.Id))
                 .ToDictionaryAsync(t => t.Id, t => t.Price);
 
             // Рассчитываем общую сумму

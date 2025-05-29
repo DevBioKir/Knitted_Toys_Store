@@ -41,3 +41,38 @@ export const deleteOrderAdmin = async (opderId: string) => {
     throw err;
   }
 }
+
+export const addToOrder = async (
+  orderId: string,
+  toyId: string,
+  quantity: number
+) => {
+  try {
+    await adminAPI.post(
+      `/AdminOrder/AddToys?orderId=${orderId}&toyId=${toyId}&quantity=${quantity}`
+    );
+  } catch (err) {
+    console.error("Ошибка при добавлении игрушки", err);
+    throw err;
+  }
+};
+
+export const reduceQuantityItem = async (orderId: string, toyId: string) => {
+  try {
+    await adminAPI.delete(
+      `/AdminOrder/ReduceQuantityItemAsync?orderId=${orderId}&toyId=${toyId}`
+    );
+  } catch (err) {
+    console.error("Ошибка при удалении игрушки", err);
+    throw err;
+  }
+};
+
+export const RemoveItemFromOrder = async (orderId: string, toyId: string) => {
+try{
+  await adminAPI.delete(`/AdminOrder/RemoveItemFromCart?orderId=${orderId}&toyId=${toyId}`)
+} catch (err) {
+  console.error("Ошибка при удалении товара из заказа", err)
+  throw err;
+}
+}
