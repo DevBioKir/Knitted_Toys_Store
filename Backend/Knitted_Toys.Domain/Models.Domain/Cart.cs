@@ -146,5 +146,12 @@
 
             return newCart;
         }
+
+        public void Clear()
+        {
+            CartItems.Clear();
+            CartLastUpdate();
+            TotalAmountUpdate();
+        }
     }
 }

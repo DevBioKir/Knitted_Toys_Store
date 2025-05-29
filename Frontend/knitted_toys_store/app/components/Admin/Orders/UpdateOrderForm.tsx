@@ -55,7 +55,7 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
   }, [order, form]);
 
   const handleAddItemToCart = async (toyId: string, quantity: number) => {
-    if (!cart) return;
+    if (!order) return;
     try {
       await addToCart(cart.id, toyId, quantity);
       message.success(`Игрушка ${toyId} успешно добавлена`);
@@ -118,8 +118,8 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
       <Divider />
 
       <Typography.Title level={3}>Позиции в заказе</Typography.Title>
-      {order.orderItems?.length ? (
-        order.orderItems.map((item) => (
+      {order.orderItemsResponse?.length ? (
+        order.orderItemsResponse.map((item) => (
           <div
             key={item.toyId}
             style={{ display: "flex", alignItems: "center", marginBottom: 8 }}

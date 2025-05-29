@@ -10,20 +10,28 @@ import {
   Spin,
   Tag,
   message,
+  Modal,
 } from "antd";
 import { useRouter } from "next/navigation";
 import { statusInfo } from "../components/OrderStatusInfo";
 import { updateStatusOrder } from "../services/orders";
 import { OrderStatus } from "../Models/Order";
+import { useEffect, useState } from "react";
+import { deleteOrderAdmin } from "../services/Admin/serviceOrdersAdmin";
 
 const { Title, Text } = Typography;
 
 export default function OrderPage() {
-  const { selectedOrder, order, isLoading, refreshOrders } = useOrder();
-
+  const { selectedOrder, order, isLoading, refreshOrders, isInitialized } = useOrder();
+  const [cancelLoading, setCancelLoading] = useState(false);
   const router = useRouter();
-
   const currentOrder = selectedOrder || order;
+
+  useEffect(() => {
+    if (!isInitialized) {
+      refreshOrders();
+    }
+  }, [isInitialized]);
 
   if (isLoading) {
     return (
@@ -33,7 +41,21 @@ export default function OrderPage() {
     );
   }
 
-  if (!currentOrder || currentOrder.orderItemsResponse?.length === 0) {
+  if (!currentOrder) {
+    return (
+      <div className="text-center p-6">
+        <Title level={3}>Нет текущего заказа</Title>
+        <Button type="primary" onClick={() => router.push("/toysPage")}>
+          Перейти в каталог
+        </Button>
+      </div>
+    );
+  }
+
+  if (
+    !currentOrder.orderItemsResponse ||
+    currentOrder.orderItemsResponse.length === 0
+  ) {
     return (
       <div className="text-center p-6">
         <Title level={3}>Заказ пуст</Title>
@@ -53,6 +75,31 @@ export default function OrderPage() {
     } catch (err) {
       console.error("Произошла ошибка при оплате заказа", err);
       throw err;
+    }
+  };
+
+  const handleCancelOrder = async () => {
+    if (!currentOrder?.id) return;
+    try {
+      await updateStatusOrder(currentOrder.id, OrderStatus.Cancelled);
+      message.success("Заказ отменён");
+
+      // Через 5 секунд — запрос на удаление
+      setTimeout(async () => {
+        try {
+          await deleteOrderAdmin(currentOrder.id);
+          message.success("Отменённый заказ удалён");
+          refreshOrders(); // Обновим, чтобы скрыть удалённый заказ
+        } catch (err) {
+          console.error("Ошибка при удалении заказа:", err);
+          message.error("Ошибка при удалении отменённого заказа");
+        }
+      }, 5000);
+
+      refreshOrders(); // Сразу обновим, чтобы статус поменялся
+    } catch (err) {
+      console.error("Ошибка при отмене заказа:", err);
+      message.error("Ошибка при отмене заказа");
     }
   };
 
@@ -116,8 +163,13 @@ export default function OrderPage() {
               Оплатить заказ
             </Button>
           )}
+
+          {currentOrder.status === OrderStatus.Paid && (
+            <Button onClick={handleCancelOrder}>Отменить заказ</Button>
+          )}
         </div>
       </div>
     </div>
   );
 }
+

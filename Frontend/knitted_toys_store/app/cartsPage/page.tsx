@@ -87,7 +87,6 @@ export default function CartPage() {
 
   return (
     <div className="text-center p-6">
-      <Title level={2}>Моя корзина</Title>
       {hasItems ? (
         <>
           <List
@@ -150,7 +149,6 @@ export default function CartPage() {
                   message.success("Заказ создан");
                   setIsModalOpen(false);
                   refreshCart();
-                  //handleClearCart(); // если хочешь очищать корзину после заказа
                 }}
               />
             </Modal>

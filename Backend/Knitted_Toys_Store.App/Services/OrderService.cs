@@ -118,5 +118,11 @@ namespace Knitted_Toys_Store.App.Services
         {
             return await _orderRepositories.CloneOrderToCartAsync(orderId);
         }
+
+        public async Task<Guid> AddToOrderAsync(Guid orderId, Guid toyId, int quantity)
+        {
+            await _orderRepositories.AddToOrderAsync(orderId, toyId, quantity);
+            return toyId;
+        }
     }
 }

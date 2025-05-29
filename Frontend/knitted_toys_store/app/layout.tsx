@@ -14,7 +14,7 @@ const menuItems = [
   { key: "home", label: <Link href="/">Главная</Link> },
   { key: "Toys", label: <Link href="/toysPage">Каталог игрушек</Link> },
   { key: "cart", label: <Link href="/cartsPage">Корзина</Link> },
-  { key: "orders", label: <Link href="/ordersPage">Мои заказы</Link>}
+  { key: "orders", label: <Link href="/ordersPage">Мой заказ</Link>}
 ];
 
 export default function RootLayout({

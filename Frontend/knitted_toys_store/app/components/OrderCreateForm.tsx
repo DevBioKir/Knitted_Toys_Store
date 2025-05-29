@@ -2,6 +2,7 @@ import { useState } from "react";
 import { OrderRequest } from "../types/Order/OrderRequest";
 import { createOrder } from "../services/orders";
 import { Button, Form, Input, message } from "antd";
+import { useOrder } from "../context/OrderProvider";
 
 interface Prop {
   onOrderCreated?: () => void;
@@ -9,10 +10,13 @@ interface Prop {
 
 export default function OrderCreateForm({ onOrderCreated }: Prop) {
   const [uploading, setUploading] = useState(false);
+  const { refreshOrders } = useOrder();
 
   const onFinish = async (values: OrderRequest) => {
     try {
+      setUploading(true);
       await createOrder({ ...values });
+      await refreshOrders();
       message.success("Заказ успешно создан");
       if (onOrderCreated) {
         onOrderCreated();
@@ -20,6 +24,8 @@ export default function OrderCreateForm({ onOrderCreated }: Prop) {
     } catch (err) {
       console.error(err);
       message.error("Ошибка при создании заказа");
+    } finally {
+      setUploading(false);
     }
   };
 

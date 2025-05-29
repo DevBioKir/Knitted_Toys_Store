@@ -11,7 +11,7 @@ import { Button, List, message } from "antd";
 import { useEffect, useState } from "react";
 
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<OrderResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingOrder, setEditingOrder] = useState<OrderResponse | null>(null);
 
@@ -24,7 +24,7 @@ export default function AdminOrdersPage() {
 
       const updateOrders = data.map(order => ({
         ...order,
-        orderItemsResponses: order.orderItemsResponses || []
+        orderItemsResponses: order.orderItemsResponse || []
       }));
 
       setOrders(updateOrders);
@@ -88,7 +88,7 @@ export default function AdminOrdersPage() {
 
                 <List
                   itemLayout="horizontal"
-                  dataSource={order.orderItemsResponses || []} // Используем cartItemsResponses
+                  dataSource={order.orderItemsResponse || []} // Используем cartItemsResponses
                   renderItem={(item) => (
                     <List.Item>
                       <List.Item.Meta

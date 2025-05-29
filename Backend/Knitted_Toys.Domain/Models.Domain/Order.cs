@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Knitted_Toys_Store.Domain.Models.Domain
 {
@@ -28,7 +29,21 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
 
         public List<OrderItems> OrderItems { get; private set; } = []; //у одного заказа может быть много товаров
 
-        private Order() {}
+        private Order(
+            decimal totalAmount, string surname, string name, string phone, string email, string deliveryAddress,
+            string deliveryNotes, IEnumerable<OrderItems> orderItems)
+        {
+            Id = Guid.NewGuid();
+            OrderDate = DateTime.UtcNow;
+            TotalAmount = totalAmount;
+            Status = OrderStatus.Pending;
+            SurnameCustomer = surname;
+            NameCustomer = name;
+            PhoneNumber = phone;
+            Email = email;
+            DeliveryAddress = deliveryAddress;
+            OrderItems = orderItems.ToList();
+        }
 
         public static Order Create(
             string surname, string name, string phone, string email, string deliveryAddress,
@@ -41,20 +56,11 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
                 throw new ArgumentException("The mail and the delivery address cannot be empty");
 
             var orderItemsList = orderItems.ToList();
+            var totalPriceItems = orderItemsList.Sum(x => x.PriceAtTime * x.Quantity);
 
-            return new Order
-            {
-                Id = Guid.NewGuid(),
-                OrderDate = DateTime.UtcNow,
-                TotalAmount = orderItemsList.Sum(x => x.PriceAtTime * x.Quantity), //при создании передаем вычисленную сумму
-                Status = OrderStatus.Pending,
-                SurnameCustomer = surname,
-                NameCustomer = name,
-                PhoneNumber = phone,
-                Email = email,
-                DeliveryAddress = deliveryAddress,
-                OrderItems = orderItemsList
-            };
+            var order = new Order(totalPriceItems, surname, name, phone, email, deliveryAddress, deliveryNotes, orderItemsList);
+
+            return order;
         }
 
         private OrderItems FindOrderItemsByToyId(Guid toyId)
@@ -70,12 +76,26 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
         {
             TotalAmount = OrderItems
                 .Where(item => item.Toy != null)
-                .Sum(item => item.Quantity * item.Toy.Price);
+                .Sum(item => item.Quantity * item.PriceAtTime);
         }
 
         public void AddOrderItems(IEnumerable<OrderItems> items)
         {
             OrderItems.AddRange(items);
+            TotalAmountUpdate();
+        }
+
+        public void AddItem(Guid orderId, Guid toyId, int quantity, decimal priceAtTime)
+        {
+            var existingItem = FindOrderItemsByToyId(toyId);
+            if (existingItem != null)
+            {
+                existingItem.UpdateQuantity(existingItem.Quantity + quantity);
+            }
+            else
+            {
+                OrderItems.Add(Domain.OrderItems.Create(orderId, toyId, quantity, priceAtTime));
+            }
             TotalAmountUpdate();
         }
 

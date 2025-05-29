@@ -43,6 +43,7 @@ type OrderContextType = {
   setSelectedOrder: (order: OrderResponse | null) => void;
   refreshOrders: () => Promise<void>;
   isLoading: boolean;
+  isInitialized: boolean;
 };
 
 const OrderContext = createContext<OrderContextType>({
@@ -51,17 +52,17 @@ const OrderContext = createContext<OrderContextType>({
   setSelectedOrder: () => {},
   refreshOrders: async () => {},
   isLoading: false,
+  isInitialized: false,
 });
 
 export const useOrder = () => useContext(OrderContext);
+// const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
   const [order, setOrder] = useState<OrderResponse | null>(null);
-  const [selectedOrder, setSelectedOrder] = useState<OrderResponse | null>(
-    null
-  );
+  const [selectedOrder, setSelectedOrder] = useState<OrderResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const hasInitialized = useRef(false);
+  const [isInitialized, setIsInitialized] = useState(false); // ← добавлено
   const refreshInProgress = useRef(false);
 
   const refreshOrders = async () => {
@@ -73,6 +74,12 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
       await waitForOrderCookie();
       //getAllOrders - тут пользовательский метод
       const data = await getCurrentOrder();
+      if (!data) {
+        logDebug("Заказ отсутствует");
+        setOrder(null);
+        setSelectedOrder(null);
+        return;
+      }
       logDebug("Получены данные корзины:", data);
 
       if (data) {
@@ -101,14 +108,9 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       setIsLoading(false);
       refreshInProgress.current = false;
+      setIsInitialized(true);
     }
   };
-
-  useEffect(() => {
-    if (hasInitialized.current) return;
-    hasInitialized.current = true;
-    refreshOrders();
-  }, []);
 
   return (
     <OrderContext.Provider
@@ -118,6 +120,7 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
         setSelectedOrder,
         refreshOrders,
         isLoading,
+        isInitialized, // ← передаём здесь
       }}
     >
       {children}

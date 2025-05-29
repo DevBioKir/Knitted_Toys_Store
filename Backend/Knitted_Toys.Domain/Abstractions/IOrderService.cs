@@ -22,5 +22,6 @@ namespace Knitted_Toys_Store.App.Services
             OrderStatus? status = null);
         Task<IEnumerable<Order>> GetOrderByStatusAsync(OrderStatus status);
         Task<Guid> CloneOrderToCartAsync(Guid orderId);
+        Task<Guid> AddToOrderAsync (Guid orderId, Guid toyId, int quantity);
     }
 }

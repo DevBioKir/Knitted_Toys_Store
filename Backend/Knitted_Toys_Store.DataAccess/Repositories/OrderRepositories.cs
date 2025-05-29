@@ -240,5 +240,78 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
             return newCart.Id;
         }
+
+        public async Task AddToOrderAsync(Guid orderId, Guid toyId, int quantity)
+        {
+            var entityOrder = await _context.Orders
+                .Include(c => c.OrderItems)
+                //.ThenInclude(ci => ci.Toy)
+                .FirstOrDefaultAsync(c => c.Id == orderId)
+                ?? throw new Exception($"Order with ID {orderId} not found.");
+
+            var entityToy = await _context.Toys
+                //.AsNoTracking()
+                .FirstOrDefaultAsync(t => t.Id == toyId)
+            ?? throw new Exception($"Toy with ID {toyId} not found.");
+
+            var existingItem = entityOrder.OrderItems.FirstOrDefault(ci => ci.ToyId == toyId);
+            if (existingItem != null)
+            {
+                await AddToyAsync(entityOrder, entityToy, quantity);
+            }
+            else if (existingItem == null)
+            {
+                await CreateToysInOrderItems(entityOrder, entityToy, quantity);
+            }
+        }
+
+        private async Task AddToyAsync(OrderEntity entityOrder, ToyEntity entityToy, int quantity)
+        {
+            try
+            {
+                var order = _mapper.Map<Order>(entityOrder);
+                order.IncreaseItemQuantity(entityToy.Id);
+
+                var updatedEntityOrder = _mapper.Map<OrderEntity>(order);
+                _context.Entry(entityOrder).CurrentValues.SetValues(updatedEntityOrder);
+
+                foreach (var item in updatedEntityOrder.OrderItems)
+                {
+                    item.Toy = null;
+                }
+                entityOrder.OrderItems = updatedEntityOrder.OrderItems;
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception err)
+            {
+                throw new Exception($"Ошибка при добавлении игрушки в позицию в заказе: {err.Message}", err);
+            }
+        }
+
+        private async Task CreateToysInOrderItems(OrderEntity entityOrder, ToyEntity entityToy, int quantity)
+        {
+            try
+            {
+                var order = _mapper.Map<Order>(entityOrder);
+
+                var newOrderItems = OrderItems.Create(entityOrder.Id, entityToy.Id, quantity, entityToy.Price);
+                var newOrderItemsEntity = _mapper.Map<OrderItemsEntity>(newOrderItems);
+                _context.OrderItems.Add(newOrderItemsEntity);
+
+                entityOrder.TotalAmount = entityOrder.OrderItems.Sum(ci => ci.Quantity * (ci.ToyId == entityToy.Id ? entityToy.Price :
+                        (ci.Toy != null ? ci.Toy.Price : 0)));
+
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new Exception("Ошибка при обновлении заказа: данные были изменены другим пользователем.");
+            }
+            catch (Exception err)
+            {
+                throw new Exception($"Ошибка при создании позиции в заказе: {err.Message}", err);
+            }
+        }
     }
 }

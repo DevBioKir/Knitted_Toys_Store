@@ -20,7 +20,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
         private readonly ILogger<AdminOrderController> _logger;
 
         public AdminOrderController(
-            IOrderService orderService, 
+            IOrderService orderService,
             IMapper mapper,
             ICartService cartService,
             ILogger<AdminOrderController> logger)
@@ -73,10 +73,10 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
         [HttpDelete]
         public async Task<ActionResult<OrderResponse>> DeleteOrderAsync(Guid id)
         {
-                var order = await _orderService.GetOrderByIdAsync(id);
-                if (order == null) return NotFound($"Order with ID {id} not found.");
+            var order = await _orderService.GetOrderByIdAsync(id);
+            if (order == null) return NotFound($"Order with ID {id} not found.");
 
-                return Ok(await _orderService.DeleteOrderAsync(id));
+            return Ok(await _orderService.DeleteOrderAsync(id));
         }
 
         [HttpGet("GetOrderCountAsync")]
@@ -131,6 +131,27 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
             {
                 _logger.LogWarning("Клонирование не удалось: {Message}", ex.Message);
                 return NotFound(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("AddToys")]
+        public async Task<ActionResult<CartItemsResponse>> AddToCartAsync(Guid orderId, Guid toyId,
+            int quantity)
+        {
+            try
+            {
+                var order = await _orderService.GetOrderByIdAsync(orderId);
+
+                if (order == null) return NotFound($"Order with ID {orderId} not found.");
+
+                var orderItem = await _orderService.AddToOrderAsync(orderId, toyId, quantity);
+
+                return Ok(orderItem);
+            }
+            catch (Exception err)
+            {
+                return BadRequest(err.ToString());
+
             }
         }
     }

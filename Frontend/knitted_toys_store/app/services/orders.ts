@@ -40,62 +40,76 @@ export const getAllOrders = async (): Promise<OrderResponse[]> => {
 // Переменная для кэширования ID корзины
 let cachedOrderId: string | null = null;
 
-export const getCurrentOrder = async(): Promise<OrderResponse> => {
-    try {
-        // Проверяем, есть ли ID заказа в cookie
-        const cookies = document.cookie.split('; ');
-        const orderCookie = cookies.find(c => c.startsWith('order_id=') || c.startsWith('orderId='));
-        const orderIdFromCookie = orderCookie ? orderCookie.split('=')[1] : null;
-        
-        // Если ID заказа в cookie совпадает с кэшированным, выводим лог
-        if (orderIdFromCookie && cachedOrderId && orderIdFromCookie === cachedOrderId) {
-            logDebug(`Найдем существующий заказ: ${cachedOrderId}`);
-        }
-        
-        // Обновляем кэшированный ID
-        if (orderIdFromCookie) {
-            cachedOrderId = orderIdFromCookie;
-        }
-        
-        const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Order/Current`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            cache: "no-store"
-        });
-        
-        if (!response.ok) {
-            throw new Error("Не удалось получить текущий заказ");
-        }
-        
-        // Получаем сырые данные
-        const rawData = await response.json();
-        logDebug("Сырые данные от API:", rawData);
-        
-        // Нормализуем данные
-        let orderData: OrderResponse;
-        
-        // Проверяем структуру данных
-        if (Array.isArray(rawData)) {
-            logDebug("API вернул массив, берем первый элемент");
-            orderData = rawData[0];
-        } else {
-            logDebug("API вернул объект");
-            orderData = rawData;
-        }
-        
-        //Нормализуем поля
-        if (!orderData.orderItemsResponse && orderData.orderItems) {
-            logDebug("Копируем cartItems в CartItemsResponses");
-            orderData.orderItemsResponse = orderData.orderItems;
-        }
-        
-        return orderData;
-    } catch (error) {
-        console.error("Ошибка при получении заказа:", error);
-        throw error;
+export const getCurrentOrder = async (): Promise<OrderResponse | null> => {
+  try {
+    // Проверяем, есть ли ID заказа в cookie
+    const cookies = document.cookie.split("; ");
+    const orderCookie = cookies.find(
+      (c) => c.startsWith("order_id=") || c.startsWith("orderId=")
+    );
+    const orderIdFromCookie = orderCookie ? orderCookie.split("=")[1] : null;
+
+    // Если ID заказа в cookie совпадает с кэшированным, выводим лог
+    if (
+      orderIdFromCookie &&
+      cachedOrderId &&
+      orderIdFromCookie === cachedOrderId
+    ) {
+      logDebug(`Найдем существующий заказ: ${cachedOrderId}`);
     }
-}
+
+    // Обновляем кэшированный ID
+    if (orderIdFromCookie) {
+      cachedOrderId = orderIdFromCookie;
+    }
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Order/Current`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        cache: "no-store",
+      }
+    );
+
+    if (response.status === 404) {
+      logDebug("Текущий заказ не найден (404)");
+      return null;
+    }
+
+    if (!response.ok) {
+      throw new Error("Не удалось получить текущий заказ");
+    }
+
+    // Получаем сырые данные
+    const rawData = await response.json();
+    logDebug("Сырые данные от API:", rawData);
+
+    // Нормализуем данные
+    let orderData: OrderResponse;
+
+    // Проверяем структуру данных
+    if (Array.isArray(rawData)) {
+      logDebug("API вернул массив, берем первый элемент");
+      orderData = rawData[0];
+    } else {
+      logDebug("API вернул объект");
+      orderData = rawData;
+    }
+
+    //Нормализуем поля
+    if (!orderData.orderItemsResponse && orderData.orderItems) {
+      logDebug("Копируем cartItems в CartItemsResponses");
+      orderData.orderItemsResponse = orderData.orderItems;
+    }
+
+    return orderData;
+  } catch (error) {
+    console.error("Ошибка при получении заказа:", error);
+    throw error;
+  }
+};
 
 export const createOrder = async (orderRequest: OrderRequest) => {
   const response = await fetch(
@@ -117,8 +131,8 @@ export const createOrder = async (orderRequest: OrderRequest) => {
   }
 };
 
-export const updateStatusOrder = async (id: string, newStatus: OrderStatus ) => {
- const response = await fetch(
+export const updateStatusOrder = async (id: string, newStatus: OrderStatus) => {
+  const response = await fetch(
     `${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Order?orderId=${id}&newStatus=${newStatus}`,
     {
       method: "PUT",
@@ -132,7 +146,7 @@ export const updateStatusOrder = async (id: string, newStatus: OrderStatus ) => 
     throw new Error("Не удалось изменить статус заказа");
   }
   return response.json();
-}
+};
 
 const DEBUG = true;
 
@@ -141,4 +155,3 @@ function logDebug(...args: any[]) {
     console.log("[OrderService]", ...args);
   }
 }
-

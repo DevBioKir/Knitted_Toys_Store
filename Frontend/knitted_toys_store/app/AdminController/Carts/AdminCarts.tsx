@@ -1,13 +1,14 @@
 "use client";
 
 import { UpdateCartForm } from "@/app/components/Admin/Carts/UpdateCartForm";
+import OrderCreateForm from "@/app/components/OrderCreateForm";
 import { Cart } from "@/app/Models/Cart";
 import {
   deleteCartAdmin,
-  getAllCartsAdmin
+  getAllCartsAdmin,
 } from "@/app/services/Admin/serviceCartsAdmin";
 import { CartResponse } from "@/app/types/Cart/CartResponse";
-import { Button, List, message } from "antd";
+import { Button, List, message, Modal } from "antd";
 import { useEffect, useState } from "react";
 
 export default function AdminCartsPage() {
@@ -15,16 +16,19 @@ export default function AdminCartsPage() {
   const [loading, setLoading] = useState(true);
   const [editingCart, setEditingCart] = useState<CartResponse | null>(null);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [cartForOrder, setCartForOrder] = useState<Cart | null>(null);
+
   const fetchCart = async () => {
     try {
       const data = await getAllCartsAdmin();
       console.log("API вернуло корзины:", data);
 
       // Убедимся, что каждая корзина имеет cartItemsResponses
-      const updatedCarts = data.map(cart => ({
+      const updatedCarts = data.map((cart) => ({
         ...cart,
-      cartItemsResponses: cart.cartItemsResponses || [] // Если нет cartItemsResponses, делаем его пустым массивом
-    }));
+        cartItemsResponses: cart.cartItemsResponses || [], // Если нет cartItemsResponses, делаем его пустым массивом
+      }));
 
       setCarts(updatedCarts);
     } catch (err) {
@@ -76,9 +80,13 @@ export default function AdminCartsPage() {
                 <p>
                   <strong>{cart.id}</strong>
                 </p>
-                <p>Дата и время создания: {new Date(cart.createAt).toLocaleString()}</p>
                 <p>
-                  Дата и время последнего изменения: {new Date(cart.lastUpdate).toLocaleString()}
+                  Дата и время создания:{" "}
+                  {new Date(cart.createAt).toLocaleString()}
+                </p>
+                <p>
+                  Дата и время последнего изменения:{" "}
+                  {new Date(cart.lastUpdate).toLocaleString()}
                 </p>
                 <p>Общая сумма корзины: {cart.totalAmount}р</p>
                 <List
@@ -105,7 +113,7 @@ export default function AdminCartsPage() {
                     </List.Item>
                   )}
                 />
-  
+
                 {/* Кнопки */}
                 <Button
                   onClick={() => setEditingCart(cart)}
@@ -114,12 +122,21 @@ export default function AdminCartsPage() {
                   Редактировать
                 </Button>
                 <Button onClick={() => handleDelete(cart.id!)}>Удалить</Button>
+                                <Button
+                  type="primary"
+                  onClick={() => {
+                    setCartForOrder(cart);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  Создать заказ
+                </Button>
               </div>
             </div>
           ))}
         </>
       )}
-  
+
       {editingCart && (
         <UpdateCartForm
           cart={editingCart}
@@ -128,6 +145,28 @@ export default function AdminCartsPage() {
             fetchCart(); // Перезагружаем корзины после редактирования
           }}
         />
+      )}
+      {/* Модалка создания заказа */}
+      {cartForOrder && (
+        <Modal
+          title="Создание заказа из корзины"
+          open={isModalOpen}
+          onCancel={() => {
+            setIsModalOpen(false);
+            setCartForOrder(null);
+          }}
+          footer={null}
+        >
+          <OrderCreateForm
+            //cart={cartForOrder}
+            onOrderCreated={() => {
+              message.success("Заказ создан");
+              setIsModalOpen(false);
+              setCartForOrder(null);
+              fetchCart(); // обновляем список корзин
+            }}
+          />
+        </Modal>
       )}
     </div>
   );
