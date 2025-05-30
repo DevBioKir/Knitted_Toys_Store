@@ -30,7 +30,7 @@ namespace Knitted_Toys_Store.App.Services
             return await _toyRepository.UpdateAsync(id, name, description, size, price, imageUrl);
         }
 
-        public async Task<Guid> DeleteToysAsync(Guid id)
+        public async Task<Guid> DeleteToyAsync(Guid id)
         {
             return await _toyRepository.DeleteAsync(id);
         }

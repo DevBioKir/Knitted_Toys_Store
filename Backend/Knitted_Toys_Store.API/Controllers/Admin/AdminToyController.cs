@@ -88,7 +88,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
 
             var imagePath = Path.Combine(_env.WebRootPath, toy.ImageUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
 
-            await _toyService.DeleteToysAsync(id);
+            await _toyService.DeleteToyAsync(id);
 
             if (System.IO.File.Exists(imagePath))
             {

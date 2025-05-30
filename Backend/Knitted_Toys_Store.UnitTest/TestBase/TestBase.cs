@@ -9,8 +9,7 @@ namespace Knitted_Toys_Store.UnitTest.Test
     {
         protected Knitted_Toys_StoreDBContext _dbContext {  get; private set; }
 
-        [SetUp]
-        public virtual void Setup()
+        public TestBase()
         {
             var options = new DbContextOptionsBuilder<Knitted_Toys_StoreDBContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -26,17 +25,9 @@ namespace Knitted_Toys_Store.UnitTest.Test
         /// </summary>
         protected virtual void SeedData() { }
 
-        [TestInitialize]
-        public void Initialize()
-        {
-            // Вызываем SeedData в каждом тесте, если он переопределен
-            SeedData();
-        }
-
-        [TearDown]
         public void Dispose()
         {
-            _dbContext.Dispose();
+            _dbContext?.Dispose();
         }
     }
 }
