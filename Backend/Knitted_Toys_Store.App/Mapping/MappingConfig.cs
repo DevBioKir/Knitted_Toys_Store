@@ -39,8 +39,22 @@ namespace Knitted_Toys_Store.App.Mapping
                 .Map(dest => dest.Price, src => src.Price)
                 .Map(dest => dest.ImageUrl, src => src.ImageUrl);
 
-            config.NewConfig<Toy, ToysResponse>();
-            config.NewConfig<ToysRequest, Toy>();
+            config.NewConfig<Toy, ToysResponse>()
+                .Map(dest => dest.Id, src => src.Id)
+                .Map(dest => dest.Name, src => src.Name)
+                .Map(dest => dest.Description, src => src.Description)
+                .Map(dest => dest.Size, src => src.Size)
+                .Map(dest => dest.Price, src => src.Price)
+                .Map(dest => dest.ImageUrl, src => src.ImageUrl);
+
+            config.NewConfig<ToysRequest, Toy>()
+                .ConstructUsing(src => Toy.Create(
+                        src.Name,
+                        src.Description,
+                        src.Size,
+                        src.Price,
+                        src.ImageUrl
+                    ));
 
             // CartItem
             config.NewConfig<CartItems, CartItems>()

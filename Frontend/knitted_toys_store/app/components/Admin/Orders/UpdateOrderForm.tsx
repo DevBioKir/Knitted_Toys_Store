@@ -1,6 +1,11 @@
 "use client";
 
-import { addToOrder, reduceQuantityItem, RemoveItemFromOrder } from "@/app/services/Admin/serviceOrdersAdmin";
+import {
+  addToOrder,
+  reduceQuantityItem,
+  RemoveItemFromOrder,
+  updateStatusOrder,
+} from "@/app/services/Admin/serviceOrdersAdmin";
 import { getAllToysAdmin } from "@/app/services/Admin/serviceToysAdmin";
 import { OrderRequest } from "@/app/types/Order/OrderRequest";
 import { OrderResponse } from "@/app/types/Order/OrderResponce";
@@ -27,6 +32,16 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
   const [toys, setToys] = useState<ToyResponse[]>();
   const [selectedToy, setSelectedToy] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<number>(1);
+  const [status, setStatus] = useState(order.status);
+  const [changingStatus, setChangingStatus] = useState(false);
+
+  const statusOptions = [
+  { value: "Pending", label: "Ожидает платы" },
+  { value: "Paid", label: "Оплачен" },
+  { value: "Shipped", label: "Отправлен" },
+  { value: "Delivered", label: "Доставлен" },
+  { value: "Cancelled", label: "Отменён" },
+];
 
   useEffect(() => {
     getAllToysAdmin()
@@ -79,6 +94,20 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
     }
   };
 
+  const handleChangeStatus = async () => {
+    try {
+      setChangingStatus(true);
+      // вызови API смены статуса
+      await updateStatusOrder(order.id, status); // реализуй в сервисе
+      message.success("Статус заказа обновлён");
+      onSuccess(); // обновить форму
+    } catch (err) {
+      message.error("Не удалось обновить статус");
+    } finally {
+      setChangingStatus(false);
+    }
+  };
+
   const handleRemoveItemFromOrder = async (toyId: string) => {
     if (!order) return;
     await RemoveItemFromOrder(order.id, toyId);
@@ -92,6 +121,9 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
         <Input readOnly />
       </Form.Item>
       <Form.Item name="surnameCustomer" label="Фамилия заказчика">
+        <Input />
+      </Form.Item>
+      <Form.Item name="status" label="Статус заказа">
         <Input />
       </Form.Item>
       <Form.Item name="nameCustomer" label="Имя заказчика">
@@ -124,8 +156,12 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
                 "Неизвестная игрушка"}{" "}
               — {item.quantity} шт.
             </span>
-            <Button onClick={() => handleAddItemToOrder(item.toyId, 1)}>+</Button>
-            <Button onClick={() => handleReduceQuantityItem(item.toyId)}>-</Button>
+            <Button onClick={() => handleAddItemToOrder(item.toyId, 1)}>
+              +
+            </Button>
+            <Button onClick={() => handleReduceQuantityItem(item.toyId)}>
+              -
+            </Button>
             <Button
               type="link"
               danger
@@ -140,6 +176,27 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
       )}
 
       <Divider />
+      <Typography.Title level={4}>Изменить статус заказа</Typography.Title>
+      <Form.Item label="Статус заказа">
+        <Select
+          value={status}
+          onChange={(value) => setStatus(value)}
+          style={{ width: "60%" }}
+        >
+          {statusOptions.map((option) => (
+            <Select.Option key={option.value} value={option.value}>
+              {option.label}
+            </Select.Option>
+          ))}
+        </Select>
+      </Form.Item>
+      <Button
+        type="primary"
+        onClick={handleChangeStatus}
+        loading={changingStatus}
+      >
+        Сохранить статус
+      </Button>
 
       <Typography.Title level={3}>Добавить новую позицию</Typography.Title>
       <Form.Item>

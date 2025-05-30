@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="StackExchange.Redis" Version="2.8.37" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Knitted_Toys.Domain\Knitted_Toys_Store.Domain.csproj" />
   </ItemGroup>
 

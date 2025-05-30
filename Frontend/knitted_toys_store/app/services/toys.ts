@@ -3,21 +3,48 @@ import { ToyResponse } from "../types/Toy/ToyResponse";
 
 
 export const getAllToys = async (): Promise<ToyResponse[]> => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Toy`, {
+    const url = `${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Toy`;
+    console.log('🔍 Запрос к URL:', url);
+    
+    const response = await fetch(url, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
         },
         credentials: 'include',
     });
-
+    
+    console.log('📡 Статус ответа:', response.status);
+    console.log('📡 Headers:', response.headers);
+    
     if (!response.ok) {
-        throw new Error("Failed to fetch toys");
+        const errorText = await response.text();
+        console.error('❌ Ошибка ответа:', errorText);
+        throw new Error(`Failed to fetch toys: ${response.status} - ${errorText}`);
     }
-
-    const data: ToyResponse[] = await response.json(); // Преобразуем ответ в массив объектов ToyResponse
-    return data; // Возвращаем данные
+    
+    const data: ToyResponse[] = await response.json();
+    console.log('✅ Полученные данные:', data);
+    console.log('📊 Количество игрушек:', data.length);
+    
+    return data;
 };
+// export const getAllToys = async (): Promise<ToyResponse[]> => {
+//     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Toy`, {
+//         method: "GET",
+//         headers: {
+//             "Content-Type": "application/json",
+//         },
+//         credentials: 'include',
+//     });
+
+//     if (!response.ok) {
+//         throw new Error("Failed to fetch toys");
+//     }
+
+//     const data: ToyResponse[] = await response.json(); // Преобразуем ответ в массив объектов ToyResponse
+//     return data; // Возвращаем данные
+// };
 
 export const getToyById = async (id: string): Promise<ToyResponse> => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Toy/${id}`, {

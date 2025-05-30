@@ -4,7 +4,6 @@ using Knitted_Toys_Store.Contracts;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Knitted_Toys_Store.Infrastructure.Middleware;
-using Microsoft.AspNetCore.Http;
 
 namespace Knitted_Toys_Store.API.Controllers
 {
@@ -35,7 +34,7 @@ namespace Knitted_Toys_Store.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<OrderResponse>>> GetAllOrdersAsync()
+        public async Task<ActionResult<IEnumerable<OrderResponse>>> GetAllOrdersAsync()
         {
             var orders = await _orderService.GetAllOrdersAsync();
 
@@ -52,6 +51,11 @@ namespace Knitted_Toys_Store.API.Controllers
             string deliveryAddress, 
             string deliveryNotes)
         {
+            var existingOrder = await _orderService.GetCurrentOrderAsync(HttpContext, Response);
+            if (existingOrder != null)
+            {
+                return BadRequest(new { message = "У Вас уже есть текущий заказ." });
+            }
             var cart = await _cartService.GetCurrentCartAsync(HttpContext, Response);
             var order = await _orderService.CreateOrderAsync(cart, surname, name, phone, email,
                     deliveryAddress, deliveryNotes);
@@ -79,7 +83,7 @@ namespace Knitted_Toys_Store.API.Controllers
         }
 
         [HttpGet("Current")]
-        public async Task<ActionResult<OrderResponse>> GetCurrentOrder()
+        public async Task<ActionResult<OrderResponse>> GetCurrentOrderAsync()
         {
             var currentOrder = await _orderService.GetCurrentOrderAsync(HttpContext, Response);
 

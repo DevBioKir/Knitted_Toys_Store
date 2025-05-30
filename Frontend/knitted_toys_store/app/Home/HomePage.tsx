@@ -19,7 +19,7 @@ const HomePage = () => {
 
       <div className="center-buttons">
         <button onClick={() => router.push("/toysPage")}>Каталог</button>
-        <button onClick={() => router.push("/promotions")}>Акции</button>
+        {/*<button onClick={() => router.push("/promotions")}>Акции</button>*/}
       </div>
     </div>
   );

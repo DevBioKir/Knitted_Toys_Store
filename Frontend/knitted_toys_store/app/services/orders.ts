@@ -111,25 +111,75 @@ export const getCurrentOrder = async (): Promise<OrderResponse | null> => {
   }
 };
 
-export const createOrder = async (orderRequest: OrderRequest) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Order?surname=${orderRequest.surnameCustomer}
-        &name=${orderRequest.nameCustomer}&phone=${orderRequest.phoneNumber}&email=${orderRequest.email}&deliveryAddress=${orderRequest.deliveryAddress}
-        &deliveryNotes=${orderRequest.deliveryNotes}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(orderRequest),
-    }
-  );
+export const createOrder = async (
+  orderRequest: OrderRequest
+): Promise<
+  | { success: true; data: any }
+  | { success: false; warning: string }
+  | { success: false; error: string }
+> => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Order?surname=${orderRequest.surnameCustomer}
+          &name=${orderRequest.nameCustomer}&phone=${orderRequest.phoneNumber}&email=${orderRequest.email}&deliveryAddress=${orderRequest.deliveryAddress}
+          &deliveryNotes=${orderRequest.deliveryNotes}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(orderRequest),
+      }
+    );
 
-  if (!response.ok) {
-    throw new Error("Не удалось создать заказ");
+    if (response.ok) {
+      const data = await response.json();
+      return { success: true, data };
+    }
+
+    // Пытаемся считать JSON-ответ от сервера
+    let body: any;
+    try {
+      body = await response.json();
+    } catch {
+      body = null;
+    }
+
+    // Сервер вернул предсказуемое предупреждение
+    if (response.status === 400 && body?.message) {
+      return { success: false, warning: body.message };
+    }
+
+    return {
+      success: false,
+      error: body?.message ?? "Неизвестная ошибка при создании заказа",
+    };
+  } catch (err) {
+    return { success: false, error: "Ошибка соединения с сервером" };
   }
 };
+
+
+// export const createOrder = async (orderRequest: OrderRequest) => {
+//   const response = await fetch(
+//     `${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}/Order?surname=${orderRequest.surnameCustomer}
+//         &name=${orderRequest.nameCustomer}&phone=${orderRequest.phoneNumber}&email=${orderRequest.email}&deliveryAddress=${orderRequest.deliveryAddress}
+//         &deliveryNotes=${orderRequest.deliveryNotes}`,
+//     {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       credentials: "include",
+//       body: JSON.stringify(orderRequest),
+//     }
+//   );
+
+//   if (!response.ok) {
+//     throw new Error("Не удалось создать заказ");
+//   }
+// };
 
 export const updateStatusOrder = async (id: string, newStatus: OrderStatus) => {
   const response = await fetch(

@@ -1,6 +1,8 @@
 "use client";
 
 import { UpdateOrderForm } from "@/app/components/Admin/Orders/UpdateOrderForm";
+import { statusInfo } from "@/app/components/OrderStatusInfo";
+import { OrderStatus } from "@/app/Models/Order";
 import {
   deleteOrderAdmin,
   getAllOrdersAdmin,
@@ -21,9 +23,9 @@ export default function AdminOrdersPage() {
       const data = await getAllOrdersAdmin();
       console.log("API вернуло заказы:", data);
 
-      const updateOrders = data.map(order => ({
+      const updateOrders = data.map((order) => ({
         ...order,
-        orderItemsResponses: order.orderItemsResponse || []
+        orderItemsResponses: order.orderItemsResponse || [],
       }));
 
       setOrders(updateOrders);
@@ -75,9 +77,24 @@ export default function AdminOrdersPage() {
                 <p>
                   <strong>Id заказа: {order.id}</strong>
                 </p>
-                <p>Дата создания заказа: {new Date(order.orderDate).toLocaleString()}</p>
+                <p>
+                  Дата создания заказа:{" "}
+                  {new Date(order.orderDate).toLocaleString()}
+                </p>
                 <p>Сумма заказа: {order.totalAmount}</p>
-                <p>Статус заказа: {order.status}</p>
+                <p>
+                  Статус заказа:{" "}
+                  <span
+                    style={{
+                      color:
+                        statusInfo[order.status as OrderStatus]?.color ||
+                        "black",
+                    }}
+                  >
+                    {statusInfo[order.status as OrderStatus]?.label ||
+                      order.status}
+                  </span>
+                </p>
                 <p>Фамилия заказчика: {order.surnameCustomer}</p>
                 <p>Имя заказчика: {order.nameCustomer}</p>
                 <p>Телефон заказчика: {order.phoneNumber}</p>

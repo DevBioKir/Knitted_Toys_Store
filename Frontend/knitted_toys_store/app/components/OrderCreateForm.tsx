@@ -12,22 +12,50 @@ export default function OrderCreateForm({ onOrderCreated }: Prop) {
   const [uploading, setUploading] = useState(false);
   const { refreshOrders } = useOrder();
 
+  
   const onFinish = async (values: OrderRequest) => {
-    try {
-      setUploading(true);
-      await createOrder({ ...values });
+  try {
+    setUploading(true);
+
+    const result = await createOrder({ ...values });
+
+    if (result.success) {
       await refreshOrders();
       message.success("Заказ успешно создан");
       if (onOrderCreated) {
         onOrderCreated();
       }
-    } catch (err) {
-      console.error(err);
-      message.error("Ошибка при создании заказа");
-    } finally {
-      setUploading(false);
+    } else if ("warning" in result) {
+      message.warning(result.warning); // Показываем предупреждение пользователю
+    } else if ("error" in result) {
+      message.error(result.error); // Показываем системную ошибку
     }
-  };
+
+  } catch (err) {
+    console.error(err);
+    message.error("Ошибка при соединении с сервером");
+  } finally {
+    setUploading(false);
+  }
+};
+
+  
+  // const onFinish = async (values: OrderRequest) => {
+  //   try {
+  //     setUploading(true);
+  //     await createOrder({ ...values });
+  //     await refreshOrders();
+  //     message.success("Заказ успешно создан");
+  //     if (onOrderCreated) {
+  //       onOrderCreated();
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //     message.error("Ошибка при создании заказа");
+  //   } finally {
+  //     setUploading(false);
+  //   }
+  // };
 
   return (
     <div style={{ maxWidth: 500, margin: "0 auto", padding: 20 }}>

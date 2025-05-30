@@ -1,6 +1,7 @@
 import { OrderRequest } from "@/app/types/Order/OrderRequest";
 import adminAPI from "./adminAPI";
 import { OrderResponse } from "@/app/types/Order/OrderResponce";
+import { OrderStatus } from "@/app/Models/Order";
 
 export const getOrderById = async (id: string): Promise<OrderResponse> => {
   try {
@@ -34,13 +35,13 @@ export const createOrderAdmin = async (orderRequest: OrderRequest) => {
 };
 
 export const deleteOrderAdmin = async (opderId: string) => {
-  try{
-    await adminAPI.delete(`/AdminOrder?id=${opderId}`)
+  try {
+    await adminAPI.delete(`/AdminOrder?id=${opderId}`);
   } catch (err) {
     console.error("Ошибка при удалении заказа", err);
     throw err;
   }
-}
+};
 
 export const addToOrder = async (
   orderId: string,
@@ -69,10 +70,21 @@ export const reduceQuantityItem = async (orderId: string, toyId: string) => {
 };
 
 export const RemoveItemFromOrder = async (orderId: string, toyId: string) => {
-try{
-  await adminAPI.delete(`/AdminOrder/RemoveItemFromCart?orderId=${orderId}&toyId=${toyId}`)
-} catch (err) {
-  console.error("Ошибка при удалении товара из заказа", err)
-  throw err;
-}
-}
+  try {
+    await adminAPI.delete(
+      `/AdminOrder/RemoveItemFromCart?orderId=${orderId}&toyId=${toyId}`
+    );
+  } catch (err) {
+    console.error("Ошибка при удалении товара из заказа", err);
+    throw err;
+  }
+};
+
+export const updateStatusOrder = async (id: string, newStatus: OrderStatus) => {
+  try {
+    await adminAPI.put(`/Order?orderId=${id}&newStatus=${newStatus}`);
+  } catch (err) {
+    console.error("Ошибка при изменении статуса заказа", err);
+    throw err;
+  }
+};

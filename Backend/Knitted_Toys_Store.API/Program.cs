@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication;
 using Mapster;
 using MapsterMapper;
 using System.Text.Json.Serialization;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -62,6 +63,9 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IToysRepositories, ToysRepositories>();
 builder.Services.AddScoped<IOrderRepositories, OrderRepositories>();
 builder.Services.AddScoped<ICartRepositories, CartRepositories>();
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect("localhost:6379"));
 
 builder.Services.AddCors(options =>
 {

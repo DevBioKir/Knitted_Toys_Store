@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Knitted_Toys_Store.App.Services;
-using Knitted_Toys_Store.Domain.Models.Domain;
+using Knitted_Toys_Store.Contracts;
 
 namespace Knitted_Toys_Store.API.Controllers.Admin
 {
@@ -103,8 +103,17 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
 
                         var imageUrl = $"/Images/{uniqueFileName}".Replace("\\", "/");
 
-                        var toy = Toy.Create(name, description, size, price, imageUrl);
-                        await _toyService.CreateToyAsync(toy);
+                        //var toy = Toy.Create(name, description, size, price, imageUrl);
+
+                        var toyRequest = new ToysRequest(
+                            name,
+                            description,
+                            size,
+                            price,
+                            imageUrl
+                        );
+
+                        await _toyService.CreateToyAsync(toyRequest);
                         toysCount++;
                     }
                     catch (Exception ex)

@@ -290,19 +290,6 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
 
             await _context.SaveChangesAsync();
         }
-        private async Task UpdateCartAsync(Cart cart)
-        {
-            var cartEntity = _mapper.Map<CartEntity>(cart);
-            _context.Carts.Update(cartEntity);
-            await _context.SaveChangesAsync();
-        }
-        private async Task<CartEntity?> LoadCartWithItems(Guid cartId)
-        {
-            return await _context.Carts
-                .Include(c => c.CartItems)
-                .ThenInclude(ci => ci.Toy)
-                .FirstOrDefaultAsync(c => c.Id == cartId);
-        }
 
         public async Task ClearCartAsync(Guid cartId)
         {
