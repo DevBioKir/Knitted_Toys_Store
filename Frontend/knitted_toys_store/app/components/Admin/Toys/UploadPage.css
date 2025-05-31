@@ -1,0 +1,54 @@
+/* src/styles/UploadPage.css */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.upload-instructions {
+  width: 90%;
+  max-width: 800px;
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.upload-instructions h3 {
+  margin-bottom: 10px;
+}
+
+.upload-instructions p {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.upload-instructions img {
+  display: block;
+  margin: 1rem 0;
+  width: 100%;
+  max-width: 600px;
+  border: 1px solid #ccc;
+}
+
+.file-upload-section {
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+}

@@ -1,0 +1,34 @@
+# Базовый образ с ASP.NET Core рантаймом
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+WORKDIR /app
+EXPOSE 80
+
+# Теперь билдим проект
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+# Копируем sln и все csproj файлы
+COPY ["Knitted_Toys_Store.sln", "."]
+COPY ["Knitted_Toys_Store.API/Knitted_Toys_Store.API.csproj", "Knitted_Toys_Store.API/"]
+COPY ["Knitted_Toys_Store.App/Knitted_Toys_Store.App.csproj", "Knitted_Toys_Store.App/"]
+COPY ["Knitted_Toys_Store.Contracts/Knitted_Toys_Store.Contracts.csproj", "Knitted_Toys_Store.Contracts/"]
+COPY ["Knitted_Toys.Domain/Knitted_Toys_Store.Domain.csproj", "Knitted_Toys.Domain/"]
+COPY ["Knitted_Toys_Store.Infrastructure/Knitted_Toys_Store.Infrastructure.csproj", "Knitted_Toys_Store.Infrastructure/"]
+COPY ["Knitted_Toys_Store.DataAccess/Knitted_Toys_Store.DataAccess.csproj", "Knitted_Toys_Store.DataAccess/"]
+COPY ["Knitted_Toys_Store.UnitTest/Knitted_Toys_Store.UnitTest.csproj", "Knitted_Toys_Store.UnitTest/"]
+
+# Восстановим зависимости
+RUN dotnet restore "Knitted_Toys_Store.API/Knitted_Toys_Store.API.csproj"
+
+# Копируем остальной код
+COPY . .
+
+# Публикуем
+WORKDIR /src/Knitted_Toys_Store.API
+RUN dotnet publish -c Release -o /app/publish
+
+# STAGE 2: Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "Knitted_Toys_Store.API.dll"]
