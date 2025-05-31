@@ -10,20 +10,19 @@ import {
   Spin,
   Tag,
   message,
-  Modal,
 } from "antd";
 import { useRouter } from "next/navigation";
 import { statusInfo } from "../components/OrderStatusInfo";
 import { updateStatusOrder } from "../services/orders";
 import { OrderStatus } from "../Models/Order";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { deleteOrderAdmin } from "../services/Admin/serviceOrdersAdmin";
 
 const { Title, Text } = Typography;
 
 export default function OrderPage() {
-  const { selectedOrder, order, isLoading, refreshOrders, isInitialized } = useOrder();
-  const [cancelLoading, setCancelLoading] = useState(false);
+  const { selectedOrder, order, isLoading, refreshOrders, isInitialized } =
+    useOrder();
   const router = useRouter();
   const currentOrder = selectedOrder || order;
 
@@ -87,6 +86,10 @@ export default function OrderPage() {
       // Через 5 секунд — запрос на удаление
       setTimeout(async () => {
         try {
+          if (!currentOrder.id) {
+            console.error("ID заказа отсутствует, удаление невозможно");
+            return;
+          }
           await deleteOrderAdmin(currentOrder.id);
           message.success("Отменённый заказ удалён");
           refreshOrders(); // Обновим, чтобы скрыть удалённый заказ
@@ -163,10 +166,9 @@ export default function OrderPage() {
               Оплатить заказ
             </Button>
           )}
-            <Button onClick={handleCancelOrder}>Отменить заказ</Button>
+          <Button onClick={handleCancelOrder}>Отменить заказ</Button>
         </div>
       </div>
     </div>
   );
 }
-

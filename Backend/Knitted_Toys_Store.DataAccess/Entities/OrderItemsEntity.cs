@@ -2,13 +2,13 @@
 {
     public class OrderItemsEntity
     {
-        public Guid Id { get; set; } //уникальный идентификатор позиции
-        public Guid OrderId { get; set; } //внешний ключ на Orders
-        public Guid ToyId { get; set; } //внешний ключ на Toy
-        public int Quantity { get; set; } //количество товара
-        public decimal PriceAtTime { get; set; } //цена на момент заказа
+        public Guid Id { get; set; } 
+        public Guid OrderId { get; set; }
+        public Guid ToyId { get; set; } 
+        public int Quantity { get; set; } 
+        public decimal PriceAtTime { get; set; } 
 
-        public OrderEntity? Order { get; set; } //ссылка на Orders
-        public ToyEntity? Toy { get; set; } //ссылка на Toy
+        public OrderEntity? Order { get; set; } 
+        public ToyEntity? Toy { get; set; } 
     }
 }

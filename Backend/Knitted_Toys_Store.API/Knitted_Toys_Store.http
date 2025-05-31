@@ -1,4 +1,5 @@
-@Knitted_Toys_Store_HostAddress = http://localhost:5237
+#@Knitted_Toys_Store_HostAddress = http://localhost:5237
+@Knitted_Toys_Store_HostAddress = http://localhost:8080
 
 GET {{Knitted_Toys_Store_HostAddress}}/weatherforecast/
 Accept: application/json

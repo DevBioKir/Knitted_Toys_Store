@@ -2,20 +2,18 @@
 {
     public class Cart
     {
-        public Guid Id { get; private set; } //сохранять его в cookies
-        public DateTime CreateAt { get; private set; } //Дата создания корзины
-        public DateTime LastUpdate { get; private set; } //Дата последнего обновления корзины
+        public Guid Id { get; private set; } 
+        public DateTime CreateAt { get; private set; } 
+        public DateTime LastUpdate { get; private set; } 
         public decimal TotalAmount { get; private set; } = 0;
 
-        //[JsonIgnore]
-        public List<CartItems> CartItems { get; private set; } = []; //у корзины может быть много Toy
+        public List<CartItems> CartItems { get; private set; } = []; 
 
-        // Для оптимистичной блокировки, используем byte[]
         public byte[] RowVersion { get; set; }
 
         private Cart() {}
 
-        public static Cart Create() //фабричный метод
+        public static Cart Create() 
         {
             return new Cart()
             {
@@ -52,7 +50,7 @@
             CartLastUpdate();
 
         }
-        public void CartLastUpdate() //обновление времени последнего изменения
+        public void CartLastUpdate()
         {
             LastUpdate = DateTime.UtcNow;
         }
@@ -64,7 +62,7 @@
                 .Sum(item => item.Quantity * item.Toy.Price);
         }
 
-        public void SetItemQuantity(Guid toyId, int quantity) //если надо полностью обновить корзину точным значением
+        public void SetItemQuantity(Guid toyId, int quantity)
         {
             if (quantity < 0)
                 throw new ArgumentException("The number must be greater than 0");
@@ -78,7 +76,7 @@
             CartLastUpdate();
             TotalAmountUpdate();
         }
-        public void IncreaseItemQuantity(Guid toyId) //увеличение количества товара в позиции на единицу
+        public void IncreaseItemQuantity(Guid toyId)
         {
             var item = FindCartItemsByToyId(toyId);
 
@@ -92,7 +90,7 @@
             TotalAmountUpdate();
         }
 
-        public void ReduceItemQuantity(Guid toyId) //уменьшение количество товара в позиции на единицу
+        public void ReduceItemQuantity(Guid toyId)
         {
             var item = FindCartItemsByToyId(toyId);
             if (item == null)
@@ -131,7 +129,6 @@
         public void RemoveItem(Guid toyId)
         {
             var item = FindCartItemsByToyId(toyId);
-            //var item = CartItems.FirstOrDefault(ci => ci.ToyId == toyId || ci.Toy?.Id == toyId);
 
             if (item == null) throw new InvalidOperationException("The toy was not found in the cart");
 

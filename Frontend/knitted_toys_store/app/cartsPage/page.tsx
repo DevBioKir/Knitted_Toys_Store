@@ -21,7 +21,7 @@ const { Title, Text } = Typography;
 
 export default function CartPage() {
   const { cart, refreshCart, isLoading } = useCart();
-  const [isUpdating, setIsUpdating] = useState(false);
+  const [isUpdating ] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
@@ -48,6 +48,10 @@ export default function CartPage() {
       return;
     }
     try {
+      if (!cart.id) {
+        console.error("Cart ID отсутствует");
+        return;
+      }
       await addToCart(cart.id, toyId, 1); // по умолчанию quantity = 1
       refreshCart();
       message.success("Товар добавлен в корзину");
@@ -64,6 +68,10 @@ export default function CartPage() {
     }
 
     try {
+      if (!cart.id) {
+        console.error("Cart ID отсутствует");
+        return;
+      }
       await reduceQuantityItem(cart.id, toyId);
       refreshCart();
       message.success("Количество товара уменьшено");

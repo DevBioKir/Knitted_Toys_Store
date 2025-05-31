@@ -16,18 +16,18 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
     public class Order
     {
         public Guid Id { get; private set; }
-        public DateTime OrderDate { get; private set; } //дата создания заказа
-        public decimal TotalAmount { get; set; } //общая сумма заказа
-        public OrderStatus Status { get; private set; } //статус заказа
+        public DateTime OrderDate { get; private set; } 
+        public decimal TotalAmount { get; set; }
+        public OrderStatus Status { get; private set; }
 
-        public string? SurnameCustomer { get; private set; } = string.Empty; //Фамилия заказчика
-        public string? NameCustomer { get; private set; } = string.Empty; //Имя заказчика
-        public string? PhoneNumber { get; private set; } = string.Empty; //Номер заказчика
-        public string? Email { get; private set; } = string.Empty; //email заказчика
-        public string? DeliveryAddress { get; private set; } = string.Empty; //адрес доставки
+        public string? SurnameCustomer { get; private set; } = string.Empty; 
+        public string? NameCustomer { get; private set; } = string.Empty; 
+        public string? PhoneNumber { get; private set; } = string.Empty; 
+        public string? Email { get; private set; } = string.Empty; 
+        public string? DeliveryAddress { get; private set; } = string.Empty; 
         public string? DeliveryNotes { get; private set; } = string.Empty;
 
-        public List<OrderItems> OrderItems { get; private set; } = []; //у одного заказа может быть много товаров
+        public List<OrderItems> OrderItems { get; private set; } = [];
 
         private Order(
             decimal totalAmount, string surname, string name, string phone, string email, string deliveryAddress,

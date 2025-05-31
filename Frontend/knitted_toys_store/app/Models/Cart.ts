@@ -7,7 +7,7 @@ export interface Cart {
     createAt: Date;
     lastUpdate: Date;
     totalAmount: number;
-    cartItems: CartItems[];
+    cartItems?: CartItems[];
     rowVersion: string; // base64 строка
 
     cartItemsResponses: CartItemsResponse[];

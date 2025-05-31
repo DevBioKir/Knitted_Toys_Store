@@ -5,16 +5,16 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
     public class CartItems
     {
         public Guid Id { get; private set; }
-        public Guid CartId { get; private set; } //внешний ключ на Cart
-        public Guid ToyId { get; private set; } //внешний ключ на Toy
-        public int Quantity { get; private set; } //количество товара
-        public DateTime AddedAt { get; private set; }//дата добавления в корзину
+        public Guid CartId { get; private set; } 
+        public Guid ToyId { get; private set; } 
+        public int Quantity { get; private set; } 
+        public DateTime AddedAt { get; private set; }
 
         [JsonIgnore]
-        public Cart? Cart { get; private set; } //ссылка на Cart
+        public Cart? Cart { get; private set; } 
 
         [JsonIgnore]
-        public Toy? Toy { get; private set; } //ссылка на Toy
+        public Toy? Toy { get; private set; } 
 
         private CartItems() {}
 
@@ -38,7 +38,6 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
             Quantity = newQuantity;
         }
 
-        // Метод для установки Toy
         public void SetToy(Toy toy)
         {
             Toy = toy ?? throw new ArgumentNullException(nameof(toy), "Toy cannot be null");

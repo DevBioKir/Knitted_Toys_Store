@@ -11,7 +11,7 @@ namespace Knitted_Toys_Store.API.Controllers.Admin
 {
     [ApiController]
     [Route("[controller]")]
-    //[Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "AdminOnly")]
     public class AdminOrderController : ControllerBase
     {
         private readonly IOrderService _orderService;

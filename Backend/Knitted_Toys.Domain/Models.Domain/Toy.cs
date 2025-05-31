@@ -11,10 +11,10 @@
         public string Description { get; private set; } = string.Empty;
         public string Size { get; private set; } = string.Empty;
         public decimal Price { get; private set; }
-        public string ImageUrl { get; private set; } = string.Empty;//путь к изображению
+        public string ImageUrl { get; private set; } = string.Empty;
 
-        public List<OrderItems> OrderItems { get; } = []; //у одной игрушки может быть много позиций в заказе
-        public List<CartItems> CartItems { get; } = []; //у одной игрушки может быть много позиций в корзине
+        public List<OrderItems> OrderItems { get; } = []; 
+        public List<CartItems> CartItems { get; } = []; 
 
         private Toy() { }
         public static Toy Create(
@@ -54,7 +54,7 @@
         {
             return new Toy
             {
-                Id = id, // Загружаем существующий Id
+                Id = id,
                 Name = name,
                 Description = description,
                 Size = size,

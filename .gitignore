@@ -402,3 +402,4 @@ FodyWeavers.xsd
 # Ignore configurations files
 appsettings.json
 appsettings.Development.json
+Frontend/.next/

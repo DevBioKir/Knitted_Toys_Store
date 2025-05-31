@@ -4,15 +4,14 @@ namespace Knitted_Toys_Store.Domain.Models.Domain
 {
     public class OrderItems
     {
-        public Guid Id { get; private set; }//уникальный идентификатор позиции
-        public Guid OrderId { get; private set; } //внешний ключ на Orders
-        public Guid ToyId { get; private set; } //внешний ключ на Toy
-        public int Quantity { get; private set; } //количество товара
-        public decimal PriceAtTime { get; private set; } //цена на момент заказа
+        public Guid Id { get; private set; }
+        public Guid OrderId { get; private set; }
+        public Guid ToyId { get; private set; } 
+        public int Quantity { get; private set; } 
+        public decimal PriceAtTime { get; private set; } 
 
-        public Order? Order { get; private set; } //ссылка на Orders
-        public Toy? Toy { get; private set; } //ссылка на Toy
-        //добавить дату создания заказа
+        public Order? Order { get; private set; } 
+        public Toy? Toy { get; private set; } 
 
         public static OrderItems Create(Guid orderId, Guid toyId, int quantity, decimal priceAtTime)
         {

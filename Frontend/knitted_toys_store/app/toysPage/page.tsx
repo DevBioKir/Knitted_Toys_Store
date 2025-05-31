@@ -48,6 +48,10 @@ export default function ToysPage() {
       return;
     }
     try {
+      if (!cart.id) {
+        console.error("Cart ID отсутствует");
+        return;
+      }
       await addToCart(cart.id, toyId, 1); // по умолчанию quantity = 1
       message.success("Товар добавлен в корзину");
     } catch (error) {

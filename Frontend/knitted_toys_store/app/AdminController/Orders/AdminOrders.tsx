@@ -79,7 +79,8 @@ export default function AdminOrdersPage() {
                 </p>
                 <p>
                   Дата создания заказа:{" "}
-                  {new Date(order.orderDate).toLocaleString()}
+                  {order.orderDate ? new Date(order.orderDate).toLocaleString() : "—"}
+                  {/*{new Date(order.orderDate).toLocaleString()}*/}
                 </p>
                 <p>Сумма заказа: {order.totalAmount}</p>
                 <p>

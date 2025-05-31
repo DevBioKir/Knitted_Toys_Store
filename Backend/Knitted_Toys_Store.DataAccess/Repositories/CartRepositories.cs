@@ -234,26 +234,6 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             await _context.SaveChangesAsync();
         }
 
-        //public async Task SetItemQuantityAsync(Guid cartId, Guid toyId, int quantity)//добавить точное количество
-        //{
-        //    var entityCart = await _context.Carts
-        //        .Include(c => c.CartItems)
-        //        .FirstOrDefaultAsync(c => c.Id == cartId);
-
-        //    if (entityCart == null)
-        //        throw new InvalidOperationException("Cart not found");
-
-        //    var cart = _mapper.Map<Cart>(entityCart);
-
-        //    cart.SetItemQuantity(toyId, quantity);
-
-        //    var updatedEntity = _mapper.Map<CartEntity>(cart);
-        //    _context.Entry(entityCart).CurrentValues.SetValues(updatedEntity);
-        //    entityCart.CartItems = updatedEntity.CartItems;
-
-        //    await _context.SaveChangesAsync();
-        //}
-
         public async Task RemoveItemFromCartAsync(Guid cartId, Guid toyId)//удаление позиции товара из корзины полностью
         {
             // Очищаем ChangeTracker перед началом операции

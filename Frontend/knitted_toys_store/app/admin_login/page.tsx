@@ -27,6 +27,7 @@ export default function AdminLoginForm() {
             router.push("/AdminController");
         } catch (error) {
             message.error("Ошибка авторизации");
+            console.error(error);
           } finally {
             setLoading(false);
           }

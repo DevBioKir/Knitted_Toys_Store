@@ -7,7 +7,6 @@ import {
   updateStatusOrder,
 } from "@/app/services/Admin/serviceOrdersAdmin";
 import { getAllToysAdmin } from "@/app/services/Admin/serviceToysAdmin";
-import { OrderRequest } from "@/app/types/Order/OrderRequest";
 import { OrderResponse } from "@/app/types/Order/OrderResponce";
 import { ToyResponse } from "@/app/types/Toy/ToyResponse";
 import {
@@ -36,12 +35,12 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
   const [changingStatus, setChangingStatus] = useState(false);
 
   const statusOptions = [
-  { value: "Pending", label: "Ожидает платы" },
-  { value: "Paid", label: "Оплачен" },
-  { value: "Shipped", label: "Отправлен" },
-  { value: "Delivered", label: "Доставлен" },
-  { value: "Cancelled", label: "Отменён" },
-];
+    { value: "Pending", label: "Ожидает платы" },
+    { value: "Paid", label: "Оплачен" },
+    { value: "Shipped", label: "Отправлен" },
+    { value: "Delivered", label: "Доставлен" },
+    { value: "Cancelled", label: "Отменён" },
+  ];
 
   useEffect(() => {
     getAllToysAdmin()
@@ -67,6 +66,10 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
   const handleAddItemToOrder = async (toyId: string, quantity: number) => {
     if (!order) return;
     try {
+      if (!order.id) {
+        console.error("Order ID отсутствует");
+        return;
+      }
       await addToOrder(order.id, toyId, quantity);
       message.success(`Игрушка ${toyId} успешно добавлена`);
       onSuccess();
@@ -86,6 +89,10 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
   const handleReduceQuantityItem = async (toyId: string) => {
     if (!order) return;
     try {
+      if (!order.id) {
+        console.error("Order ID отсутствует");
+        return;
+      }
       await reduceQuantityItem(order.id, toyId);
       message.success(`Количество игрушек ${toyId} успешно уменьшено`);
       onSuccess();
@@ -98,6 +105,15 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
     try {
       setChangingStatus(true);
       // вызови API смены статуса
+      if (!order.id) {
+        console.error("Order ID отсутствует");
+        return;
+      }
+      if (!status) {
+        message.error("Статус не выбран");
+        setChangingStatus(false);
+        return;
+      }
       await updateStatusOrder(order.id, status); // реализуй в сервисе
       message.success("Статус заказа обновлён");
       onSuccess(); // обновить форму
@@ -110,6 +126,10 @@ export const UpdateOrderForm = ({ order, onSuccess }: Props) => {
 
   const handleRemoveItemFromOrder = async (toyId: string) => {
     if (!order) return;
+    if (!order.id) {
+      console.error("Cart ID отсутствует");
+      return;
+    }
     await RemoveItemFromOrder(order.id, toyId);
     onSuccess();
   };

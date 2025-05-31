@@ -6,8 +6,6 @@ namespace Knitted_Toys_Store.App.Services
     public interface ICartService
     {
         Task<Guid> AddToCartAsync(Guid cartId, Guid toyId, int quantity);
-        //Task<Guid> AddToCartAsync(Guid cartId, Guid toyId, int quantity);
-        //Task<Guid> CreateToysInCartItems(Guid cartId, Guid toyId, int quantity);
         Task<Cart> CreateCartAsync();
         Task<Guid> DeleteCartAsync(Guid id);
         Task<IEnumerable<Cart>> GetAllCartsAsync();
@@ -18,6 +16,5 @@ namespace Knitted_Toys_Store.App.Services
         Task<Guid> ReduceQuantityItemAsync(Guid cartId, Guid toyId);
         Task ClearCartAsync(Guid cartId);
         Task<Cart?> CloneCartAsync(Guid cartId);
-        //Task<Guid> SetItemQuantityAsync(Guid cartId, Guid toyId, int quantity);
     }
 }

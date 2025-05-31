@@ -162,34 +162,6 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
             return _mapper.Map<List<Order>>(ordersByStatus);
         }
 
-        //public async Task UpdateOrderFromCartAsync(Guid orderId, Guid cartId)
-        //{
-        //    var entityOrder = await _context.Orders
-        //        .Include(o => o.OrderItems)
-        //        .FirstOrDefaultAsync(o => o.Id == orderId);
-
-        //    if (entityOrder == null) throw new InvalidOperationException("Order not found");
-        //    var domainOrder = _mapper.Map<Order>(entityOrder);
-
-        //    var cart = await _context.Carts
-        //        .Include(c => c.CartItems)
-        //        .ThenInclude(ci => ci.Toy)
-        //        .FirstOrDefaultAsync(c => c.Id == cartId);
-
-        //    if (cart == null) throw new InvalidOperationException("Cart not found");
-
-        //    domainOrder.OrderItems.Clear();
-
-        //    foreach (var ci in cart.CartItems)
-        //    {
-        //        domainOrder.OrderItems.Add(OrderItems.Create(order.Id, ci.ToyId, ci.Quantity, ci.Toy.Price));
-        //    }
-
-        //    order.UpdateTotalAmount();
-        //    _context.Orders.Update(order);
-        //    await _context.SaveChangesAsync();
-        //}
-
         public async Task UpdateOrderStatusAsync(Guid orderId, OrderStatus newStatus)
         {
             var entityOrder = await _context.Orders.FindAsync(orderId);
@@ -242,8 +214,6 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
                     _logger.LogError("Игрушка с ID {ToyId} не загружена в заказе", item.ToyId);
                     throw new InvalidOperationException($"Игрушка с ID {item.ToyId} не загружена в заказе");
                 }
-                // var toyDomain = _mapper.Map<Toy>(item.Toy); // ToyEntity уже загружен через Include
-                //newCartItem.SetToy(toyDomain);
                 newCartItem.SetToy(item.Toy);
 
                 newCart.CartItems.Add(newCartItem);
@@ -271,12 +241,10 @@ namespace Knitted_Toys_Store.DataAccess.Repositories
         {
             var entityOrder = await _context.Orders
                 .Include(c => c.OrderItems)
-                //.ThenInclude(ci => ci.Toy)
                 .FirstOrDefaultAsync(c => c.Id == orderId)
                 ?? throw new Exception($"Order with ID {orderId} not found.");
 
             var entityToy = await _context.Toys
-                //.AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == toyId)
             ?? throw new Exception($"Toy with ID {toyId} not found.");
 

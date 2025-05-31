@@ -6,7 +6,7 @@ export interface OrderResponse{
     id?: string;
     orderDate?: Date;
     totalAmount?: number;
-    status?: OrderStatus;
+    status: OrderStatus;
     surnameCustomer: string;
     nameCustomer: string;
     phoneNumber: string;

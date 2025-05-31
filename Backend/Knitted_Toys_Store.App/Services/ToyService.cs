@@ -33,7 +33,7 @@ namespace Knitted_Toys_Store.App.Services
 
             // ВРЕМЕННО: очистим кэш для отладки
             await InvalidateCacheAsync(TOYS_CACHE_KEY);
-            _logger.LogInformation("🗑️ Кэш очищен для отладки");
+            _logger.LogInformation("Кэш очищен для отладки");
 
             // Пытаемся получить из кэша
             var cachedToys = await GetFromCacheAsync<List<ToysResponse>>(TOYS_CACHE_KEY);
@@ -54,7 +54,7 @@ namespace Knitted_Toys_Store.App.Services
                 //var toyResponses = domainToys.Adapt<List<ToysResponse>>();
                 var toyResponses = _mapper.Map<List<ToysResponse>>(domainToys);
 
-                _logger.LogInformation("💾 Сохраняем {Count} игрушек в кэш на {Minutes} минут", toyResponses.Count, 5);
+                _logger.LogInformation("Сохраняем {Count} игрушек в кэш на {Minutes} минут", toyResponses.Count, 5);
 
                 // Кэшируем DTO (они легко сериализуются)
                 await SetCacheAsync(TOYS_CACHE_KEY, toyResponses);
@@ -82,20 +82,6 @@ namespace Knitted_Toys_Store.App.Services
 
             return toyId;
         }
-
-        //public async Task<Guid> CreateToyAsync(Toy toy)
-        //{
-        //    _logger.LogInformation("Добавляем новую игрушку: {ToyName}", toy.Name);
-
-        //    var toyId = await _toyRepository.CreateToyAsync(toy);
-        //    _logger.LogInformation("Игрушка создана в БД с ID: {ToyId}", toyId);
-
-        //    _logger.LogInformation("Удаляем устаревший кэш...");
-        //    await InvalidateCacheAsync(TOYS_CACHE_KEY);
-        //    _logger.LogInformation("Кэш очищен! При следующем запросе GetAllToys данные загрузятся заново");
-
-        //    return toyId;
-        //}
 
         public async Task<Guid> UpdateToyAsync(Guid id, ToysRequest request)
         {
@@ -137,34 +123,6 @@ namespace Knitted_Toys_Store.App.Services
 
             return deletedToyId;
         }
-
-        //public async Task<Guid> UpdateToyAsync(Guid id, string name, string description, string size, decimal price, string imageUrl)
-        //{
-        //    _logger.LogInformation("Обновляем игрушку с ID: {ToyId}", id);
-
-        //    var updatedToyId = await _toyRepository.UpdateAsync(id, name, description, size, price, imageUrl);
-        //    _logger.LogInformation("Игрушка обновлена в БД с ID: {ToyId}", updatedToyId);
-
-        //    _logger.LogInformation("Удаляем устаревший кэш...");
-        //    await InvalidateCacheAsync(TOYS_CACHE_KEY);
-        //    _logger.LogInformation("Кэш очищен!");
-
-        //    return updatedToyId;
-        //}
-
-        //public async Task<Guid> DeleteToyAsync(Guid id)
-        //{
-        //    _logger.LogInformation("Удаляем игрушку с ID: {ToyId}", id);
-
-        //    var deletedToyId = await _toyRepository.DeleteAsync(id);
-        //    _logger.LogInformation("Игрушка удалена из БД с ID: {ToyId}", deletedToyId);
-
-        //    _logger.LogInformation("Удаляем устаревший кэш...");
-        //    await InvalidateCacheAsync(TOYS_CACHE_KEY);
-        //    _logger.LogInformation("Кэш очищен!");
-
-        //    return deletedToyId;
-        //}
 
         public async Task<ToysResponse?> GetToyByIdAsync(Guid id)
         {

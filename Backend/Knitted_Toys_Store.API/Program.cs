@@ -65,7 +65,7 @@ builder.Services.AddScoped<IOrderRepositories, OrderRepositories>();
 builder.Services.AddScoped<ICartRepositories, CartRepositories>();
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
-    ConnectionMultiplexer.Connect("localhost:6379"));
+    ConnectionMultiplexer.Connect(configuration["Redis:Configuration"] ?? "localhost:6379"));
 
 builder.Services.AddCors(options =>
 {
