@@ -1,7 +1,6 @@
 # Базовый образ с ASP.NET Core рантаймом
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-WORKDIR /app
-EXPOSE 80
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
 
 # Теперь билдим проект
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
@@ -20,8 +19,15 @@ COPY ["Knitted_Toys_Store.UnitTest/Knitted_Toys_Store.UnitTest.csproj", "Knitted
 # Восстановим зависимости
 RUN dotnet restore "Knitted_Toys_Store.API/Knitted_Toys_Store.API.csproj"
 
-# Копируем остальной код
+# Копируем весь исходный код
 COPY . .
+
+# Устанавливаем EF CLI глобально
+RUN dotnet tool install --global dotnet-ef \
+ && echo 'export PATH="$PATH:/root/.dotnet/tools"' >> ~/.bashrc
+
+# Прописываем путь к инструментам EF
+ENV PATH="$PATH:/root/.dotnet/tools"
 
 # Публикуем
 WORKDIR /src/Knitted_Toys_Store.API
@@ -31,4 +37,6 @@ RUN dotnet publish -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
+
+# ENV ASPNETCORE_ENVIRONMENT=Development (или Production, как надо)
 ENTRYPOINT ["dotnet", "Knitted_Toys_Store.API.dll"]
