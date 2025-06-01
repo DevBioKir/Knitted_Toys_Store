@@ -1,8 +1,4 @@
-# Базовый образ с ASP.NET Core рантаймом
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-WORKDIR /src
-
-# Теперь билдим проект
+# Билдим проект
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
