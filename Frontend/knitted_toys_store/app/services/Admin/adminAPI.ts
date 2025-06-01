@@ -1,6 +1,7 @@
 import axios from "axios";
 
 export const adminAPI = axios.create({
+    baseURL: "/api", // <-- относительный путь!
     withCredentials: true,
     headers: {
         "Content-Type": "application/json",

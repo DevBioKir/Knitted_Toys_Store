@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_DB: Knitted_Toys_Store_DB
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: BioKir124578
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -30,9 +30,13 @@ services:
     container_name: backend
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - DOTNET_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
     depends_on:
       - postgres
       - redis
+    ports:
+    - "8080:80"
     networks:
       - knitted_net
 
