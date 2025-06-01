@@ -135,11 +135,47 @@ namespace Knitted_Toys_Store.DataAccess.Migrations
                 name: "IX_OrderItems_ToyId",
                 table: "OrderItems",
                 column: "ToyId");
+
+            // ---- SQL для триггера и расширения ----
+            migrationBuilder.Sql(@"
+                CREATE EXTENSION IF NOT EXISTS pgcrypto;
+            ");
+
+            migrationBuilder.Sql(@"
+                CREATE OR REPLACE FUNCTION update_rowversion()
+                RETURNS trigger AS $$
+                BEGIN
+                    NEW.""RowVersion"" = gen_random_bytes(8);
+                    RETURN NEW;
+                END;
+                $$ LANGUAGE plpgsql;
+            ");
+
+            migrationBuilder.Sql(@"
+                CREATE TRIGGER trg_update_rowversion
+                BEFORE INSERT OR UPDATE ON ""Carts""
+                FOR EACH ROW
+                EXECUTE PROCEDURE update_rowversion();
+            ");
+
+            migrationBuilder.Sql(@"
+                ALTER TABLE ""Carts""
+                ALTER COLUMN ""RowVersion"" SET DEFAULT gen_random_bytes(8);
+            ");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            // Удаляем триггер и функцию
+            migrationBuilder.Sql(@"
+                DROP TRIGGER IF EXISTS trg_update_rowversion ON ""Carts"";
+            ");
+
+            migrationBuilder.Sql(@"
+                DROP FUNCTION IF EXISTS update_rowversion();
+            ");
+
             migrationBuilder.DropTable(
                 name: "CartItems");
 
