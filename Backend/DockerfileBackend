@@ -19,20 +19,26 @@ RUN dotnet restore "Knitted_Toys_Store.API/Knitted_Toys_Store.API.csproj"
 COPY . .
 
 # Устанавливаем EF CLI глобально
-RUN dotnet tool install --global dotnet-ef \
- && echo 'export PATH="$PATH:/root/.dotnet/tools"' >> ~/.bashrc
-
-# Прописываем путь к инструментам EF
+RUN dotnet tool install --global dotnet-ef
 ENV PATH="$PATH:/root/.dotnet/tools"
 
-# Публикуем
+# Публикация приложения
 WORKDIR /src/Knitted_Toys_Store.API
 RUN dotnet publish -c Release -o /app/publish
 
 # STAGE 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
+
+# Копируем опубликованные артефакты
 COPY --from=build /app/publish .
 
-# ENV ASPNETCORE_ENVIRONMENT=Development (или Production, как надо)
-ENTRYPOINT ["dotnet", "Knitted_Toys_Store.API.dll"]
+# Копируем entrypoint
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
+# Установка EF CLI для миграций (нужна SDK, поэтому лучше оставить их в build stage, а миграции запускать оттуда)
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+# Запуск через скрипт
+ENTRYPOINT ["./entrypoint.sh"]
