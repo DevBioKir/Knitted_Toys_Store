@@ -137,35 +137,35 @@ app.UseOrderIdentifier();
 
 app.MapControllers();
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var logger = services.GetRequiredService<ILogger<Program>>();
-    var env = services.GetRequiredService<IWebHostEnvironment>();
+//using (var scope = app.Services.CreateScope())
+//{
+//    var services = scope.ServiceProvider;
+//    var logger = services.GetRequiredService<ILogger<Program>>();
+//    var env = services.GetRequiredService<IWebHostEnvironment>();
 
-    if (env.IsDevelopment())
-    {
-        try
-        {
-            var dbContext = services.GetRequiredService<Knitted_Toys_StoreDBContext>();
+//    if (env.IsDevelopment())
+//    {
+//        try
+//        {
+//            var dbContext = services.GetRequiredService<Knitted_Toys_StoreDBContext>();
 
-            var pendingMigrations = dbContext.Database.GetPendingMigrations();
-            if (pendingMigrations.Any())
-            {
-                logger.LogInformation("Найдены неприменённые миграции. Применяем...");
-                dbContext.Database.Migrate();
-                logger.LogInformation("Миграции успешно применены.");
-            }
-            else
-            {
-                logger.LogInformation("Все миграции уже применены.");
-            }
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Ошибка при применении миграций");
-        }
-    }
-}
+//            var pendingMigrations = dbContext.Database.GetPendingMigrations();
+//            if (pendingMigrations.Any())
+//            {
+//                logger.LogInformation("Найдены неприменённые миграции. Применяем...");
+//                dbContext.Database.Migrate();
+//                logger.LogInformation("Миграции успешно применены.");
+//            }
+//            else
+//            {
+//                logger.LogInformation("Все миграции уже применены.");
+//            }
+//        }
+//        catch (Exception ex)
+//        {
+//            logger.LogError(ex, "Ошибка при применении миграций");
+//        }
+//    }
+//}
 
 app.Run();

@@ -29,9 +29,4 @@ WORKDIR /app
 # Копируем опубликованные артефакты
 COPY --from=build /app/publish .
 
-# Копируем entrypoint
-COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
-
-# Запуск через скрипт
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["dotnet", "Knitted_Toys_Store.API.dll"]

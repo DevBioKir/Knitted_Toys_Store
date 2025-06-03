@@ -1,84 +1,67 @@
-# version: '3.8'
-
 services:
   postgres:
     image: postgres:15
     container_name: postgres
     restart: always
     environment:
-      POSTGRES_DB: Knitted_Toys_Store_DB
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: BioKir124578
+      POSTGRES_DB: "Knitted_Toys_Store_DB"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "BioKir124578"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - knitted_net
-
-  redis:
-    image: redis:8.0.1
-    container_name: redis
-    restart: always
-    volumes:
-      - redis_data:/data
-    networks:
-      - knitted_net
-
-  backend-migrations:
-    build:
-      context: ./Backend
-      dockerfile: DockerfileBackend
-      target: build  # build stage с SDK для миграций
-    depends_on:
-      - postgres
-      - redis
-    environment:
-      ConnectionStrings__Knitted_Toys_StoreDBContext: "Host=postgres;Username=postgres;Password=BioKir124578;Port=5432;Database=Knitted_Toys_Store_DB"
-      Redis__Configuration: "redis:6379"
-    entrypoint: [
-      "dotnet", "ef", "database", "update",
-      "--project", "Knitted_Toys_Store.DataAccess",
-      "--startup-project", "Knitted_Toys_Store.API"
-    ]
-  
-  backend:
-    build:
-      context: ./Backend
-      dockerfile: DockerfileBackend
-    container_name: backend
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - DOTNET_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:80
-    depends_on:
-      - postgres
-      - redis
     ports:
-    - "8080:80"
-    networks:
+      - "5432:5432"
+    networks: 
       - knitted_net
 
-  frontend:
-    build:
-      context: ./Frontend
-      dockerfile: DockerfileFrontend
-    container_name: frontend
-    depends_on:
-      - backend
-    networks:
-      - knitted_net
+redis:
+  image: redis:8.0.1
+  container_name: redis
+  restart: always
+  volumes:
+    - redis_data:/data
+  networks:
+    - knitted_net
 
-  nginx:
-    image: nginx:stable-alpine
-    container_name: nginx
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - frontend
-      - backend
-    networks:
-      - knitted_net
+backend:
+  build:
+    context: ./Backend
+    dockerfile: DockerfileBackend
+  container_name: backend
+  environment:
+    - ASPNETCORE_ENVIRONMENT=Production
+    - DOTNET_ENVIRONMENT=Production
+    - ASPNETCORE_URLS=http://+:80
+  depends_on:
+    - postgres
+    - redis
+  ports:
+    - "80:80"
+  networks:
+    - knitted_net
+
+frontend:
+  build:
+    context: ./Frontend
+    dockerfile: DockerfileFrontend
+  container_name: frontend
+  depends_on:
+    - backend
+  networks:
+    - knitted_net
+
+nginx:
+  image: nginx:stable-alpine
+  container_name: nginx
+  ports:
+    - "80:80"
+  volumes:
+    - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  depends_on:
+    - frontend
+    - backend
+  networks:
+    - knitted_net
 
 volumes:
   postgres_data:
