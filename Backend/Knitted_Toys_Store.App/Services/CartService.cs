@@ -34,53 +34,104 @@ namespace Knitted_Toys_Store.App.Services
             return await _cartRepositories.CreateCartAsync();
         }
 
-        public async Task<Cart> GetCurrentCartAsync(HttpContext httpContext, HttpResponse responce)
+        public async Task<Cart> GetCurrentCartAsync(HttpContext httpContext, HttpResponse response)
         {
             _logger.LogInformation("Получен запрос на текущую корзину");
 
+            // Проверяем HttpContext.Items (обработано middleware)
             if (httpContext.Items.TryGetValue(CartIdentifierMiddleware.CartCookieName, out var cartIdObj) &&
                 cartIdObj is Guid cartGuid)
             {
                 _logger.LogInformation($"Найден ID корзины в HttpContext.Items: {cartGuid}");
-
                 var existingCart = await _cartRepositories.GetCartByIdAsync(cartGuid);
                 if (existingCart != null)
                 {
-                    _logger.LogInformation($"Найдена существующая корзина с ID: {cartGuid}");
                     return existingCart;
                 }
             }
 
-            //проверяем наличие cookie
+            // Проверяем cookie напрямую
             if (httpContext.Request.Cookies.TryGetValue(CartIdentifierMiddleware.CartCookieName, out string? cookieCartIdStr) &&
                 Guid.TryParse(cookieCartIdStr, out Guid cookieCartId))
             {
                 _logger.LogInformation($"Найден ID корзины в cookie: {cookieCartId}");
-
                 var existingCart = await _cartRepositories.GetCartByIdAsync(cookieCartId);
                 if (existingCart != null)
                 {
-                    _logger.LogInformation($"Найдена существующая корзина с ID: {cookieCartId}");
                     return existingCart;
-                }
-                else
-                {
-                    _logger.LogWarning($"Корзина с ID {cookieCartId} не найдена в базе данных");
                 }
             }
 
+            // Создаем новую корзину
+            _logger.LogInformation("Создаем новую корзину");
             var newCart = await _cartRepositories.CreateCartAsync();
 
-            //устанавливаем cookie
-            responce.Cookies.Append(CartIdentifierMiddleware.CartCookieName, newCart.Id.ToString(), new CookieOptions
+            // Настройки cookie для IP-адреса (HTTP)
+            var cookieOptions = new CookieOptions
             {
-                HttpOnly = false,
-                Expires = DateTimeOffset.Now.AddDays(30),
-                Path = "/"
-            });
+                HttpOnly = false, // Для доступа из JavaScript
+                Expires = DateTimeOffset.UtcNow.AddDays(30),
+                Path = "/",
+                Domain = null, // Не указываем домен для IP
+                SameSite = SameSiteMode.Lax, // Lax для HTTP
+                Secure = false, // false для HTTP
+                IsEssential = true
+            };
 
+            response.Cookies.Append(CartIdentifierMiddleware.CartCookieName, newCart.Id.ToString(), cookieOptions);
+            httpContext.Items[CartIdentifierMiddleware.CartCookieName] = newCart.Id;
+
+            _logger.LogInformation($"Создана новая корзина с ID: {newCart.Id}");
             return newCart;
         }
+
+        //public async Task<Cart> GetCurrentCartAsync(HttpContext httpContext, HttpResponse responce)
+        //{
+        //    _logger.LogInformation("Получен запрос на текущую корзину");
+
+        //    if (httpContext.Items.TryGetValue(CartIdentifierMiddleware.CartCookieName, out var cartIdObj) &&
+        //        cartIdObj is Guid cartGuid)
+        //    {
+        //        _logger.LogInformation($"Найден ID корзины в HttpContext.Items: {cartGuid}");
+
+        //        var existingCart = await _cartRepositories.GetCartByIdAsync(cartGuid);
+        //        if (existingCart != null)
+        //        {
+        //            _logger.LogInformation($"Найдена существующая корзина с ID: {cartGuid}");
+        //            return existingCart;
+        //        }
+        //    }
+
+        //    //проверяем наличие cookie
+        //    if (httpContext.Request.Cookies.TryGetValue(CartIdentifierMiddleware.CartCookieName, out string? cookieCartIdStr) &&
+        //        Guid.TryParse(cookieCartIdStr, out Guid cookieCartId))
+        //    {
+        //        _logger.LogInformation($"Найден ID корзины в cookie: {cookieCartId}");
+
+        //        var existingCart = await _cartRepositories.GetCartByIdAsync(cookieCartId);
+        //        if (existingCart != null)
+        //        {
+        //            _logger.LogInformation($"Найдена существующая корзина с ID: {cookieCartId}");
+        //            return existingCart;
+        //        }
+        //        else
+        //        {
+        //            _logger.LogWarning($"Корзина с ID {cookieCartId} не найдена в базе данных");
+        //        }
+        //    }
+
+        //    var newCart = await _cartRepositories.CreateCartAsync();
+
+        //    //устанавливаем cookie
+        //    responce.Cookies.Append(CartIdentifierMiddleware.CartCookieName, newCart.Id.ToString(), new CookieOptions
+        //    {
+        //        HttpOnly = false,
+        //        Expires = DateTimeOffset.Now.AddDays(30),
+        //        Path = "/"
+        //    });
+
+        //    return newCart;
+        //}
 
         public async Task<Guid> UpdateAsync(Cart cart)
         {

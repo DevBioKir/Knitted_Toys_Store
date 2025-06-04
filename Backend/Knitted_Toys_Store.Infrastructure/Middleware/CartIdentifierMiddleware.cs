@@ -23,18 +23,14 @@ namespace Knitted_Toys_Store.Infrastructure.Middleware
         {
             _logger.LogInformation($"CartIdentifierMiddleware: Обработка запроса {context.Request.Path}");
 
-            //Проверка запроса
-            bool isGetCartRequest = context.Request.Path.Value?.Equals("/Cart/Current", StringComparison.OrdinalIgnoreCase) == true &&
-                                context.Request.Method == HttpMethods.Get;
-
             if (context.Items.ContainsKey(CartCookieName))
             {
-                _logger.LogInformation("CartIdentifierMiddleware: Запрос уже обработан, пропускаем");
+                _logger.LogInformation("CartIdentifierMiddleware: Запрос уже обработан");
                 await _next(context);
                 return;
             }
 
-            // Проверяем наличие cookie
+            // Проверяем cookie
             if (context.Request.Cookies.TryGetValue(CartCookieName, out var cookieValue) &&
                 Guid.TryParse(cookieValue, out var cartId))
             {
@@ -43,30 +39,66 @@ namespace Knitted_Toys_Store.Infrastructure.Middleware
                 var cart = await cartService.GetCartByIdAsync(cartId);
                 if (cart != null)
                 {
-                    _logger.LogInformation($"CartIdentifierMiddleware: Найдена существующая корзина с ID {cartId}");
+                    _logger.LogInformation($"CartIdentifierMiddleware: Корзина {cartId} существует");
                     context.Items[CartCookieName] = cartId;
                 }
                 else
                 {
-                    _logger.LogWarning($"CartIdentifierMiddleware: Корзина с ID {cartId} не найдена в базе данных");
-
-                    if (!isGetCartRequest)
-                    {
-                        _logger.LogInformation("CartIdentifierMiddleware: Это не запрос /Cart/Current, создаем новую корзину");
-                        cartId = await CreateNewCartAsync(cartService, context);
-                        context.Items[CartCookieName] = cartId;
-                    }
+                    _logger.LogWarning($"CartIdentifierMiddleware: Корзина {cartId} не найдена в БД");
                 }
-            }
-            else if (!isGetCartRequest)
-            {
-                _logger.LogInformation("CartIdentifierMiddleware: ID корзины не найден в cookie, создаем новую корзину");
-                var newCartId = await CreateNewCartAsync(cartService, context);
-                context.Items[CartCookieName] = newCartId;
             }
 
             await _next(context);
         }
+
+        //public async Task InvokeAsync(HttpContext context, ICartService cartService)
+        //{
+        //    _logger.LogInformation($"CartIdentifierMiddleware: Обработка запроса {context.Request.Path}");
+
+        //    //Проверка запроса
+        //    bool isGetCartRequest = context.Request.Path.Value?.Equals("/Cart/Current", StringComparison.OrdinalIgnoreCase) == true &&
+        //                        context.Request.Method == HttpMethods.Get;
+
+        //    if (context.Items.ContainsKey(CartCookieName))
+        //    {
+        //        _logger.LogInformation("CartIdentifierMiddleware: Запрос уже обработан, пропускаем");
+        //        await _next(context);
+        //        return;
+        //    }
+
+        //    // Проверяем наличие cookie
+        //    if (context.Request.Cookies.TryGetValue(CartCookieName, out var cookieValue) &&
+        //        Guid.TryParse(cookieValue, out var cartId))
+        //    {
+        //        _logger.LogInformation($"CartIdentifierMiddleware: найден ID корзины {cartId}");
+
+        //        var cart = await cartService.GetCartByIdAsync(cartId);
+        //        if (cart != null)
+        //        {
+        //            _logger.LogInformation($"CartIdentifierMiddleware: Найдена существующая корзина с ID {cartId}");
+        //            context.Items[CartCookieName] = cartId;
+        //        }
+        //        else
+        //        {
+        //            _logger.LogWarning($"CartIdentifierMiddleware: Корзина с ID {cartId} не найдена в базе данных");
+
+        //            if (!isGetCartRequest)
+        //            {
+        //                _logger.LogInformation("CartIdentifierMiddleware: Это не запрос /Cart/Current, создаем новую корзину");
+        //                cartId = await CreateNewCartAsync(cartService, context);
+        //                context.Items[CartCookieName] = cartId;
+        //            }
+        //        }
+        //    }
+        //    else if (!isGetCartRequest)
+        //    {
+        //        _logger.LogInformation("CartIdentifierMiddleware: ID корзины не найден в cookie, создаем новую корзину");
+        //        var newCartId = await CreateNewCartAsync(cartService, context);
+        //        context.Items[CartCookieName] = newCartId;
+        //    }
+
+        //    await _next(context);
+        //}
 
         private async Task<Guid> CreateNewCartAsync(ICartService cartService, HttpContext httpContext)
         {
