@@ -7,8 +7,9 @@
   box-sizing: border-box;
 }
 
-html, body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+html,
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   font-size: 16px;
   line-height: 1.6;
   background-color: #fafafa;
@@ -27,8 +28,13 @@ a {
   color: inherit;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Arial', sans-serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Arial", sans-serif;
   font-weight: 700;
 }
 
@@ -36,6 +42,7 @@ p {
   font-size: 1rem;
   color: #555;
 }
+
 
 /* Global containers */
 .container {
@@ -48,19 +55,21 @@ p {
 /* Button Styles */
 button,
 .ant-btn {
-  background-color: #E0B0FF; /* Soft pink color */
+  background-color: #00ff99; /* Soft pink color */
   border: none;
-  color: white;
-  padding: 10px 20px;
+  color: #000;
+  padding: 12px 24px;
   font-size: 16px;
+  font-weight: bold;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99;
 }
 
 button:hover,
 .ant-btn:hover {
-  background-color: #FF1493; /* Darker pink */
+  background-color: #ff1493; /* Darker pink */
   transform: translateY(-2px);
 }
 
@@ -132,7 +141,7 @@ footer {
 }
 
 .bg-gradient {
-  background: linear-gradient(135deg, #FF69B4, #FF1493);
+  background: linear-gradient(135deg, #00e0ff, #007fff);
 }
 
 /* Custom utilities for spacing */

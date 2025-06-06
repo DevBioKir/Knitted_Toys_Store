@@ -1,77 +1,192 @@
 .home-container {
-    position: relative;
-    text-align: center;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-  }
-  
-  .background-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.background-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.welcome-text {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  color: #ffffff;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+  z-index: 2;
+  max-width: 90%;
+  text-align: center;
+}
+
+.center-buttons {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  z-index: 2;
+}
+
+.center-buttons button {
+  padding: 14px 28px;
+  font-size: 1.2rem;
+  background-color: #00e0ff;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  border-radius: 8px;
+  min-height: 44px;
+  max-width: 200px;
+}
+
+.center-buttons button:hover {
+  background-color: white;
+  transform: translateY(-2px);
+}
+
+.neon-blue-btn {
+  background-color: #00e0ff;
+  color: black;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  padding: 10px 20px;
+  box-shadow: 0 0 10px #00e0ff, 0 0 20px #00e0ff;
+  transition: all 0.3s ease;
+}
+
+.neon-blue-btn:hover {
+  background-color: #00ffff;
+  box-shadow: 0 0 15px #00ffff, 0 0 30px #00ffff;
+  transform: translateY(-2px);
+}
+
+.cartoon-carrot-btn {
+  background-color: #FFA500; /* Морковный оранжевый */
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 18px;
+  padding: 10px 24px;
+  font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
+  box-shadow: 0 4px #cc8400;
+  transition: all 0.2s ease-in-out;
+}
+
+.cartoon-carrot-btn:hover {
+  background-color: #ff8c00;
+  box-shadow: 0 6px #cc8400;
+  transform: translateY(-2px);
+}
+
+.cartoon-carrot-btn:active {
+  box-shadow: 0 2px #cc8400;
+  transform: translateY(2px);
+}
+
+.btn-candy {
+  background: #ff5e78;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 26px;
+  font-size: 17px;
+  font-family: 'Comic Sans MS', sans-serif;
+  box-shadow: 0 5px #c64158;
+  transition: 0.2s ease;
+}
+
+.btn-candy:hover {
+  background: #ff3c60;
+  box-shadow: 0 7px #c64158;
+  transform: translateY(-2px);
+}
+
+.btn-candy:active {
+  transform: translateY(2px);
+  box-shadow: 0 3px #c64158;
+}
+
+.btn-neon-green {
+  background-color: #0f0;
+  color: #000;
+  font-weight: bold;
+  border: 2px solid #0f0;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-size: 16px;
+  box-shadow: 0 0 10px #0f0, 0 0 20px #0f0;
+  transition: 0.3s ease;
+}
+
+.btn-neon-green:hover {
+  background-color: #1aff1a;
+  box-shadow: 0 0 15px #1aff1a, 0 0 30px #1aff1a;
+}
+
+.btn-plush {
+  background: #fddde6;
+  color: #333;
+  border: 2px solid #f9aacb;
+  border-radius: 15px;
+  padding: 12px 28px;
+  font-size: 16px;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: 0 4px 8px rgba(255, 192, 203, 0.5);
+  transition: 0.2s ease;
+}
+
+.btn-plush:hover {
+  background: #f9aacb;
+  box-shadow: 0 6px 12px rgba(255, 192, 203, 0.6);
+  transform: scale(1.03);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
   .welcome-text {
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 2.5rem;
-    color: #ffffff;
-    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
-    z-index: 2;
+    font-size: 1.5rem;
   }
-  
-  .center-buttons {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    align-items: center;
-    z-index: 2;
-  }
-  
+
   .center-buttons button {
-    padding: 14px 28px;
+    font-size: 1rem;
+    width: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-text {
     font-size: 1.2rem;
-    background-color: transparent;
-    border: 2px solid white;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-    border-radius: 6px;
   }
-  
-  .center-buttons button:hover {
-    background-color: white;
-    color: black;
+
+  .center-buttons button {
+    font-size: 0.95rem;
+    width: 160px;
   }
-  
-  /* 🌐 Адаптивность */
-  @media (max-width: 768px) {
-    .welcome-text {
-      font-size: 1.5rem;
-      top: 8%;
+
+  /* Анимация появления */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
     }
-  
-    .center-buttons button {
-      font-size: 1rem;
-      padding: 12px 20px;
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
-  
-  @media (max-width: 480px) {
-    .welcome-text {
-      font-size: 1.2rem;
-    }
-  
-    .center-buttons button {
-      font-size: 0.9rem;
-      padding: 10px 18px;
-    }
-  }
-  
+}
