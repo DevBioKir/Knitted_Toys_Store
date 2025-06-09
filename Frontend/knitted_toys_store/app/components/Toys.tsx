@@ -1,5 +1,6 @@
 import { Card, Button, Space } from "antd";
 import { Toy } from "../Models/Toy";
+import styles from "./Toys.module.css";
 
 interface Props {
   toys: Toy[];
@@ -14,16 +15,8 @@ export const Toys = ({ toys, onAddToCart }: Props) => {
   const baseUrl = process.env.NEXT_PUBLIC_DEV_API_BASE_URL;
 
   return (
-    <div style={{ padding: "20px" }}>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-          gap: "16px",
-          maxWidth: "1200px",
-          margin: "0 auto",
-        }}
-      >
+    <div className={styles.container}>
+      <div className={styles.grid}>
         {toys.map((toy) => (
           <Card
             key={toy.id}
@@ -33,18 +26,20 @@ export const Toys = ({ toys, onAddToCart }: Props) => {
                 <img
                   alt={toy.name}
                   src={`${baseUrl}${toy.imageUrl}`}
-                  style={{ height: 200, objectFit: "cover" }}
+                  className={styles.image}
                 />
               ) : null
             }
-            style={{ width: 300 }}
+            className={styles.card}
           >
             <p>{toy.description}</p>
             <p>Размер: {toy.size}мм</p>
             <p>Цена: {toy.price} ₽</p>
             <Space>
               {/* <Button onClick={() => onEdit(toy)}>Редактировать</Button> */}
-              <Button onClick={() => onAddToCart(toy.id!)}>
+              <Button 
+              className={styles.addToCartButton}
+              onClick={() => onAddToCart(toy.id!)}>
                 Добавить в корзину
               </Button>
             </Space>

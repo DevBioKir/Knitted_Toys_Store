@@ -16,6 +16,7 @@ import { addToCart, reduceQuantityItem } from "../services/carts";
 import { useCart } from "../context/CartProvider";
 import OrderCreateForm from "../components/OrderCreateForm";
 import { useRouter } from "next/navigation";
+import styles from "./CartsPage.module.css";
 
 const { Title, Text } = Typography;
 
@@ -94,33 +95,30 @@ export default function CartPage() {
     Array.isArray(CartItemsResponses) && CartItemsResponses.length > 0;
 
   return (
-    <div className="text-center p-6">
+    <div className={styles.container}>
       {hasItems ? (
         <>
           <List
             itemLayout="horizontal"
             dataSource={CartItemsResponses}
             renderItem={(item) => (
-              <Card className="mb-4">
+              <Card className={styles.card}>
                 <List.Item>
                   <List.Item.Meta
                     avatar={
                       <Avatar
                         src={`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}${item.toyImageUrl}`}
                         alt={item.toyName}
-                        size={300}
+                        //size={300}
                         shape="square"
-                        style={{
-                          border: "1px solid #f0f0f0", // лёгкая рамка
-                          objectFit: "cover",
-                        }}
+                        className={styles.avatar}
                       />
                     }
                     title={<Text strong>{item.toyName}</Text>}
                     description={
                       <Space direction="vertical">
                         <Text>Количество: {item.quantity}</Text>
-                        <Space>
+                        <div className={styles.actionsRow}>
                           <Button
                             onClick={() => handleReduceQuantityItem(item.toyId)}
                           >
@@ -132,15 +130,15 @@ export default function CartPage() {
                           >
                             +
                           </Button>
+                          </div>
                         </Space>
-                      </Space>
                     }
                   />
                 </List.Item>
               </Card>
             )}
           />
-          <div className="flex justify-between items-center mt-4">
+          <div className={styles.actions}>
             <Text strong>Итого: {cart?.totalAmount} ₽</Text>
             <Button type="primary" onClick={() => setIsModalOpen(true)}>
               Оформить заказ
@@ -163,20 +161,18 @@ export default function CartPage() {
           </div>
         </>
       ) : (
-        <div className="text-center p-6">
+        <div className={styles.empty}>
           <Title level={3}>Корзина пуста</Title>
-          <p className="mb-4 text-gray-500">
+          <p>
             Возможно, вы уже оформили заказ или не добавили товары
           </p>
-          <div className="flex flex-col items-center">
-            <div className="flex gap-4">
+          <div className={styles.actionsRow}>
               <Button onClick={refreshCart}>Обновить</Button>
               <Button type="primary" onClick={() => router.push("/toysPage")}>
                 Перейти в каталог
               </Button>
             </div>
           </div>
-        </div>
       )}
     </div>
   );

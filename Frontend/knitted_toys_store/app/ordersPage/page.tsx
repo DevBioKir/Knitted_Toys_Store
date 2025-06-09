@@ -17,6 +17,7 @@ import { updateStatusOrder } from "../services/orders";
 import { OrderStatus } from "../Models/Order";
 import { useEffect } from "react";
 import { deleteOrderAdmin } from "../services/Admin/serviceOrdersAdmin";
+import styles from "./OrdersPage.module.css";
 
 const { Title, Text } = Typography;
 
@@ -107,8 +108,8 @@ export default function OrderPage() {
   };
 
   return (
-    <div className="p-4 max-w-3xl mx-auto">
-      <div className="flex justify-between items-center mb-4">
+    <div className={styles.container}>
+      <div className={styles.header}>
         <Title level={2}>Текущий заказ</Title>
         <Space>
           <Button onClick={() => router.back()}>Назад</Button>
@@ -119,55 +120,43 @@ export default function OrderPage() {
       <List
         dataSource={currentOrder.orderItemsResponse}
         renderItem={(item) => (
-          <Card className="mb-4" key={item.id}>
-            <List.Item>
-              <List.Item.Meta
-                avatar={
-                  <img
-                    src={`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}${item.toyImageUrl}`}
-                    alt={item.toyName}
-                    style={{ width: 80, height: 80, objectFit: "cover" }}
-                  />
-                }
-                title={<Text strong>{item.toyName}</Text>}
-                description={
-                  <Space direction="vertical">
-                    <Text>Количество: {item.quantity}</Text>
-                    <Text>Цена за штуку: {item.priceAtTime} ₽</Text>
-                    <Text strong>
-                      Итого: {item.quantity * item.priceAtTime} ₽
-                    </Text>
-                  </Space>
-                }
+          <Card className={styles.card} key={item.id}>
+            <List.Item className={styles.item}>
+              <img
+                src={`${process.env.NEXT_PUBLIC_DEV_API_BASE_URL}${item.toyImageUrl}`}
+                alt={item.toyName}
+                className={styles.image}
               />
+              <div className={styles.itemDetails}>
+                <Text strong>{item.toyName}</Text>
+                <Text>Количество: {item.quantity}</Text>
+                <Text>Цена за штуку: {item.priceAtTime} ₽</Text>
+                <Text strong>Итого: {item.quantity * item.priceAtTime} ₽</Text>
+              </div>
             </List.Item>
           </Card>
         )}
       />
 
-      <div className="flex justify-between items-center mt-6">
-        <div className="flex items-center gap-2">
-          <Text strong style={{ fontSize: "1.2rem" }}>
-            Статус:
-          </Text>
-          <Tag
-            color={statusInfo[currentOrder.status]?.color || "default"}
-            className="text-lg px-3 py-1"
-          >
-            {statusInfo[currentOrder.status]?.label || "Неизвестно"}
-          </Tag>
-        </div>
-        <div className="flex items-center gap-4">
-          <Text strong style={{ fontSize: "1.2rem" }}>
-            Общая сумма: {currentOrder.totalAmount} ₽
-          </Text>
-          {currentOrder.status === OrderStatus.Pending && (
-            <Button type="primary" onClick={handlePayOrder}>
-              Оплатить заказ
-            </Button>
-          )}
-          <Button onClick={handleCancelOrder}>Отменить заказ</Button>
-        </div>
+      <div className={`${styles.statusRow} mt-6`}>
+        <Text strong>Статус:</Text>
+        <Tag
+          color={statusInfo[currentOrder.status]?.color || "default"}
+          className="text-lg px-3 py-1"
+        >
+          {statusInfo[currentOrder.status]?.label || "Неизвестно"}
+        </Tag>
+      </div>
+      <div className={styles.actions}>
+        <Text strong className={styles.total}>
+          Общая сумма: {currentOrder.totalAmount} ₽
+        </Text>
+        {currentOrder.status === OrderStatus.Pending && (
+          <Button type="primary" onClick={handlePayOrder}>
+            Оплатить заказ
+          </Button>
+        )}
+        <Button onClick={handleCancelOrder}>Отменить заказ</Button>
       </div>
     </div>
   );
