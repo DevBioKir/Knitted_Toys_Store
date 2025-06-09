@@ -4,6 +4,7 @@ using Knitted_Toys_Store.Contracts;
 using Knitted_Toys_Store.Domain.Models.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Knitted_Toys_Store.Infrastructure.Middleware;
+using Microsoft.AspNetCore.Http;
 
 namespace Knitted_Toys_Store.API.Controllers
 {
@@ -44,43 +45,84 @@ namespace Knitted_Toys_Store.API.Controllers
 
         [HttpPost]
         public async Task<ActionResult<OrderResponse>> CreateOrderAsync(
-            string surname,
-            string name, 
-            string phone, 
-            string email, 
-            string deliveryAddress, 
-            string deliveryNotes)
+           string surname,
+           string name,
+           string phone,
+           string email,
+           string deliveryAddress,
+           string deliveryNotes)
         {
             var existingOrder = await _orderService.GetCurrentOrderAsync(HttpContext, Response);
             if (existingOrder != null)
             {
                 return BadRequest(new { message = "У Вас уже есть текущий заказ." });
             }
+
             var cart = await _cartService.GetCurrentCartAsync(HttpContext, Response);
             var order = await _orderService.CreateOrderAsync(cart, surname, name, phone, email,
                     deliveryAddress, deliveryNotes);
             await _cartService.ClearCartAsync(cart.Id);
 
-            //Установим order_id в cookie
-            var isDevelopment = HttpContext.Request.Host.Host.Contains("localhost");
-
             var cookieOptions = new CookieOptions
             {
+                HttpOnly = false,
                 Expires = DateTimeOffset.UtcNow.AddDays(30),
-                HttpOnly = true,  // ставим true, чтобы защитить от доступа из JS
-                IsEssential = true,
-                SameSite = isDevelopment ? SameSiteMode.Lax : SameSiteMode.None,
-                Secure = !isDevelopment,
-                Path = "/"
+                Path = "/",
+                Domain = null, // Не указываем домен для IP
+                SameSite = SameSiteMode.Lax,
+                Secure = false,
+                IsEssential = true
             };
 
             Response.Cookies.Append(
                 OrderIdentifierMiddleware.OrderCookieName,
                 order.Id.ToString(),
-                cookieOptions);
+            cookieOptions);
+
+            HttpContext.Items[OrderIdentifierMiddleware.OrderCookieName] = order.Id;
 
             return Ok(order);
         }
+
+        //[HttpPost]
+        //public async Task<ActionResult<OrderResponse>> CreateOrderAsync(
+        //    string surname,
+        //    string name, 
+        //    string phone, 
+        //    string email, 
+        //    string deliveryAddress, 
+        //    string deliveryNotes)
+        //{
+        //    var existingOrder = await _orderService.GetCurrentOrderAsync(HttpContext, Response);
+        //    if (existingOrder != null)
+        //    {
+        //        return BadRequest(new { message = "У Вас уже есть текущий заказ." });
+        //    }
+        //    var cart = await _cartService.GetCurrentCartAsync(HttpContext, Response);
+        //    var order = await _orderService.CreateOrderAsync(cart, surname, name, phone, email,
+        //            deliveryAddress, deliveryNotes);
+        //    await _cartService.ClearCartAsync(cart.Id);
+
+        //    //Установим order_id в cookie
+        //    var isDevelopment = HttpContext.Request.Host.Host.Contains("localhost");
+
+        //    var cookieOptions = new CookieOptions
+        //    {
+        //        Expires = DateTimeOffset.UtcNow.AddDays(30),
+        //        HttpOnly = true,  // ставим true, чтобы защитить от доступа из JS
+        //        IsEssential = true,
+        //        SameSite = isDevelopment ? SameSiteMode.Lax : SameSiteMode.None,
+        //        Secure = !isDevelopment,
+        //        Path = "/"
+        //    };
+
+        //    Response.Cookies.Append(
+        //        OrderIdentifierMiddleware.OrderCookieName,
+        //        order.Id.ToString(),
+        //        cookieOptions);
+
+        //    return Ok(order);
+        //}
 
         [HttpGet("Current")]
         public async Task<ActionResult<OrderResponse>> GetCurrentOrderAsync()

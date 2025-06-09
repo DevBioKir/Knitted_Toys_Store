@@ -11,7 +11,9 @@ namespace Knitted_Toys_Store.Infrastructure.Middleware
         private readonly RequestDelegate _next;
         private readonly ILogger<OrderIdentifierMiddleware> _logger;
 
-        public OrderIdentifierMiddleware(RequestDelegate next, ILogger<OrderIdentifierMiddleware> logger)
+        public OrderIdentifierMiddleware(
+            RequestDelegate next, 
+            ILogger<OrderIdentifierMiddleware> logger)
         {
             _next = next;
             _logger = logger;
@@ -23,7 +25,7 @@ namespace Knitted_Toys_Store.Infrastructure.Middleware
 
             if (context.Items.ContainsKey(OrderCookieName))
             {
-                _logger.LogInformation("OrderIdentifierMiddleware: Заказ уже обработан, пропускаем");
+                _logger.LogInformation("OrderIdentifierMiddleware: Запрос уже обработан, пропускаем");
                 await _next(context);
                 return;
             }

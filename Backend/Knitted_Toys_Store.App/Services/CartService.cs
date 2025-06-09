@@ -4,7 +4,6 @@ using Knitted_Toys_Store.Domain.Models.Domain;
 using Knitted_Toys_Store.Infrastructure.Middleware;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Knitted_Toys_Store.Contracts;
 
 namespace Knitted_Toys_Store.App.Services
 {
@@ -13,7 +12,10 @@ namespace Knitted_Toys_Store.App.Services
         private readonly ICartRepositories _cartRepositories;
         private readonly IMapper _mapper;
         private readonly ILogger<CartIdentifierMiddleware> _logger;
-        public CartService(ICartRepositories cartRepositories, IMapper mapper, ILogger<CartIdentifierMiddleware> logger)
+        public CartService(
+            ICartRepositories cartRepositories, 
+            IMapper mapper, 
+            ILogger<CartIdentifierMiddleware> logger)
         {
             _cartRepositories = cartRepositories;
             _mapper = mapper;
@@ -69,7 +71,7 @@ namespace Knitted_Toys_Store.App.Services
             // Настройки cookie для IP-адреса (HTTP)
             var cookieOptions = new CookieOptions
             {
-                HttpOnly = false, // Для доступа из JavaScript
+                HttpOnly = false, 
                 Expires = DateTimeOffset.UtcNow.AddDays(30),
                 Path = "/",
                 Domain = null, // Не указываем домен для IP
@@ -78,60 +80,16 @@ namespace Knitted_Toys_Store.App.Services
                 IsEssential = true
             };
 
-            response.Cookies.Append(CartIdentifierMiddleware.CartCookieName, newCart.Id.ToString(), cookieOptions);
+            response.Cookies.Append(
+                CartIdentifierMiddleware.CartCookieName, 
+                newCart.Id.ToString(), 
+                cookieOptions);
+
             httpContext.Items[CartIdentifierMiddleware.CartCookieName] = newCart.Id;
 
             _logger.LogInformation($"Создана новая корзина с ID: {newCart.Id}");
             return newCart;
         }
-
-        //public async Task<Cart> GetCurrentCartAsync(HttpContext httpContext, HttpResponse responce)
-        //{
-        //    _logger.LogInformation("Получен запрос на текущую корзину");
-
-        //    if (httpContext.Items.TryGetValue(CartIdentifierMiddleware.CartCookieName, out var cartIdObj) &&
-        //        cartIdObj is Guid cartGuid)
-        //    {
-        //        _logger.LogInformation($"Найден ID корзины в HttpContext.Items: {cartGuid}");
-
-        //        var existingCart = await _cartRepositories.GetCartByIdAsync(cartGuid);
-        //        if (existingCart != null)
-        //        {
-        //            _logger.LogInformation($"Найдена существующая корзина с ID: {cartGuid}");
-        //            return existingCart;
-        //        }
-        //    }
-
-        //    //проверяем наличие cookie
-        //    if (httpContext.Request.Cookies.TryGetValue(CartIdentifierMiddleware.CartCookieName, out string? cookieCartIdStr) &&
-        //        Guid.TryParse(cookieCartIdStr, out Guid cookieCartId))
-        //    {
-        //        _logger.LogInformation($"Найден ID корзины в cookie: {cookieCartId}");
-
-        //        var existingCart = await _cartRepositories.GetCartByIdAsync(cookieCartId);
-        //        if (existingCart != null)
-        //        {
-        //            _logger.LogInformation($"Найдена существующая корзина с ID: {cookieCartId}");
-        //            return existingCart;
-        //        }
-        //        else
-        //        {
-        //            _logger.LogWarning($"Корзина с ID {cookieCartId} не найдена в базе данных");
-        //        }
-        //    }
-
-        //    var newCart = await _cartRepositories.CreateCartAsync();
-
-        //    //устанавливаем cookie
-        //    responce.Cookies.Append(CartIdentifierMiddleware.CartCookieName, newCart.Id.ToString(), new CookieOptions
-        //    {
-        //        HttpOnly = false,
-        //        Expires = DateTimeOffset.Now.AddDays(30),
-        //        Path = "/"
-        //    });
-
-        //    return newCart;
-        //}
 
         public async Task<Guid> UpdateAsync(Cart cart)
         {
