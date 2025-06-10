@@ -37,7 +37,7 @@ export const getAllOrders = async (): Promise<OrderResponse[]> => {
   return data;
 };
 
-// Переменная для кэширования ID корзины
+// Переменная для кэширования ID заказа
 let cachedOrderId: string | null = null;
 
 export const getCurrentOrder = async (): Promise<OrderResponse | null> => {
