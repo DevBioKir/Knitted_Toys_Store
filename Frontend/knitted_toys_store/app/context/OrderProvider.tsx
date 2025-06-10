@@ -62,7 +62,7 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
   const [order, setOrder] = useState<OrderResponse | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<OrderResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false); // ← добавлено
+  const [isInitialized, setIsInitialized] = useState(false);
   const refreshInProgress = useRef(false);
 
   const refreshOrders = async () => {

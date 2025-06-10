@@ -20,19 +20,19 @@ export const Toys = ({ toys, onAddToCart }: Props) => {
         {toys.map((toy) => (
           <Card
             key={toy.id}
-            title={toy.name}
+            title={<span className={styles.toyName}>{toy.name}</span>}
             cover={
               toy.imageUrl ? (
                 <img
                   alt={toy.name}
                   src={`${baseUrl}${toy.imageUrl}`}
-                  className={styles.image}
+                  className={styles.toyImage}
                 />
               ) : null
             }
-            className={styles.card}
+            className={styles.toyCard}
           >
-            <p>{toy.description}</p>
+            <p className={styles.toyDescription}>{toy.description}</p>
             <p>Размер: {toy.size}мм</p>
             <p>Цена: {toy.price} ₽</p>
             <Space>
