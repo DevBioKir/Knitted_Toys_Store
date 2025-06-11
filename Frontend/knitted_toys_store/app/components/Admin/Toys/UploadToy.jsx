@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./UploadPage.css"; // Путь к файлу стилей
+import "./UploadPage.css";
 import uploadToysFromExcel from "@/app/services/Admin/serviceUploadToysFromExcel";
 
 export const ToyUploadPage = () => {
