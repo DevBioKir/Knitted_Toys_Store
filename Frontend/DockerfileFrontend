@@ -5,7 +5,6 @@ WORKDIR /app
 COPY knitted_toys_store/package*.json ./
 RUN npm install
 
-# Убедись, что .env.local не попадёт
 COPY knitted_toys_store/ ./
 RUN rm -f .env.local  # критично!
 
