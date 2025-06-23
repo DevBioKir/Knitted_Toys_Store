@@ -389,6 +389,14 @@ FodyWeavers.xsd
 # Local History for Visual Studio Code
 .history/
 
+# 🐳 Docker локальные файлы
+docker-compose.yml
+
+# 🔒 Секреты и переменные окружения
+.env
+.env.local
+.env.*.local
+
 # Windows Installer files from build outputs
 *.cab
 *.msi
@@ -402,4 +410,5 @@ FodyWeavers.xsd
 # Ignore configurations files
 appsettings.json
 appsettings.Development.json
+appsettings.Production.json
 Frontend/.next/
