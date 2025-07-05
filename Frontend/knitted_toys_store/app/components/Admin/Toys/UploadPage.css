@@ -34,7 +34,7 @@
   margin-top: 20px;
 }
 
-button {
+.upload-button {
   padding: 10px 20px;
   background-color: #4CAF50;
   color: white;
@@ -43,7 +43,7 @@ button {
   margin-top: 10px;
 }
 
-button:disabled {
+.upload-button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
 }

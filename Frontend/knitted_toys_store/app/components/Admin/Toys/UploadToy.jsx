@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./UploadPage.css"; // Путь к файлу стилей
+import "./UploadPage.css";
 import uploadToysFromExcel from "@/app/services/Admin/serviceUploadToysFromExcel";
 
 export const ToyUploadPage = () => {
@@ -19,7 +19,7 @@ export const ToyUploadPage = () => {
     setErrorMessage("");
 
     try {
-      await uploadToysFromExcel(zipFile); // просто вызываем функцию
+      await uploadToysFromExcel(zipFile);
       alert("Игрушки успешно загружены!");
     } catch (error) {
       setErrorMessage("Произошла ошибка при загрузке. Попробуйте снова.");
@@ -28,7 +28,6 @@ export const ToyUploadPage = () => {
     }
   };
 
-  // Функция для обработки выбора файла
   const handleFileChange = (e) => {
     setZipFile(e.target.files[0]);
   };

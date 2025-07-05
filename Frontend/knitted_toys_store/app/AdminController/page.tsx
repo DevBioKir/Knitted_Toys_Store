@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import AdminToysPage from "./Toys/AdminToys";
 import AdminCartsPage from "./Carts/AdminCarts";
 import ToyUploadPage from "../components/Admin/Toys/UploadToy";
+import ToyUpdatePricePage from "../components/Admin/Toys/UpdatePriceToys";
 import { useRouter } from "next/navigation";
 import "./../components/Admin/Toys/AdminAddToyPage.css";
 import AdminOrdersPage from "./Orders/AdminOrders";
@@ -55,6 +56,11 @@ export default function AdminPage() {
                 </div>
               </div>
             ),
+          },
+          {
+            key: "updatePriceToys",
+            label: "Изменение цены игрушек",
+            children: <ToyUpdatePricePage />,
           },
           {
             key: "toys",
