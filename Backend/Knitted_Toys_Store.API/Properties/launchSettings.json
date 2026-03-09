@@ -8,7 +8,6 @@
         },
         "dotnetRunMessages": true,
         "applicationUrl": "http://localhost:5237"
-        //"applicationUrl": "http://192.168.251.61:5237"
     },
     "https": {
       "commandName": "Project",
